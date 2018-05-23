@@ -1,0 +1,7 @@
+<launch>
+
+  <!-- run nmea_navsat_driver with arguments _port and _baud specified -->
+  <!-- equivelant of "rosrun nmea_navsat_driver nmea_serial_driver _port:=/dev/ttyUSB0 _baud:=115200" -->
+  <node name="nmea_serial_driver" pkg="nmea_navsat_driver" type="nmea_serial_driver" args="_port:=/dev/ttyUSB0 _baud:=115200">
+
+</launch>
