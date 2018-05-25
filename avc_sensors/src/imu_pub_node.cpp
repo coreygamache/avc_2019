@@ -14,9 +14,6 @@ int main(int argc, char const **argv) {
   //initialize node and create node handler
   ros::init(argc, argcv, "imu_pub_node");
 
-  //create public NodeHandle for publishing messages
-  ros::NodeHandle node;
-
   //create private NodeHandle for getting IMU parameters
   ros::NodeHandle node_private("~");
 
@@ -123,8 +120,8 @@ int main(int argc, char const **argv) {
   }
 
   //create publishers to publish IMU and compass messages with buffer size 10, and latch set to false
-  ros::Publisher imu_pub = node.advertise<sensor_msgs::Imu>("imu", 10, false);
-  ros::Publisher compass_pub = node.advertise<sensor_msgs::MagneticField>("compass", 10, false);
+  ros::Publisher imu_pub = node_private.advertise<sensor_msgs::Imu>("imu", 10, false);
+  ros::Publisher compass_pub = node_private.advertise<sensor_msgs::MagneticField>("compass", 10, false);
 
   ros::Rate loop_rate(10);
   while (ros::ok())
