@@ -36,7 +36,7 @@ void ProximitySensor::setTriggerPin(int trigger)
 //  int timeout     time to wait for echo in milliseconds (optional, default 50)
 //returns:
 //  double          distance to nearest object in meters
-double ProximitySensor::getDistance(int timeout = 20)
+double ProximitySensor::getDistance(int timeout = 30)
 {
 
   //convert timeout in milliseconds to microseconds
