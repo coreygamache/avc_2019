@@ -3,12 +3,16 @@
   <!-- INFORMATION -->
   <!-- static_transform_publisher args: x y z yaw pitch roll frame_id child_frame_id period_in_ms -->
 
+  <!-- launch GPS publisher node and broadcast transform -->
+  <include file="$(find nmea_navsat_driver)/launch/nmea_navsat_driver.launch" />
+  <node name="gps_to_base_tf" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 base_link gps_link 10" />
+
   <!-- launch IMU publisher node and broadcast transform -->
   <node name="imu_pub_node" ns="imu" pkg="avc_sensors" type="imu_pub_node" />
   <node name="imu_to_base_tf" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 base_link imu_link 10" />
 
-  <!-- launch GPS publisher node and broadcast transform -->
-  <include file="$(find nmea_navsat_driver)/launch/nmea_navsat_driver.launch" />
-  <node name="gps_to_base_tf" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 base_link gps_link 10" />
+  <!-- launch proximity sensor publisher node and broadcast transform -->
+  <node name="proximity_pub_node" ns="proximity_sensor" pkg="avc_sensors" type="proximity_pub_node" />
+  <node name="proximity_sensor_to_base_tf" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 base_link proximity_sensor_link 10" />
 
 </launch>
