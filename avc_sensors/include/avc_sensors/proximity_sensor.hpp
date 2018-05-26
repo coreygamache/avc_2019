@@ -1,5 +1,5 @@
-#ifndef DEF_PROXIMITY_SENSOR
-#define DEF_PROXIMITY_SENSOR
+#ifndef PROXIMITY_SENSOR_HPP
+#define PROXIMITY_SENSOR_HPP
 
 class ProximitySensor
 {
@@ -20,3 +20,5 @@ class ProximitySensor
     int triggerPin;
 
 };
+
+#endif
