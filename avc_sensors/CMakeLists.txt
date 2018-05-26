@@ -77,8 +77,7 @@ include_directories(
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/avc_sensors.cpp
 # )
-add_library(proximity_sensor src/proximity_sensor.cpp
-)
+add_library(proximity_sensor src/proximity_sensor.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -96,9 +95,6 @@ add_executable(proximity_pub_node src/proximity_pub_node.cpp)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-# add_dependencies(imu_pub_node imu_pub_node_generate_messages_cpp)
-# add_dependencies(laser_pub_node laser_pub_node_generate_messages_cpp)
-# add_dependencies(proximity_pub_node proximity_pub_node_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
