@@ -8,8 +8,6 @@ project(avc_sensors)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  message_generation
-  nmea_navsat_driver
   roscpp
   sensor_msgs
 )
@@ -43,10 +41,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  sensor_msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   sensor_msgs
+# )
 
 ###################################
 ## catkin specific configuration ##
@@ -59,9 +57,9 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES avc_sensors
-  CATKIN_DEPENDS nmea_navsat_driver roscpp sensor_msgs
-  DEPENDS message_runtime
+  LIBRARIES proximity_sensor
+  CATKIN_DEPENDS roscpp sensor_msgs
+  # DEPENDS message_runtime
 )
 
 ###########
@@ -71,7 +69,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+ include/avc_sensors
  ${catkin_INCLUDE_DIRS}
 )
 
@@ -79,9 +77,8 @@ include_directories(
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/avc_sensors.cpp
 # )
-#add_library(avc_sensors
-#  src/avc_sensors/proximity_sensor.cpp
-#)
+add_library(proximity_sensor src/proximity_sensor.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -94,19 +91,20 @@ include_directories(
 # add_executable(${PROJECT_NAME}_node src/avc_sensors_node.cpp)
 add_executable(imu_pub_node src/imu_pub_node.cpp)
 #add_executable(laser_pub_node src/laser_pub_node.cpp)
-#add_executable(proximity_pub_node src/proximity_pub_node.cpp)
+add_executable(proximity_pub_node src/proximity_pub_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(imu_pub_node imu_pub_node_generate_messages_cpp)
-#add_dependencies(laser_pub_node laser_pub_node_generate_messages_cpp)
-#add_dependencies(proximity_pub_node proximity_pub_node_generate_messages_cpp)
+# add_dependencies(imu_pub_node imu_pub_node_generate_messages_cpp)
+# add_dependencies(laser_pub_node laser_pub_node_generate_messages_cpp)
+# add_dependencies(proximity_pub_node proximity_pub_node_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
+target_link_libraries(proximity_sensor ${catkin_LIBRARIES} wiringPi)
 target_link_libraries(imu_pub_node ${catkin_LIBRARIES} RTIMULib)
 #target_link_libraries(laser_pub_node ${catkin_LIBRARIES})
-#target_link_libraries(proximity_pub_node ${catkin_LIBRARIES} wiringPi)
+target_link_libraries(proximity_pub_node ${catkin_LIBRARIES} proximity_sensor)
