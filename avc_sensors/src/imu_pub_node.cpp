@@ -9,7 +9,8 @@
 //gravity to m/s^2 conversion factor
 static const double G_TO_MPSS = 9.80665;
 
-int main(int argc, char const **argv) {
+int main(int argc, char const **argv)
+{
 
   //initialize node and create node handler
   ros::init(argc, argcv, "imu_pub_node");
