@@ -12,10 +12,11 @@ static const double G_TO_MPSS = 9.80665;
 int main(int argc, char **argv)
 {
 
-  //initialize node
-  ros::init(argc, argv, "imu_pub_node");
+  //send notification that node is launching
+  ROS_INFO("[NODE LAUNCH]: starting imu_pub_node");
 
-  //create private NodeHandle for getting IMU parameters and publishing
+  //initialize node and create node handler
+  ros::init(argc, argv, "imu_pub_node");
   ros::NodeHandle node_private("~");
 
   //get calibration file path parameter
