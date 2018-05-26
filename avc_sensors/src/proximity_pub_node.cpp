@@ -1,15 +1,15 @@
 //ROS includes
-#include "ros/ros.h"
-#include "sensor_msgs/Range.h"
+#include <ros/ros.h>
+#include <sensor_msgs/Range.h>
 
 //other includes
-#include "proximity_sensor.hpp"
+#include <proximity_sensor.hpp>
 
-int main(int argc, char const **argv)
+int main(int argc, char **argv)
 {
 
   //initialize node and create node handler
-  ros::init(argc, argc, "proximity_pub_node");
+  ros::init(argc, argv, "proximity_pub_node");
   ros::NodeHandle node_private("~");
 
   //create Sensor type object with echo set to GPIO pin 23 and trigger to 24
@@ -25,7 +25,7 @@ int main(int argc, char const **argv)
   proximity_msg.header.frame_id = "proximity_sensor_link";
 
   //set radiation type of sensor (0 indicates ultrasound, 1 infrared)
-  proximity_msg.radiation_type = 0
+  proximity_msg.radiation_type = 0;
 
   //set field of view of sensor in radians
   proximity_msg.field_of_view = 0.3665;
@@ -50,8 +50,8 @@ int main(int argc, char const **argv)
     //set time of current distance reading
     proximity_msg.header.stamp = ros::Time::now();
 
-    //get distance to nearest object from proximity sensor with 25ms timeout]
-    proximity_msg.range = sensor.getDistance();
+    //get distance to nearest object from proximity sensor with 25ms timeout
+    proximity_msg.range = sensor.getDistance(25);
 
     //publish proximity sensor range message
     proximity_pub.publish(proximity_msg);
