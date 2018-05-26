@@ -1,12 +1,23 @@
-#include "ros/ros.h"
-#include "proximity_sensor.hpp"
-#include "wiringPi.h"
+//ROS includes
+#include <ros/ros.h>
+
+//external includes
+#include <wiringPi.h>
+
+//include header
+#include <proximity_sensor.hpp>
 
 //default constructor
 ProximitySensor::ProximitySensor(int echo, int trigger)
 {
+
+  //run wiringPi setup functions
+  wiringPiSetup();
+
+  //set pins to given pin numbers
   setEchoPin(echo);
   setTriggerPin(trigger);
+
 }
 
 int ProximitySensor::getEchoPin()
@@ -28,7 +39,7 @@ void ProximitySensor::setEchoPin(int echo)
 void ProximitySensor::setTriggerPin(int trigger)
 {
   pinMode(this->triggerPin, OUTPUT);
-  digitalWrite(this->trigger, LOW);
+  digitalWrite(this->triggerPin, LOW);
 }
 
 //getDistance       get distance to nearest object in sensor's field of view
