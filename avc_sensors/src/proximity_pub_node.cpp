@@ -8,6 +8,9 @@
 int main(int argc, char **argv)
 {
 
+  //send notification that node is launching
+  ROS_INFO("[NODE LAUNCH]: starting proximity_pub_node");
+
   //initialize node and create node handler
   ros::init(argc, argv, "proximity_pub_node");
   ros::NodeHandle node_private("~");
