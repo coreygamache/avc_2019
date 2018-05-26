@@ -1,26 +1,26 @@
 //ROS includes
-#include "ros/ros.h"
-#include "sensor_msgs/Imu.h>"
-#include "sensor_msgs/MagneticField.h"
+#include <ros/ros.h>
+#include <sensor_msgs/Imu.h>
+#include <sensor_msgs/MagneticField.h>
 
 //external library includes
-#include "RTIMULib.h"
+#include <RTIMULib.h>
 
 //gravity to m/s^2 conversion factor
 static const double G_TO_MPSS = 9.80665;
 
-int main(int argc, char const **argv)
+int main(int argc, char **argv)
 {
 
   //initialize node
-  ros::init(argc, argcv, "imu_pub_node");
+  ros::init(argc, argv, "imu_pub_node");
 
   //create private NodeHandle for getting IMU parameters and publishing
   ros::NodeHandle node_private("~");
 
   //get calibration file path parameter
   std::string calibration_file_path;
-  if (!node_private.getParam("calibration_file_path", calibration_file_path)
+  if (!node_private.getParam("calibration_file_path", calibration_file_path))
   {
     ROS_ERROR("calibration file not found");
     ROS_BREAK();
@@ -41,10 +41,10 @@ int main(int argc, char const **argv)
   }
 
   //create RTIMUSettings type object called imu_settings to set initial IMU settings that will later be used to create IMU object
-  RTIMUSettings *imu_settings = new RTIMUSettings:RTIMUSettings(calibration_file_path.c_str(), calibration_file_name.c_str());
+  RTIMUSettings *imu_settings = new RTIMUSettings(calibration_file_path.c_str(), calibration_file_name.c_str());
 
   //create RTIMU type object called imu using previously determined settings
-  RTIMU *imu = RTIMU:createIMU(&imu_settings);;
+  RTIMU *imu = RTIMU::createIMU(imu_settings);
 
   //make sure IMU was detected
   if ((imu == NULL) || (imu->IMUType() == RTIMU_TYPE_NULL))
