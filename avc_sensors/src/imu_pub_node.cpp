@@ -124,7 +124,9 @@ int main(int argc, char const **argv)
   ros::Publisher imu_pub = node_private.advertise<sensor_msgs::Imu>("imu", 10, false);
   ros::Publisher compass_pub = node_private.advertise<sensor_msgs::MagneticField>("compass", 10, false);
 
+  //set refresh rate to 10 hz
   ros::Rate loop_rate(10);
+
   while (ros::ok())
   {
 
