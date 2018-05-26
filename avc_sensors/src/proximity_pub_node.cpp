@@ -18,11 +18,11 @@ int main(int argc, char const **argv)
   //create sensor_msgs/Range type message to publish proximity sensor data
   sensor_msgs::Range proximity_msg;
 
-  //set static message values
-  proximity_msg.header.frame_id = "proximity_sensor_frame";
-
   //static message values for HC-SR04 ultrasonic range sensor
   //----------------------------------------------------------
+
+  //set sensor frame id
+  proximity_msg.header.frame_id = "proximity_sensor_link";
 
   //set radiation type of sensor (0 indicates ultrasound, 1 infrared)
   proximity_msg.radiation_type = 0
