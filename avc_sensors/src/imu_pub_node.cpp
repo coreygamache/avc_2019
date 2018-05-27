@@ -76,7 +76,7 @@ int main(int argc, char **argv)
   {
     orientation_covariance.assign(9, 0);
   }
-  std::copy(orientation_covariance.begin(), orientation_covariance.end(), imu_msg.orientation_covariance);
+  std::copy(orientation_covariance.begin(), orientation_covariance.end(), std::begin(imu_msg.orientation_covariance));
 
   //get IMU angular velocity covariance values
   std::vector<double> angular_velocity_covariance;
@@ -84,7 +84,7 @@ int main(int argc, char **argv)
   {
     angular_velocity_covariance.assign(9, 0);
   }
-  std::copy(angular_velocity_covariance.begin(), angular_velocity_covariance.end(), imu_msg.angular_velocity_covariance);
+  std::copy(angular_velocity_covariance.begin(), angular_velocity_covariance.end(), std::begin(imu_msg.angular_velocity_covariance));
 
   //get IMU linear acceleration covariance values
   std::vector<double> linear_acceleration_covariance;
@@ -92,14 +92,14 @@ int main(int argc, char **argv)
   {
     linear_acceleration_covariance.assign(9, 0);
   }
-  std::copy(linear_acceleration_covariance.begin(), linear_acceleration_covariance.end(), imu_msg.linear_acceleration_covariance);
+  std::copy(linear_acceleration_covariance.begin(), linear_acceleration_covariance.end(), std::begin(imu_msg.linear_acceleration_covariance));
 
   //create sensor_msgs/MagneticField type message to publish compass data
   sensor_msgs::MagneticField compass_msg;
 
-  //set compass message magnetic_field_covariance values to zero to indicate unknown
+  //set compass message magnetic_field_covariance values to zero to indicat e unknown
   std::vector<double> magnetic_field_covariance(9, 0);
-  std::copy(magnetic_field_covariance.begin(), magnetic_field_covariance.end(), compass_msg.magnetic_field_covariance);
+  std::copy(magnetic_field_covariance.begin(), magnetic_field_covariance.end(), std::begin(compass_msg.magnetic_field_covariance));
 
   //create publishers to publish IMU and compass messages with buffer size 10, and latch set to false
   ros::Publisher imu_pub = node_private.advertise<sensor_msgs::Imu>("imu", 10, false);
