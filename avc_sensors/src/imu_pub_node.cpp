@@ -72,54 +72,34 @@ int main(int argc, char **argv)
 
   //get IMU orientation covariance values
   std::vector<double> orientation_covariance;
-  if (node_private.getParam("orientation_covariance", orientation_covariance) && orientation_covariance.size() == 9)
+  if (!node_private.getParam("orientation_covariance", orientation_covariance) || orientation_covariance.size() != 9)
   {
-    for (int i=0; i < 9; i++)
-    {
-      imu_msg.orientation_covariance[i] = orientation_covariance[i];
-    }
+    orientation_covariance.assign(9, 0);
   }
-  else
-  {
-    imu_msg.orientation_covariance[0] = -1;
-  }
+  std::copy(orientation_covariance.begin(), orientation_covariance.end(), imu_msg.orientation_covariance);
 
   //get IMU angular velocity covariance values
   std::vector<double> angular_velocity_covariance;
-  if (node_private.getParam("angular_velocity_covariance", angular_velocity_covariance) && angular_velocity_covariance.size() == 9)
+  if (!node_private.getParam("angular_velocity_covariance", angular_velocity_covariance) || angular_velocity_covariance.size() != 9)
   {
-    for (int i=0; i < 9; i++)
-    {
-      imu_msg.angular_velocity_covariance[i] = angular_velocity_covariance[i];
-    }
+    angular_velocity_covariance.assign(9, 0);
   }
-  else
-  {
-    imu_msg.angular_velocity_covariance[0] = -1;
-  }
+  std::copy(angular_velocity_covariance.begin(), angular_velocity_covariance.end(), imu_msg.angular_velocity_covariance);
 
   //get IMU linear acceleration covariance values
   std::vector<double> linear_acceleration_covariance;
-  if (node_private.getParam("linear_acceleration_covariance", linear_acceleration_covariance) && linear_acceleration_covariance.size() == 9)
+  if (!node_private.getParam("linear_acceleration_covariance", linear_acceleration_covariance) || linear_acceleration_covariance.size() != 9)
   {
-    for (int i=0; i < 9; i++)
-    {
-      imu_msg.linear_acceleration_covariance[i] = linear_acceleration_covariance[i];
-    }
+    linear_acceleration_covariance.assign(9, 0);
   }
-  else
-  {
-    imu_msg.linear_acceleration_covariance[0] = -1;
-  }
+  std::copy(linear_acceleration_covariance.begin(), linear_acceleration_covariance.end(), imu_msg.linear_acceleration_covariance);
 
   //create sensor_msgs/MagneticField type message to publish compass data
   sensor_msgs::MagneticField compass_msg;
 
   //set compass message magnetic_field_covariance values to zero to indicate unknown
-  for (int i=0; i < 9; i++)
-  {
-    compass_msg.magnetic_field_covariance[i] = 0;
-  }
+  std::vector<double> magnetic_field_covariance(9, 0);
+  std::copy(magnetic_field_covariance.begin(), magnetic_field_covariance.end(), compass_msg.magnetic_field_covariance);
 
   //create publishers to publish IMU and compass messages with buffer size 10, and latch set to false
   ros::Publisher imu_pub = node_private.advertise<sensor_msgs::Imu>("imu", 10, false);
