@@ -35,9 +35,9 @@ void ProximitySensor::setEchoPin(int echo)
 
   //set pin to provided value, ensuring input is valid
   //default to GPIO pin 23 on invalid input
-  if ((echo < 2) || (echo > 27))
+  if ((echo < 0) || (echo > 31))
   {
-    this->echoPin = 23;
+    this->echoPin = 4;
   }
   else
   {
@@ -55,9 +55,9 @@ void ProximitySensor::setTriggerPin(int trigger)
 
   //set pin to provided value, ensuring input is valid
   //default to GPIO pin 24 on invalid input
-  if ((trigger < 2) || (trigger > 27))
+  if ((trigger < 0) || (trigger > 31))
   {
-    this->triggerPin = 24;
+    this->triggerPin = 5;
   }
   else
   {
