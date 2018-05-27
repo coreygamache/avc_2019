@@ -67,7 +67,7 @@ void ProximitySensor::setTriggerPin(int trigger)
   //designate pin as output and disable pull-up resistor
   pinMode(this->triggerPin, OUTPUT);
   digitalWrite(this->triggerPin, LOW);
-  
+
 }
 
 //getDistance       get distance to nearest object in sensor's field of view
@@ -86,28 +86,33 @@ double ProximitySensor::getDistance(int timeout = 30)
   delayMicroseconds(10);
   digitalWrite(this->triggerPin, LOW);
 
+  //create and set start time to current time
   long start_time = micros();
 
-  //wait for start of signal from echo pin
+  //wait for start of HIGH signal from echo pin
   //return -1 if time waiting exceeds timeout duration to indicate error
-  while (this->echoPin == LOW)
+  while (digitalRead(this->echoPin) == LOW)
   {
     if ((micros() - start_time) >= timeout)
     {
       return -1;
     }
   }
+
+  //set time to current time (start of HIGH signal)
   start_time = micros();
 
-  //wait for end of signal from echo pin
+  //wait for end of HIGH signal from echo pin
   //return -1 if time waiting exceeds timeout duration to indicate error
-  while (this->echoPin == LOW)
+  while (digitalRead(this->echoPin) == HIGH)
   {
     if ((micros() - start_time) >= timeout)
     {
       return -1;
     }
   }
+
+  //set end time to current time (end of HIGH signal)
   long end_time = micros();
 
   //return distance to nearest object in meters
