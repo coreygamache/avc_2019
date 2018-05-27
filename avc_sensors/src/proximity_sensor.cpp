@@ -32,14 +32,42 @@ int ProximitySensor::getTriggerPin()
 
 void ProximitySensor::setEchoPin(int echo)
 {
+
+  //set pin to provided value, ensuring input is valid
+  //default to GPIO pin 23 on invalid input
+  if ((echo < 2) || (echo > 27))
+  {
+    this->echoPin = 23;
+  }
+  else
+  {
+    this->echoPin = echo;
+  }
+
+  //designate pin as input and disable pull-up resistor
   pinMode(this->echoPin, INPUT);
   digitalWrite(this->echoPin, LOW);
+
 }
 
 void ProximitySensor::setTriggerPin(int trigger)
 {
+
+  //set pin to provided value, ensuring input is valid
+  //default to GPIO pin 24 on invalid input
+  if ((trigger < 2) || (trigger > 27))
+  {
+    this->triggerPin = 24;
+  }
+  else
+  {
+    this->triggerPin = trigger;
+  }
+
+  //designate pin as output and disable pull-up resistor
   pinMode(this->triggerPin, OUTPUT);
   digitalWrite(this->triggerPin, LOW);
+  
 }
 
 //getDistance       get distance to nearest object in sensor's field of view
