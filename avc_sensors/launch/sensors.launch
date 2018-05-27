@@ -1,14 +1,15 @@
 <launch>
 
   <!-- INFORMATION -->
-  <!-- static_transform_publisher args: x y z yaw pitch roll frame_id child_frame_id period_in_ms -->
+  <!-- static_transform_publisher args: x y z yaw pitch roll parent_frame_id child_frame_id -->
+  <!-- static_transform_publisher args: x y z qx qy qz qw parent_frame_id child_frame_id -->
 
   <!-- launch IMU publisher node and broadcast transform -->
   <node name="imu_pub_node" ns="imu" pkg="avc_sensors" type="imu_pub_node" />
-  <node name="imu_to_base_tf" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 base_link imu_link 10" />
+  <node name="imu_link_broadcaster" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 base_link imu_link" />
 
   <!-- launch proximity sensor publisher node and broadcast transform -->
   <node name="proximity_pub_node" ns="proximity_sensor" pkg="avc_sensors" type="proximity_pub_node" />
-  <node name="proximity_sensor_to_base_tf" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 base_link proximity_sensor_link 10" />
+  <node name="proximity_sensor_link_broadcaster" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 base_link proximity_sensor_link" />
 
 </launch>

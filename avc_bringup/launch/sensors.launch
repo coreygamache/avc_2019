@@ -1,13 +1,14 @@
 <launch>
 
   <!-- INFORMATION -->
-  <!-- static_transform_publisher args: x y z yaw pitch roll frame_id child_frame_id period_in_ms -->
+  <!-- static_transform_publisher args: x y z yaw pitch roll parent_frame_id child_frame_id -->
+  <!-- static_transform_publisher args: x y z qx qy qz qw parent_frame_id child_frame_id -->
 
   <!-- launch avc_sensors publisher nodes and broadcast transforms -->
   <include file="$(find avc_sensors)/launch/sensors.launch" />
 
   <!-- launch GPS publisher node and broadcast transform -->
   <include file="$(find nmea_navsat_driver)/launch/nmea_navsat_driver.launch" />
-  <node name="gps_to_base_tf" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 base_link gps_link 10" />
+  <node name="gps_link_broadcaster" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 base_link gps_link" />
 
 </launch>
