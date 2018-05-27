@@ -16,7 +16,7 @@ int main(int argc, char **argv)
   ros::NodeHandle node_private("~");
 
   //create Sensor type object with echo set to GPIO pin 23 and trigger to 24
-  ProximitySensor sensor(23, 24);
+  ProximitySensor sensor(4, 5);
 
   //create sensor_msgs/Range type message to publish proximity sensor data
   sensor_msgs::Range proximity_msg;
