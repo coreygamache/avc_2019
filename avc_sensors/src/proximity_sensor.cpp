@@ -7,6 +7,10 @@
 //include header
 #include <proximity_sensor.hpp>
 
+//default pin constants
+const int ECHO_PIN_DEFAULT = 4;
+const int TRIGGER_PIN_DEFAULT = 5;
+
 //default constructor
 ProximitySensor::ProximitySensor(int echo, int trigger)
 {
@@ -37,7 +41,7 @@ void ProximitySensor::setEchoPin(int echo)
   //default to GPIO pin 23 on invalid input
   if ((echo < 0) || (echo > 31))
   {
-    this->echoPin = 4;
+    this->echoPin = ECHO_PIN_DEFAULT;
   }
   else
   {
@@ -57,7 +61,7 @@ void ProximitySensor::setTriggerPin(int trigger)
   //default to GPIO pin 24 on invalid input
   if ((trigger < 0) || (trigger > 31))
   {
-    this->triggerPin = 5;
+    this->triggerPin = TRIGGER_PIN_DEFAULT;
   }
   else
   {
