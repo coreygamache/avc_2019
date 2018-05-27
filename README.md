@@ -21,4 +21,5 @@ The robot's navigation software is built using the ROS framework and coded prima
 __Robot Operating System (ROS)__: http://www.ros.org/<br>
 __ROS Navigation Stack__: http://wiki.ros.org/navigation<br>
 __nmea_navsat_driver__: http://wiki.ros.org/nmea_navsat_driver<br>
-__RTIMULib2 (MPU-9255 fork)__: https://github.com/Nick-Currawong/RTIMULib2
+__RTIMULib2 (MPU-9255 fork)__: https://github.com/Nick-Currawong/RTIMULib2<br><br><br>
+__*Note*__: C++ 11 is required to compile this repository.
