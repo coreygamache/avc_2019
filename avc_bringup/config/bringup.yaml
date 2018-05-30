@@ -1,0 +1,14 @@
+# AVC robot parameters
+
+sensors:
+  gps:
+    enable: true
+
+  imu:
+    enable: true
+
+#  laser:
+#    enable:
+
+  proximity_sensor:
+    enable: true
