@@ -15,6 +15,17 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "proximity_pub_node");
   ros::NodeHandle node_private("~");
 
+  //get pin parameters or use default values if not found
+  int echo_pin, trigger_pin;
+  if (!node_private.getParam("proximity_sensor/echo_pin"), echo_pin)
+  {
+    echo_pin = 4;
+  }
+  if (!node_private.getParam ("proximity_sensor/trigger_pin"), trigger_pin)
+  {
+    trigger_pin = 5;
+  }
+
   //create Sensor type object with echo set to GPIO pin 23 and trigger to 24
   ProximitySensor sensor(4, 5);
 
