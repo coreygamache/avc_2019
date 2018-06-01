@@ -11,8 +11,8 @@ sensors:
   imu:
     enable: true
 
-#  laser:
-#    enable:
+  laser:
+    enable: false
 
   proximity_sensor:
     enable: true
