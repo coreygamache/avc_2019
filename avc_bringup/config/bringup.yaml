@@ -1,8 +1,12 @@
 # AVC robot parameters
 
 sensors:
+  enable: true
+
   gps:
+    baud_rate: 115200
     enable: true
+    serial_port: /dev/ttyUSB0
 
   imu:
     enable: true
