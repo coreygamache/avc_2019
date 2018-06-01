@@ -5,7 +5,6 @@
 # GPS parameters
 # gps:
 #   refresh_rate: 10.0
-#   serial_port:
 
 # IMU parameters
 imu:
