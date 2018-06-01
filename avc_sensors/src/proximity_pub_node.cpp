@@ -84,8 +84,16 @@ int main(int argc, char **argv)
   //create publisher to publish proximity sensor message with buffer size 10, and latch set to false
   ros::Publisher proximity_pub = node_private.advertise<sensor_msgs::Range>("proximity", 10, false);
 
-  //set refresh rate to 10 hz
-  ros::Rate loop_rate(10);
+  //get refresh rate of sensor in hertz
+  float refresh_rate;
+  if (!node_private.getParam("proximity_sensor/refresh_rate", refresh_rate))
+  {
+    ROS_ERROR("proximity sensor refresh rate not defined in config file: avc_sensors/config/sensors.yaml");
+    ROS_BREAK();
+  }
+
+  //set refresh rate of ROS loop to refresh rate of sensor
+  ros::Rate loop_rate(refresh_rate);
 
   while (ros::ok())
   {
