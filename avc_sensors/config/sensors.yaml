@@ -10,6 +10,7 @@
 # IMU parameters
 imu:
   refresh_rate: 10.0
+  slerp_power: 0.02
 
 # NOT YET IMPLEMENTED
 # laser parameters
