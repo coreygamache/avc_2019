@@ -61,8 +61,15 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
+  float slerp_power;
+  if (!node_private.getParam("imu/slerp_power", slerp_power))
+  {
+    ROS_ERROR("IMU slerp power not defined in config file: avc_sensors/config/sensors.yaml");
+    ROS_BREAK();
+  }
+
   //set fusion coefficient and enable gyro, accelerometer, and compass
-  imu->setSlerpPower(0.02);
+  imu->setSlerpPower(slerp_power);
   imu->setGyroEnable(true);
   imu->setAccelEnable(true);
   imu->setCompassEnable(true);
@@ -105,8 +112,16 @@ int main(int argc, char **argv)
   ros::Publisher imu_pub = node_private.advertise<sensor_msgs::Imu>("imu", 10, false);
   ros::Publisher compass_pub = node_private.advertise<sensor_msgs::MagneticField>("compass", 10, false);
 
-  //set refresh rate to 10 hz
-  ros::Rate loop_rate(10);
+  //get refresh rate of sensor in hertz
+  float refresh_rate;
+  if (!node_private.getParam("imu/refresh_rate", refresh_rate))
+  {
+    ROS_ERROR("IMU refresh rate not defined in config file: avc_sensors/config/sensors.yaml");
+    ROS_BREAK();
+  }
+
+  //set refresh rate of ROS loop to defined refresh rate of sensor parameter
+  ros::Rate loop_rate(refresh_rate);
 
   while (ros::ok())
   {
