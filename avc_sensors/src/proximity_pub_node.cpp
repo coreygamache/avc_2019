@@ -92,7 +92,7 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
-  //set refresh rate of ROS loop to refresh rate of sensor
+  //set refresh rate of ROS loop to defined refresh rate of sensor parameter
   ros::Rate loop_rate(refresh_rate);
 
   while (ros::ok())
