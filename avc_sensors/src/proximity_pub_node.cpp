@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 
   //get trigger pin from parameters
   int trigger_pin;
-  if (!node_private.getParam ("proximity_sensor/trigger_pin", trigger_pin))
+  if (!node_private.getParam("proximity_sensor/trigger_pin", trigger_pin))
   {
     ROS_ERROR("proximity sensor trigger pin not defined in config file: avc_sensors/config/sensors.yaml");
     ROS_BREAK();
