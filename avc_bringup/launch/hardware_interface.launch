@@ -1,0 +1,20 @@
+<launch>
+
+  <!-- set arguments -->
+  <arg name="hardware_esc_enable" value="false" />
+  <arg name="hardware_servo_enable" value="false" />
+
+  <!-- load hardware interface parameters to parameter server -->
+  <rosparam command="load" file="$(find avc_hardware_interface)/config/hardware_interface.yaml" ns="hardware" />
+
+  <!-- if ESC is enabled, launch ESC interface node -->
+  <group if="$(arg hardware_esc_enable)">
+    <node name="esc_node" pkg="avc_hardware_interface" type="esc_node" ns="hardware" output="screen" />
+  </group>
+
+  <!-- if servo is enabled, launch servo interface node -->
+  <group if="$(arg hardware_servo_enable)">
+    <node name="servo_node" pkg="avc_hardware_interface" type="servo_node" ns="hardware" output="screen" />
+  </group>
+
+</launch>
