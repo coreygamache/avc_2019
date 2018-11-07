@@ -1,3 +1,5 @@
 esc:
+  output_pin: 254
 
 servo:
+  output_pin: 255
