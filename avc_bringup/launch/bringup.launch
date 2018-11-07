@@ -1,10 +1,13 @@
 <launch>
 
-<!-- load avc_bringup parameters -->
-<rosparam command="load" file="$(find avc_bringup)/config/bringup.yaml" />
+<!-- set arguments -->
+<arg name="sensors_enabled" value="true" />
 
-  <!-- if sensors are enabled then include sensor launch file  -->
-<group if="$(arg sensors/enable)">
+<!-- set sensors_enabled parameter from setting on parameter server -->
+<!-- <param name="sensors_enabled" value="$(arg sensors/enable)" /> -->
+
+<!-- if sensors are enabled then include sensor launch file  -->
+<group if="$(arg sensors_enabled)">
   <include file="$(find avc_bringup)/launch/sensors.launch" />
 </group>
 
