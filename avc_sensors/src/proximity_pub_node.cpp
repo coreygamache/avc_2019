@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 
   //get echo pin from parameters
   int echo_pin;
-  if (!node_private.getParam("proximity_sensor/echo_pin", echo_pin))
+  if (!node_private.getParam("/sensor/proximity_sensor/echo_pin", echo_pin))
   {
     ROS_ERROR("proximity sensor echo pin not defined in config file: avc_sensors/config/sensors.yaml");
     ROS_BREAK();
@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 
   //get trigger pin from parameters
   int trigger_pin;
-  if (!node_private.getParam("proximity_sensor/trigger_pin", trigger_pin))
+  if (!node_private.getParam("/sensor/proximity_sensor/trigger_pin", trigger_pin))
   {
     ROS_ERROR("proximity sensor trigger pin not defined in config file: avc_sensors/config/sensors.yaml");
     ROS_BREAK();
@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 
   //set radiation type of sensor (0 indicates ultrasound, 1 infrared)
   int radiation_type;
-  if (!node_private.getParam("proximity_sensor/radiation_type", radiation_type))
+  if (!node_private.getParam("/sensor/proximity_sensor/radiation_type", radiation_type))
   {
     ROS_ERROR("proximity sensor radiation type not defined in config file: avc_sensors/config/sensors.yaml");
     ROS_BREAK();
@@ -54,7 +54,7 @@ int main(int argc, char **argv)
 
   //set field of view of sensor in radians
   float field_of_view;
-  if (!node_private.getParam("proximity_sensor/field_of_view", field_of_view))
+  if (!node_private.getParam("/sensor/proximity_sensor/field_of_view", field_of_view))
   {
     ROS_ERROR("proximity sensor field of view not defined in config file: avc_sensors/config/sensors.yaml");
     ROS_BREAK();
@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 
   //set minimum range of sensor in meters
   float min_range;
-  if (!node_private.getParam("proximity_sensor/min_range", min_range))
+  if (!node_private.getParam("/sensor/proximity_sensor/min_range", min_range))
   {
     ROS_ERROR("proximity sensor minimum range not defined in config file: avc_sensors/config/sensors.yaml");
     ROS_BREAK();
@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 
   //set maximum range of sensor in meters
   float max_range;
-  if (!node_private.getParam("proximity_sensor/max_range", max_range))
+  if (!node_private.getParam("/sensor/proximity_sensor/max_range", max_range))
   {
     ROS_ERROR("proximity sensor maximum range not defined in config file: avc_sensors/config/sensors.yaml");
     ROS_BREAK();
@@ -86,7 +86,7 @@ int main(int argc, char **argv)
 
   //get refresh rate of sensor in hertz
   float refresh_rate;
-  if (!node_private.getParam("proximity_sensor/refresh_rate", refresh_rate))
+  if (!node_private.getParam("/sensor/proximity_sensor/refresh_rate", refresh_rate))
   {
     ROS_ERROR("proximity sensor refresh rate not defined in config file: avc_sensors/config/sensors.yaml");
     ROS_BREAK();
