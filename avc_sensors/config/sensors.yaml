@@ -10,6 +10,9 @@ gps:
 
 # IMU parameters
 imu:
+  calibration_file_path: /home/corey/avc_ws/src/avc_sensors/config
+  calibration_file_name: RTIMULib
+  frame_id: imu_link
   refresh_rate: 10.0
   slerp_power: 0.02
 
