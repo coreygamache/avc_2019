@@ -1,19 +1,17 @@
 # sensor parameters
 # all refresh rates are given in hertz
 
-# NOT YET IMPLEMENTED
 # GPS parameters
-# gps:
-#   refresh_rate: 10.0
+gps:
+  baud_rate: 115200
+  enable: false
+  serial_port: /dev/ttyUSB0
+  refresh_rate: 10.0
 
 # IMU parameters
 imu:
   refresh_rate: 10.0
   slerp_power: 0.02
-
-# NOT YET IMPLEMENTED
-# laser parameters
-# laser:
 
 # proximity sensor parameters
 proximity_sensor:
