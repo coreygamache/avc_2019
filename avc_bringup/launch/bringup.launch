@@ -1,10 +1,16 @@
 <launch>
 
 <!-- set arguments -->
-<arg name="sensors_enabled" value="true" />
+<arg name="hardware_enabled" value="true" />
+<arg name="sensors_enabled" value="false" />
 
 <!-- set sensors_enabled parameter from setting on parameter server -->
 <!-- <param name="sensors_enabled" value="$(arg sensors/enable)" /> -->
+
+<!-- if sensors are enabled then include sensor launch file  -->
+<group if="$(arg hardware_enabled)">
+  <include file="$(find avc_bringup)/launch/hardware_interface.launch" />
+</group>
 
 <!-- if sensors are enabled then include sensor launch file  -->
 <group if="$(arg sensors_enabled)">
