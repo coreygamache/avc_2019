@@ -19,24 +19,25 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "imu_pub_node");
   ros::NodeHandle node_private("~");
 
-  //get calibration file path parameter
+  //retrieve calibration file path from parameter server [RTIMULib parameter]
   std::string calibration_file_path;
-  if (!node_private.getParam("calibration_file_path", calibration_file_path))
+  if (!node_private.getParam("/sensor/imu/calibration_file_path", calibration_file_path))
   {
     ROS_ERROR("calibration file not found");
     ROS_BREAK();
   }
+  ROS_INFO("calibration file path: %s", calibration_file_path.c_str()); //output calibration file path (for testing)
 
-  //get calibration file name parameter
+  //retrieve calibration file name from parameter server [RTIMULib parameter]
   std::string calibration_file_name = "RTIMULib";
-  if (!node_private.getParam("calibration_file_name", calibration_file_name))
+  if (!node_private.getParam("/sensor/imu/calibration_file_name", calibration_file_name))
   {
     ROS_WARN_STREAM("no calibration file name provided, using default: " << calibration_file_name);
   }
 
-  //get frame id parameter
+  //get frame id parameter [RTIMULib parameter]
   std::string frame_id = "imu_link";
-  if (!node_private.getParam("frame_id", frame_id))
+  if (!node_private.getParam("/sensor/imu/frame_id", frame_id))
   {
     ROS_WARN_STREAM("no frame_id provided, using default: " << frame_id);
   }
@@ -61,8 +62,9 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
+  //retrieve slerp power from parameter server
   float slerp_power;
-  if (!node_private.getParam("imu/slerp_power", slerp_power))
+  if (!node_private.getParam("/sensor/imu/slerp_power", slerp_power))
   {
     ROS_ERROR("IMU slerp power not defined in config file: avc_sensors/config/sensors.yaml");
     ROS_BREAK();
@@ -77,7 +79,7 @@ int main(int argc, char **argv)
   //create geometry_msgs/Imu type message to publish IMU data
   sensor_msgs::Imu imu_msg;
 
-  //get IMU orientation covariance values
+  //retrieve IMU orientation covariance values from parameter server
   std::vector<double> orientation_covariance;
   if (!node_private.getParam("orientation_covariance", orientation_covariance) || orientation_covariance.size() != 9)
   {
@@ -85,7 +87,7 @@ int main(int argc, char **argv)
   }
   std::copy(orientation_covariance.begin(), orientation_covariance.end(), std::begin(imu_msg.orientation_covariance));
 
-  //get IMU angular velocity covariance values
+  //retrieve IMU angular velocity covariance values from parameter server
   std::vector<double> angular_velocity_covariance;
   if (!node_private.getParam("angular_velocity_covariance", angular_velocity_covariance) || angular_velocity_covariance.size() != 9)
   {
@@ -93,7 +95,7 @@ int main(int argc, char **argv)
   }
   std::copy(angular_velocity_covariance.begin(), angular_velocity_covariance.end(), std::begin(imu_msg.angular_velocity_covariance));
 
-  //get IMU linear acceleration covariance values
+  //retrieve IMU linear acceleration covariance values from parameter server
   std::vector<double> linear_acceleration_covariance;
   if (!node_private.getParam("linear_acceleration_covariance", linear_acceleration_covariance) || linear_acceleration_covariance.size() != 9)
   {
@@ -104,7 +106,7 @@ int main(int argc, char **argv)
   //create sensor_msgs/MagneticField type message to publish compass data
   sensor_msgs::MagneticField compass_msg;
 
-  //set compass message magnetic_field_covariance values to zero to indicat e unknown
+  //set compass message magnetic_field_covariance values to zero to indicate unknown
   std::vector<double> magnetic_field_covariance(9, 0);
   std::copy(magnetic_field_covariance.begin(), magnetic_field_covariance.end(), std::begin(compass_msg.magnetic_field_covariance));
 
@@ -112,7 +114,7 @@ int main(int argc, char **argv)
   ros::Publisher imu_pub = node_private.advertise<sensor_msgs::Imu>("imu", 10, false);
   ros::Publisher compass_pub = node_private.advertise<sensor_msgs::MagneticField>("compass", 10, false);
 
-  //get refresh rate of sensor in hertz
+  //retrieve refresh rate of sensor from parameter server [Hz]
   float refresh_rate;
   if (!node_private.getParam("imu/refresh_rate", refresh_rate))
   {
@@ -128,6 +130,8 @@ int main(int argc, char **argv)
 
     if (imu->IMURead())
     {
+
+      //get current IMU data
       RTIMU_DATA imu_data = imu->getIMUData();
 
       //set IMU message headers
@@ -153,6 +157,7 @@ int main(int argc, char **argv)
       //publish IMU message
       imu_pub.publish(imu_msg);
 
+      //if compass reading is value then get data and publish compass message
       if (imu_data.compassValid)
       {
 
@@ -173,7 +178,7 @@ int main(int argc, char **argv)
 
     }
 
-    //spin once because ROS
+    //process callback functions
     ros::spinOnce();
 
     //sleep until next IMU reading
