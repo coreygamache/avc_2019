@@ -4,32 +4,32 @@
   <!-- static_transform_publisher args: x y z yaw pitch roll parent_frame_id child_frame_id -->
   <!-- static_transform_publisher args: x y z qx qy qz qw parent_frame_id child_frame_id -->
 
+  <!-- set arguments -->
+  <arg name="sensors_gps_enable" value="false" />
+  <arg name="sensors_imu_enable" value="false" />
+  <arg name="sensors_proximity_enable" value="false" />
+
+  <!-- load sensor parameters to parameter server -->
+  <rosparam command="load" file="$(find avc_sensors)/config/sensors.yaml" ns="sensor" />
+
   <!-- launch avc_sensors publisher nodes and broadcast transforms -->
   <!-- if GPS is enabled, launch GPS publisher node and broadcast transform -->
-  <group if="$(arg sensors/gps/enable)">
+  <group if="$(arg sensors_gps_enable)">
     <!-- run nmea_navsat_driver with arguments _port and _baud specified -->
     <!-- equivelant of "rosrun nmea_navsat_driver nmea_serial_driver _port:=/dev/ttyUSB0 _baud:=115200" -->
-    <node name="nmea_serial_driver" pkg="nmea_navsat_driver" type="nmea_serial_driver" args="_port:=$(arg sensors/gps/serial_port) _baud:=$(arg sensors/gps/baud_rate)" />
+    <node name="nmea_serial_driver" pkg="nmea_navsat_driver" type="nmea_serial_driver" ns="sensor" args="_port:=$(arg sensors/gps/serial_port) _baud:=$(arg sensors/gps/baud_rate)" />
     <node name="gps_link_broadcaster" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 base_link gps_link" />
   </group>
 
   <!-- if IMU is enabled, launch IMU publisher node and broadcast transform -->
-  <group if="$(arg sensors/imu/enable)">
-    <node name="imu_pub_node" ns="imu" pkg="avc_sensors" type="imu_pub_node">
-      <rosparam command="load" file="$(find avc_sensors)/config/sensors.yaml"  ns="imu" />
-    </node>
+  <group if="$(arg sensors_imu_enable)">
+    <node name="imu_pub_node" pkg="avc_sensors" type="imu_pub_node" ns="sensor" />
     <node name="imu_link_broadcaster" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 base_link imu_link" />
   </group>
 
-  <!-- if laser is enabled, launch laser publisher node and broadcast transform -->
-  <group if=$"(arg sensors/laser/enable)">
-  </group>
-
   <!-- if proximity sensor is enabled, launch proximity sensor publisher node and broadcast transform -->
-  <group if="$(arg sensors/proximity_sensor/enable)">
-    <node name="proximity_pub_node" ns="proximity_sensor" pkg="avc_sensors" type="proximity_pub_node">
-      <rosparam command="load" file="$(find avc_sensors)/config/sensors.yaml"  ns="proximity_sensor" />
-    </node>
+  <group if="$(arg sensors_proximity_enable)">
+    <node name="proximity_pub_node" pkg="avc_sensors" type="proximity_pub_node"  ns="sensor" />
     <node name="proximity_sensor_link_broadcaster" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 base_link proximity_sensor_link" />
   </group>
 
