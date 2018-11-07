@@ -110,7 +110,7 @@ int main(int argc, char **argv)
     //publish proximity sensor range message
     proximity_pub.publish(proximity_msg);
 
-    //spin once because ROS
+    //process callback functions
     ros::spinOnce();
 
     //sleep until next sensor reading
