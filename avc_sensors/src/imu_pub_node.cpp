@@ -148,7 +148,7 @@ int main(int argc, char **argv)
       imu_msg.angular_velocity.x = imu_data.gyro.x();
       imu_msg.angular_velocity.y = imu_data.gyro.y();
       imu_msg.angular_velocity.z = imu_data.gyro.z();
-      ROS_INFO("velocity (x, y, z): %f, %f, %f", imu_data.gyro.x(), imu_data.gyro.y(), imu_data.gyro.z());
+      //ROS_INFO("velocity (x, y, z): %f, %f, %f", imu_data.gyro.x(), imu_data.gyro.y(), imu_data.gyro.z());
 
       //set IMU message linear accelerations
       imu_msg.linear_acceleration.x = imu_data.accel.x() * G_TO_MPSS;
