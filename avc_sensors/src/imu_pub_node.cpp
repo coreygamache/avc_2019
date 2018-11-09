@@ -42,6 +42,14 @@ int main(int argc, char **argv)
     ROS_WARN_STREAM("no frame_id provided, using default: " << frame_id);
   }
 
+  //retrieve refresh rate of sensor from parameter server [Hz]
+  float refresh_rate;
+  if (!node_private.getParam("/sensor/imu/refresh_rate", refresh_rate))
+  {
+    ROS_ERROR("IMU refresh rate not defined in config file: avc_sensors/config/sensors.yaml");
+    ROS_BREAK();
+  }
+
   //create RTIMUSettings type object called imu_settings to set initial IMU settings that will later be used to create IMU object
   RTIMUSettings *imu_settings = new RTIMUSettings(calibration_file_path.c_str(), calibration_file_name.c_str());
 
@@ -113,14 +121,6 @@ int main(int argc, char **argv)
   //create publishers to publish IMU and compass messages with buffer size 10, and latch set to false
   ros::Publisher imu_pub = node_private.advertise<sensor_msgs::Imu>("imu", 10, false);
   ros::Publisher compass_pub = node_private.advertise<sensor_msgs::MagneticField>("compass", 10, false);
-
-  //retrieve refresh rate of sensor from parameter server [Hz]
-  float refresh_rate;
-  if (!node_private.getParam("imu/refresh_rate", refresh_rate))
-  {
-    ROS_ERROR("IMU refresh rate not defined in config file: avc_sensors/config/sensors.yaml");
-    ROS_BREAK();
-  }
 
   //set refresh rate of ROS loop to defined refresh rate of sensor parameter
   ros::Rate loop_rate(refresh_rate);
