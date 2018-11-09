@@ -6,8 +6,8 @@
 
   <!-- set arguments -->
   <arg name="sensors_gps_enable" value="false" />
-  <arg name="sensors_imu_enable" value="false" />
-  <arg name="sensors_proximity_enable" value="true" />
+  <arg name="sensors_imu_enable" value="true" />
+  <arg name="sensors_proximity_enable" value="false" />
 
   <!-- load sensor parameters to parameter server -->
   <rosparam command="load" file="$(find avc_sensors)/config/sensors.yaml" ns="sensor" />
