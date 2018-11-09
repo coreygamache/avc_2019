@@ -5,8 +5,8 @@
   <!-- static_transform_publisher args: x y z qx qy qz qw parent_frame_id child_frame_id -->
 
   <!-- set arguments -->
-  <arg name="sensors_gps_enable" value="false" />
-  <arg name="sensors_imu_enable" value="true" />
+  <arg name="sensors_gps_enable" value="true" />
+  <arg name="sensors_imu_enable" value="false" />
   <arg name="sensors_proximity_enable" value="false" />
 
   <!-- load sensor parameters to parameter server -->
