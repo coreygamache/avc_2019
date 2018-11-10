@@ -9,6 +9,7 @@ add_compile_options(-std=c++11)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  avc_msgs
   sensor_msgs
 )
 
@@ -49,16 +50,11 @@ find_package(catkin REQUIRED COMPONENTS
 ###################################
 ## catkin specific configuration ##
 ###################################
-## The catkin_package macro generates cmake config files for your package
-## Declare things to be passed to dependent projects
-## INCLUDE_DIRS: uncomment this if your package contains header files
-## LIBRARIES: libraries you create in this project that dependent projects also need
-## CATKIN_DEPENDS: catkin_packages dependent projects also need
-## DEPENDS: system dependencies of this project that dependent projects also need
+
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES proximity_sensor
-  CATKIN_DEPENDS roscpp sensor_msgs
+  CATKIN_DEPENDS roscpp avc_msgs sensor_msgs
   # DEPENDS message_runtime
 )
 
@@ -88,8 +84,8 @@ add_library(proximity_sensor src/proximity_sensor.cpp)
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/avc_sensors_node.cpp)
+add_executable(encoder_pub_node src/encoder_pub_node.cpp)
 add_executable(imu_pub_node src/imu_pub_node.cpp)
-#add_executable(laser_pub_node src/laser_pub_node.cpp)
 add_executable(proximity_pub_node src/proximity_pub_node.cpp)
 
 ## Add cmake target dependencies of the executable
@@ -101,6 +97,6 @@ add_executable(proximity_pub_node src/proximity_pub_node.cpp)
 #   ${catkin_LIBRARIES}
 # )
 target_link_libraries(proximity_sensor ${catkin_LIBRARIES} wiringPi)
+target_link_libraries(encoder_pub_node ${catkin_LIBRARIES} wiringPi)
 target_link_libraries(imu_pub_node ${catkin_LIBRARIES} RTIMULib)
-#target_link_libraries(laser_pub_node ${catkin_LIBRARIES})
 target_link_libraries(proximity_pub_node ${catkin_LIBRARIES} proximity_sensor)
