@@ -1,12 +1,35 @@
 # sensor parameters
 # all refresh rates are given in hertz
 
-# GPS parameters
-gps:
-  baud_rate: 115200
-  enable: false
-  serial_port: /dev/ttyAMA0
-  refresh_rate: 10.0
+# encoder parameters
+encoder:
+  fl:
+    counts_per_rev: 4
+    input_pin: 252
+    refresh_rate: 10
+    sample_num: 10
+  fr:
+    counts_per_rev: 4
+    input_pin: 253
+    refresh_rate: 10
+    sample_num: 10
+  rl:
+    counts_per_rev: 4
+    input_pin: 254
+    refresh_rate: 10
+    sample_num: 10
+  rr:
+    counts_per_rev: 4
+    input_pin: 255
+    refresh_rate: 10
+    sample_num: 10
+
+# GPS parameters (not used)
+# gps:
+#  baud_rate: 9600
+#  enable: false
+#  serial_port: /dev/serial0
+#  refresh_rate: 10.0
 
 # IMU parameters
 imu:
