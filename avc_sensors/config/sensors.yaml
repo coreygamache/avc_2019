@@ -5,7 +5,7 @@
 encoder:
   fl:
     counts_per_rev: 4
-    input_pin: 252
+    input_pin: 3
     refresh_rate: 10
     sample_num: 10
   fr:

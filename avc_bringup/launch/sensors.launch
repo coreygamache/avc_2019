@@ -19,11 +19,11 @@
   <group if="$(arg sensors_encoder_enable)">
     <node name="fl_encoder_pub_node" pkg="avc_sensors" type="encoder_pub_node" ns="sensor" args="f l" output="screen" />
     <!-- <node name="imu_link_broadcaster" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 base_link imu_link" /> -->
-    <node name="fr_encoder_pub_node" pkg="avc_sensors" type="encoder_pub_node" ns="sensor" args="f r" output="screen" />
+    <!-- <node name="fr_encoder_pub_node" pkg="avc_sensors" type="encoder_pub_node" ns="sensor" args="f r" output="screen" /> -->
     <!-- <node name="imu_link_broadcaster" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 base_link imu_link" /> -->
-    <node name="rl_encoder_pub_node" pkg="avc_sensors" type="encoder_pub_node" ns="sensor" args="r l" output="screen" />
+    <!-- <node name="rl_encoder_pub_node" pkg="avc_sensors" type="encoder_pub_node" ns="sensor" args="r l" output="screen" /> -->
     <!-- <node name="imu_link_broadcaster" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 base_link imu_link" /> -->
-    <node name="rr_encoder_pub_node" pkg="avc_sensors" type="encoder_pub_node" ns="sensor" args="r r" output="screen" />
+    <!-- <node name="rr_encoder_pub_node" pkg="avc_sensors" type="encoder_pub_node" ns="sensor" args="r r" output="screen" /> -->
     <!-- <node name="imu_link_broadcaster" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 base_link imu_link" /> -->
   </group>
 
