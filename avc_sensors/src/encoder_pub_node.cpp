@@ -35,7 +35,7 @@ float getVelocity(int cpr, int sample_num, int refresh_rate)
   {
     num_pulses += encoder_pulses;
     encoder_pulses = 0;
-    delay((1000 / refresh_rate) / (sample_num * 2));
+    delay((1000 / refresh_rate) / (sample_num * 1.25));
   }
 
   //calculate velocity in rotations per second from sample time and counts per rev
