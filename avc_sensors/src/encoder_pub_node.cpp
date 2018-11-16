@@ -5,8 +5,8 @@
 
 //global variables
 //unsigned int encoder_samples[ENCODER_SAMPLE_NUM];
-unsigned int encoder_sample = 0;
-unsigned int last_pulse_time = 0;
+volatile unsigned int encoder_sample = 0;
+volatile unsigned int last_pulse_time = 0;
 
 void encoderInterruptCallback()
 {
@@ -37,7 +37,7 @@ float getVelocity(int cpr, int sample_num)
   //calculate velocity in rotations per second from sample time and counts per rev
   float velocity = 0;
   if (sample_time > 0)
-    float velocity = 1 / ((sample_time / 1000) * cpr);
+    velocity = 1 / ((sample_time / 1000) * cpr);
 
   //return angular velocity in radians per second
   return (velocity * 2 * 3.14159265359);
