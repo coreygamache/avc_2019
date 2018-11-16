@@ -5,8 +5,8 @@
 
 //global variables
 //unsigned int encoder_samples[ENCODER_SAMPLE_NUM];
-volatile unsigned int encoder_sample = 0;
-volatile unsigned int last_pulse_time = 0;
+unsigned int encoder_sample = 0;
+unsigned int last_pulse_time = 0;
 
 void encoderInterruptCallback()
 {
