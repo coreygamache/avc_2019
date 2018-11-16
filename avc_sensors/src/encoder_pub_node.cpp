@@ -5,42 +5,45 @@
 
 //global variables
 //unsigned int encoder_samples[ENCODER_SAMPLE_NUM];
-volatile unsigned int encoder_sample = 0;
-volatile unsigned int last_pulse_time = 0;
+//volatile unsigned int encoder_sample = 0;
+//volatile unsigned int last_pulse_time = 0;
+volatile unsigned int encoder_pulses = 0;
 
 void encoderInterruptCallback()
 {
 
   //capture current pulse time, set sample time to time since current and last pulse, then update last pulse time
-  unsigned int current_pulse_time = millis();
+  /*unsigned int current_pulse_time = millis();
   encoder_sample = current_pulse_time - last_pulse_time;
-  last_pulse_time = current_pulse_time;
+  last_pulse_time = current_pulse_time;*/
+  if (encoder_pulses < 4294967295)
+    encoder_pulses++;
+  else
+    encoder_pulses = 0;
 
 }
 
 //sample velocity ENCODER_SAMPLE_NUM times and return average result
-float getVelocity(int cpr, int sample_num)
+float getVelocity(int cpr, int sample_num, int refresh_rate)
 {
 
 
   //calculate average sample time over last sample_num samples
-  float sample_time = 0;
+  int num_pulses = 0;
+  float start_time = millis();
   for (int i = 0; i < sample_num; i++)
   {
-      sample_time += encoder_sample;
-      delay(5);
+    num_pulses += encoder_pulses;
+    encoder_pulses = 0;
+    delay((1000 / refresh_rate) / (sample_num * 2));
   }
 
-  //set sample time to average time over sample_num samples
-  sample_time = sample_time / float(sample_num);
-
   //calculate velocity in rotations per second from sample time and counts per rev
-  float velocity = 0;
-  if (sample_time > 0)
-    velocity = 1 / ((sample_time / 1000) * cpr);
+  float velocity = num_pulses / ((millis() - start_time) / 1000); // [pulses/s]
+  velocity =  (velocity / cpr) * 2 * 3.14159265359; // [rad/s]
 
   //return angular velocity in radians per second
-  return (velocity * 2 * 3.14159265359);
+  return velocity;
 
 }
 
@@ -148,7 +151,7 @@ int main(int argc, char **argv)
   {
 
     //set encoder message angular velocity value to current value reported from encoder [rad/s]
-    encoder_msg.angular_velocity = getVelocity(counts_per_rev, sample_num);
+    encoder_msg.angular_velocity = getVelocity(counts_per_rev, sample_num, refresh_rate);
 
     //add ROS_INFO output to display current proximity sensor range to terminal (for testing)
     ROS_INFO("current angular velocity: %f", encoder_msg.angular_velocity);
