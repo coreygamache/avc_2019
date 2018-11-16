@@ -154,7 +154,7 @@ int main(int argc, char **argv)
     encoder_msg.angular_velocity = getVelocity(counts_per_rev, sample_num, refresh_rate);
 
     //add ROS_INFO output to display current proximity sensor range to terminal (for testing)
-    ROS_INFO("current angular velocity: %f", encoder_msg.angular_velocity);
+    //ROS_INFO("current angular velocity: %f", encoder_msg.angular_velocity);
 
     //publish proximity sensor range message
     encoder_pub.publish(encoder_msg);
