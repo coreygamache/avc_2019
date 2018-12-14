@@ -9,6 +9,7 @@ project(avc_hardware_interface)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  avc_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -83,7 +84,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES avc_hardware_interface
-  CATKIN_DEPENDS roscpp
+  CATKIN_DEPENDS roscpp avc_msgs
 #  DEPENDS system_lib
 )
 
