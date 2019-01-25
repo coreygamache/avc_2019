@@ -10,6 +10,7 @@ project(avc_mapping)
 find_package(catkin REQUIRED COMPONENTS
   avc_msgs
   roscpp
+  sensor_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -74,7 +75,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES avc_mapping
-  CATKIN_DEPENDS avc_msgs roscpp
+  CATKIN_DEPENDS avc_msgs roscpp sensor_msgs
 #  DEPENDS system_lib
 )
 
