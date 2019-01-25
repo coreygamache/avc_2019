@@ -30,6 +30,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   DIRECTORY msg
   FILES
+  Control.msg
   Encoder.msg
 #   Message2.msg
 )
