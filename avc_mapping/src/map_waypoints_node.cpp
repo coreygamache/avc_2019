@@ -13,7 +13,6 @@
 //global variables
 bool mapping = false;
 bool mapping_mode = false;
-int map_waypoint_delay = 500; //time to wait for new GPS position data [ms]
 
 //global controller variables
 std::vector<int> controller_buttons(13, 0);
@@ -60,70 +59,6 @@ void controllerCallback(const sensor_msgs::Joy::ConstPtr& msg)
   //set local values to match message values
   controller_buttons = msg->buttons;
 
-  //if save waypoint button on controller is pressed, mapping mode is enabled, and not currently saving a waypoint then save waypoint
-  if (mapping_mode && !mapping && (controller_buttons[0] == 1))
-  {
-
-    //set mapping variable to true to indicate waypoint is being saved
-    mapping = true;
-
-    //set button status to 0 to prevent consecutive toggles for one button press
-    controller_buttons[0] = 0;
-
-    //turn on LED and output text to indicate waypoint is being recorded
-    digitalWrite(indicator_LED, HIGH);
-    ROS_INFO("[map_waypoints_node] saving current position to list of waypoints");
-
-    //wait momentarily for new GPS position signal
-    delay(map_waypoint_delay);
-
-    //process callback function calls
-    ros::spinOnce();
-
-    //add most recent GPS position to list of waypoints
-    gpsWaypoints.push_back(gpsFix);
-
-    //turn off LED and output text to indicate waypoint has been recorded
-    digitalWrite(indicator_LED, LOW);
-    ROS_INFO("[map_waypoints_node] waypoint saved (%d total waypoints)", int(gpsWaypoints.size()));
-
-    //set mapping variable to false to indicate waypoint saving is complete
-    mapping = false;
-
-  }
-  //if save list button on controller is pressed, mapping mode is enabled, and not currently saving a waypoint then save list
-  //else is used to prevent attempting to save waypoint and waypoint list if buttons are pressed at same time
-  else if (mapping_mode && !mapping && (controller_buttons[0] == 1))
-  {
-
-    //set mapping variable to true to indicate waypoint list is being saved
-    mapping = true;
-
-    //output list to csv file
-
-    //flash LED three times to indicate waypoint list was saved
-    for (int i = 0; i < 3; i++)
-    {
-
-      //flash LED
-      digitalWrite(indicator_LED, HIGH);
-      delay(250);
-      digitalWrite(indicator_LED, LOW);
-
-      //delay between flashes
-      if (i < 2)
-        delay(250);
-
-    }
-
-    //output text to indicate waypoint list was saved
-    ROS_INFO("[map_waypoints_node] waypoint list saved to %s (%d total waypoints)", "file_path", int(gpsWaypoints.size()));
-
-    //set mapping variable to false to indicate waypoint list saving is complete
-    mapping = false;
-
-  }
-
 }
 
 //callback function called to process service requests on the disable mapping mode topic
@@ -153,8 +88,8 @@ bool disableMappingCallback(avc_msgs::DisableMapping::Request& req, avc_msgs::Di
 
   }
 
-  //return ready to change status
-  return res.ready_to_change;
+  //return true to indicate service processing is complete
+  return true;
 
 }
 
@@ -189,6 +124,22 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
+  //retrieve map waypoint delay from parameter server [ms]
+  int map_waypoint_delay;
+  if (!node_private.getParam("/control/map_waypoints_node/map_waypoint_delay", map_waypoint_delay))
+  {
+    ROS_ERROR("[map_waypoints_node] map waypoint delay not defined in config file: avc_mapping/config/mapping.yaml");
+    ROS_BREAK();
+  }
+
+  //retrieve refresh rate of node in hertz from parameter server
+  float refresh_rate;
+  if (!node_private.getParam("/control/map_waypoints_node/refresh_rate", refresh_rate))
+  {
+    ROS_ERROR("[map_waypoints_node] control node refresh rate not defined in config file: avc_mapping/config/mapping.yaml");
+    ROS_BREAK();
+  }
+
   //create service to process service requests on the disable mapping topic
   ros::ServiceServer disable_mapping_srv = node_public.advertiseService("disable_mapping", disableMappingCallback);
 
@@ -205,8 +156,76 @@ int main(int argc, char **argv)
   wiringPiSetup();
   pinMode(indicator_LED, OUTPUT);
 
-  //process callback function calls until node is shutdown
-  ros::spin();
+  //set loop rate in Hz
+  ros::Rate loop_rate(refresh_rate);
 
+  while (ros::ok())
+  {
+
+    //if save waypoint button on controller is pressed, mapping mode is enabled, and not currently saving a waypoint then save waypoint
+    if (mapping_mode && (controller_buttons[0] == 1))
+    {
+
+      //set mapping variable to true to indicate waypoint is being saved
+      mapping = true;
+
+      //set button status to 0 to prevent consecutive toggles for one button press
+      controller_buttons[0] = 0;
+
+      //turn on LED and output text to indicate waypoint is being recorded
+      digitalWrite(indicator_LED, HIGH);
+      ROS_INFO("[map_waypoints_node] saving current position to list of waypoints");
+
+      //wait momentarily for new GPS position signal
+      delay(map_waypoint_delay);
+
+      //process callback function calls
+      ros::spinOnce();
+
+      //add most recent GPS position to list of waypoints
+      gpsWaypoints.push_back(gpsFix);
+
+      //turn off LED and output text to indicate waypoint has been recorded
+      digitalWrite(indicator_LED, LOW);
+      ROS_INFO("[map_waypoints_node] waypoint saved (%d total waypoints)", int(gpsWaypoints.size()));
+
+      //set mapping variable to false to indicate waypoint saving is complete
+      mapping = false;
+
+    }
+    //if save list button on controller is pressed, mapping mode is enabled, and not currently saving a waypoint then save list
+    //else is used to prevent attempting to save waypoint and waypoint list if buttons are pressed at same time
+    else if (mapping_mode && (controller_buttons[0] == 1))
+    {
+
+      //output list to csv file
+
+      //flash LED three times to indicate waypoint list was saved
+      for (int i = 0; i < 3; i++)
+      {
+
+        //flash LED
+        digitalWrite(indicator_LED, HIGH);
+        delay(250);
+        digitalWrite(indicator_LED, LOW);
+
+        //delay between flashes
+        if (i < 2)
+          delay(250);
+
+      }
+
+      //output text to indicate waypoint list was saved
+      ROS_INFO("[map_waypoints_node] waypoint list saved to %s (%d total waypoints)", "file_path", int(gpsWaypoints.size()));
+
+    }
+
+    //process callback functions
+    ros::spinOnce();
+
+    //sleep until next sensor reading
+    loop_rate.sleep();
+
+  }
   return 0;
 }
