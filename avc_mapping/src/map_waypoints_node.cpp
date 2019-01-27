@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <ros/ros.h>
 #include <avc_msgs/Control.h>
+#include <avc_msgs/DisableMapping.h>
 #include <sensor_msgs/Joy.h>
 #include <sensor_msgs/NavSatFix.h>
 #include <signal.h>
@@ -125,6 +126,38 @@ void controllerCallback(const sensor_msgs::Joy::ConstPtr& msg)
 
 }
 
+//callback function called to process service requests on the disable mapping mode topic
+bool disableMappingCallback(avc_msgs::DisableMapping::Request& req, avc_msgs::DisableMapping::Response& res)
+{
+
+  //if node isn't currently mapping then ready to change modes, otherwise not ready to change
+  res.ready_to_change = !mapping;
+
+  //output ROS INFO message to inform of mode change request and reply statuses
+  if (res.ready_to_change)
+  {
+
+    if (req.mode_change_requested)
+      ROS_INFO("[map_waypoints_node] mode change requested; indicating ready to change");
+    else
+      ROS_INFO("[map_waypoints_node] ready to change modes status requested; indicating ready to change");
+
+  }
+  else
+  {
+
+    if (req.mode_change_requested)
+      ROS_INFO("[map_waypoints_node] mode change requested; indicating node is busy");
+    else
+      ROS_INFO("[map_waypoints_node] ready to change modes status requested; indicating node is busy");
+
+  }
+
+  //return ready to change status
+  return res.ready_to_change;
+
+}
+
 //callback function called to process messages on GPS fix topic
 void gpsFixCallback(const sensor_msgs::NavSatFix::ConstPtr& msg)
 {
@@ -155,6 +188,9 @@ int main(int argc, char **argv)
     ROS_ERROR("[map_waypoints_node] indicator LED pin not defined in config file: avc_bringup/config/global.yaml");
     ROS_BREAK();
   }
+
+  //create service to process service requests on the disable mapping topic
+  ros::ServiceServer disable_mapping_srv = node_public.advertiseService("disable_mapping", disableMappingCallback);
 
   //create subscriber to subscribe to control messages topic with queue size set to 1000
   ros::Subscriber control_sub = node_public.subscribe("control", 1000, controlCallback);
