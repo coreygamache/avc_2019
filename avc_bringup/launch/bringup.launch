@@ -1,8 +1,9 @@
 <launch>
 
 <!-- set arguments -->
+<arg name="controls_enabled" value="true" />
 <arg name="hardware_enabled" value="false" />
-<arg name="sensors_enabled" value="true" />
+<arg name="sensors_enabled" value="false" />
 
 <!-- set sensors_enabled parameter from setting on parameter server -->
 <!-- <param name="sensors_enabled" value="$(arg sensors/enable)" /> -->
@@ -15,6 +16,14 @@
 <!-- if sensors are enabled then include sensor launch file  -->
 <group if="$(arg sensors_enabled)">
   <include file="$(find avc_bringup)/launch/sensors.launch" />
+</group>
+
+<!-- if control is enabled then load control parameters to parameter server and launch control nodes -->
+<group if="$(arg control_enabled)">
+  <!--<rosparam command="load" file="$(find avc_control)/config/control.yaml" ns="control" /> -->
+  <rosparam command="load" file="$(find avc_mapping)/config/mapping.yaml" ns="control" />
+  <node name="control_node" pkg="avc_control" type="control_node" ns="control" output="screen" />
+  <node name="controller_node" pkg="joy" type="joy_node" ns="control" output="screen" />
 </group>
 
 </launch>
