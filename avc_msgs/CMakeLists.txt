@@ -40,6 +40,7 @@ add_service_files(
 #   Service1.srv
 #   Service2.srv
   DisableMapping.srv
+  DisableNavigation.srv
 )
 
 ## Generate actions in the 'action' folder
