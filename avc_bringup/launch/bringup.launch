@@ -1,7 +1,7 @@
 <launch>
 
 <!-- set arguments -->
-<arg name="controls_enabled" value="true" />
+<arg name="control_enabled" value="true" />
 <arg name="hardware_enabled" value="false" />
 <arg name="sensors_enabled" value="false" />
 
