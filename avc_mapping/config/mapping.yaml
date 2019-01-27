@@ -1,0 +1,3 @@
+map_waypoints_node:
+  map_waypoint_delay: 500 # [ms]
+  refresh_rate: 10
