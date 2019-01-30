@@ -69,22 +69,14 @@ bool disableMappingCallback(avc_msgs::DisableMapping::Request& req, avc_msgs::Di
   res.ready_to_change = !mapping;
 
   //output ROS INFO message to inform of mode change request and reply statuses
-  if (res.ready_to_change)
-  {
-
-    if (req.mode_change_requested)
-      ROS_INFO("[map_waypoints_node] mode change requested; indicating ready to change");
-    else
-      ROS_INFO("[map_waypoints_node] ready to change modes status requested; indicating ready to change");
-
-  }
+  if (req.mode_change_requested && res.ready_to_change)
+    ROS_INFO("[map_waypoints_node] mode change requested; indicating ready to change");
+  else if (!req.mode_change_requested && res.ready_to_change)
+    ROS_INFO("[map_waypoints_node] ready to change modes status requested; indicating ready to change");
+  else if (req.mode_change_requested && !res.ready_to_change)
+    ROS_INFO("[map_waypoints_node] mode change requested; indicating node is busy");
   else
-  {
-
-    if (req.mode_change_requested)
-      ROS_INFO("[map_waypoints_node] mode change requested; indicating node is busy");
-    else
-      ROS_INFO("[map_waypoints_node] ready to change modes status requested; indicating node is busy");
+    ROS_INFO("[map_waypoints_node] ready to change modes status requested; indicating node is busy");
 
   }
 
