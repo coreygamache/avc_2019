@@ -2,8 +2,8 @@
 //this node controls control mode changing via controller button press
 #include <errno.h>
 #include <ros/ros.h>
-#include <avc_msgs/Control.h>
 #include <avc_msgs/ChangeControlMode.h>
+#include <avc_msgs/Control.h>
 #include <sensor_msgs/Joy.h>
 #include <signal.h>
 #include <wiringPi.h>

@@ -3,8 +3,8 @@
 //while mapping mode is enabled the robot can be manually controlled
 #include <errno.h>
 #include <ros/ros.h>
-#include <avc_msgs/Control.h>
 #include <avc_msgs/ChangeControlMode.h>
+#include <avc_msgs/Control.h>
 #include <sensor_msgs/Joy.h>
 #include <sensor_msgs/NavSatFix.h>
 #include <signal.h>
