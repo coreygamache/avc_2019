@@ -3,8 +3,7 @@
 #include <errno.h>
 #include <ros/ros.h>
 #include <avc_msgs/Control.h>
-#include <avc_msgs/DisableMapping.h>
-#include <avc_msgs/DisableNavigation.h>
+#include <avc_msgs/ChangeControlMode.h>
 #include <sensor_msgs/Joy.h>
 #include <signal.h>
 #include <wiringPi.h>
@@ -106,21 +105,21 @@ int main(int argc, char **argv)
   control_msg.header.frame_id = "0";
 
   //create disable mapping service object and set default parameters
-  avc_msgs::DisableMapping disable_mapping_srv;
+  avc_msgs::ChangeControlMode disable_mapping_srv;
   disable_mapping_srv.request.mode_change_requested = true;
 
   //create disable navigation object and set default parameters
-  avc_msgs::DisableNavigation disable_navigation_srv;
+  avc_msgs::ChangeControlMode disable_navigation_srv;
   disable_navigation_srv.request.mode_change_requested = true;
 
   //create publisher to publish control message status with buffer size 10, and latch set to true
   ros::Publisher control_pub = node_public.advertise<avc_msgs::Control>("control", 10, true);
 
   //create service client to send service requests on the disable mapping topic
-  ros::ServiceClient disable_mapping_clt = node_public.serviceClient<avc_msgs::DisableMapping>("disable_mapping");
+  ros::ServiceClient disable_mapping_clt = node_public.serviceClient<avc_msgs::ChangeControlMode>("disable_mapping");
 
   //create service client to send service requests on the disable navigation topic
-  ros::ServiceClient disable_navigation_clt = node_public.serviceClient<avc_msgs::DisableNavigation>("disable_navigation");
+  ros::ServiceClient disable_navigation_clt = node_public.serviceClient<avc_msgs::ChangeControlMode>("disable_navigation");
 
   //create subscriber to subscribe to joy messages topic with queue size set to 1000
   ros::Subscriber controller_sub = node_public.subscribe("joy", 1000, controllerCallback);
