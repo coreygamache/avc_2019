@@ -104,6 +104,10 @@ int main(int argc, char **argv)
   avc_msgs::Control control_msg;
   control_msg.header.frame_id = "0";
 
+  //create disable manual control service object and set default parameters
+  avc_msgs::ChangeControlMode disable_manual_control_srv;
+  disable_manual_control_srv.request.mode_change_requested = true;
+
   //create disable mapping service object and set default parameters
   avc_msgs::ChangeControlMode disable_mapping_srv;
   disable_mapping_srv.request.mode_change_requested = true;
@@ -114,6 +118,9 @@ int main(int argc, char **argv)
 
   //create publisher to publish control message status with buffer size 10, and latch set to true
   ros::Publisher control_pub = node_public.advertise<avc_msgs::Control>("control", 10, true);
+
+  //create service client to send service requests on the disable navigation topic
+  ros::ServiceClient disable_manual_control_clt = node_public.serviceClient<avc_msgs::ChangeControlMode>("disable_manual_control");
 
   //create service client to send service requests on the disable mapping topic
   ros::ServiceClient disable_mapping_clt = node_public.serviceClient<avc_msgs::ChangeControlMode>("disable_mapping");
@@ -162,6 +169,19 @@ int main(int argc, char **argv)
       //reset mode change requested to prevent mode from toggling twice on one button press
       mode_change_requested = false;
 
+      //wait for verification from manual control program that it's safe to change modes
+      do
+      {
+
+        //call service and verify success
+        if (!disable_manual_control_clt.call(disable_manual_control_srv))
+        {
+          ROS_INFO("[control_node] failed to call disable manual control service");
+          ROS_BREAK();
+        }
+
+      }
+      while (!disable_manual_control_srv.response.ready_to_change);
 
       //wait for verification from mapping program that it's safe to change modes
       do
