@@ -1,2 +1,5 @@
 control_node:
   refresh_rate: 10
+
+manual_control_node:
+  refresh_rate: 10
