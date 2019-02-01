@@ -38,8 +38,7 @@ add_message_files(
 add_service_files(
   DIRECTORY srv
   FILES
-  DisableMapping.srv
-  DisableNavigation.srv
+  ChangeControlMode.srv
 )
 
 ## Generate actions in the 'action' folder
