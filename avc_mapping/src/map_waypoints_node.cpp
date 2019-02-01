@@ -4,7 +4,7 @@
 #include <errno.h>
 #include <ros/ros.h>
 #include <avc_msgs/Control.h>
-#include <avc_msgs/DisableMapping.h>
+#include <avc_msgs/ChangeControlMode.h>
 #include <sensor_msgs/Joy.h>
 #include <sensor_msgs/NavSatFix.h>
 #include <signal.h>
@@ -41,14 +41,15 @@ void sigintHandler(int sig)
 void controlCallback(const avc_msgs::Control::ConstPtr& msg)
 {
 
-  //set local value to match message value
-  mapping_mode = !msg->autonomous_control;
+  //verify that local mode matches global mode
+  if (mapping_mode == msg->autonomous_control)
+  {
 
-  //inform of mode change
-  if (mapping_mode)
-    ROS_INFO("[map_waypoints_node] entering mapping mode");
-  else
-    ROS_INFO("[map_waypoints_node] exiting mapping mode");
+    //modes do not match; send notification and shut down node
+    ROS_INFO("[map_waypoints_node] local control mode does not match global control mode; killing program");
+    ROS_BREAK();
+
+  }
 
 }
 
@@ -62,23 +63,29 @@ void controllerCallback(const sensor_msgs::Joy::ConstPtr& msg)
 }
 
 //callback function called to process service requests on the disable mapping mode topic
-bool disableMappingCallback(avc_msgs::DisableMapping::Request& req, avc_msgs::DisableMapping::Response& res)
+bool disableMappingCallback(avc_msgs::ChangeControlMode::Request& req, avc_msgs::ChangeControlMode::Response& res)
 {
 
-  //if node isn't currently mapping then ready to change modes, otherwise not ready to change
+  //if node isn't currently busy then ready to change modes, otherwise not ready to change
   res.ready_to_change = !mapping;
 
-  //output ROS INFO message to inform of mode change request and reply statuses
+  //output ROS INFO message to inform of mode change request and reply status
   if (req.mode_change_requested && res.ready_to_change)
-    ROS_INFO("[map_waypoints_node] mode change requested; indicating ready to change");
+  {
+
+    //change modes
+    mapping_mode = !mapping_mode;
+
+    //output notification
+    ROS_INFO("[map_waypoints_node] mode change requested; changing control modes");
+
+  }
   else if (!req.mode_change_requested && res.ready_to_change)
     ROS_INFO("[map_waypoints_node] ready to change modes status requested; indicating ready to change");
   else if (req.mode_change_requested && !res.ready_to_change)
     ROS_INFO("[map_waypoints_node] mode change requested; indicating node is busy");
   else
     ROS_INFO("[map_waypoints_node] ready to change modes status requested; indicating node is busy");
-
-  }
 
   //return true to indicate service processing is complete
   return true;
@@ -154,8 +161,8 @@ int main(int argc, char **argv)
   while (ros::ok())
   {
 
-    //if save waypoint button on controller is pressed, mapping mode is enabled, and not currently saving a waypoint then save waypoint
-    if (mapping_mode && (controller_buttons[0] == 1))
+   //if save waypoint button on controller is pressed, mapping mode is enabled, and not currently saving a waypoint then save waypoint
+   if (mapping_mode && (controller_buttons[0] == 1))
     {
 
       //set mapping variable to true to indicate waypoint is being saved
