@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(avc_navigation)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -10,6 +10,7 @@ project(avc_navigation)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   avc_msgs
+  nav_msgs
   sensor_msgs
 )
 
@@ -75,7 +76,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES avc_navigation
-  CATKIN_DEPENDS roscpp avc_msgs sensor_msgs
+  CATKIN_DEPENDS roscpp avc_msgs nav_msgs sensor_msgs
 #  DEPENDS system_lib
 )
 
@@ -121,4 +122,4 @@ add_dependencies(navigation_node ${catkin_EXPORTED_TARGETS})
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(navigation_node ${catkin_LIBRARIES})
+target_link_libraries(navigation_node ${catkin_LIBRARIES} wiringPi)
