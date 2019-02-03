@@ -1,13 +1,20 @@
 # global parameters
 
+# arduino parameters
+arduino:
+  i2c_address: 0x04 # i2c protocol address
+
 # button parameters
 button:
   emergency_stop:
     input_pin: 255
+  mode_change: 252
 
+# controller parameters
 joy_node:
   dev: "/dev/input/js0"
 
+# indicator LED parameters
 led:
   indicator_pin: 254
   mode_blue_pin: 249
@@ -15,7 +22,6 @@ led:
   mode_red_pin: 251
   power_pin: 248
 
-switch:
-  mode:
-    mapping_pin: 252
-    running_pin: 253
+# steering servo parameters
+steering_servo:
+  max_rotation_angle: 30.0 # max rotation from neutral position in either direction [deg]
