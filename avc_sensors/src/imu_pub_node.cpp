@@ -118,10 +118,12 @@ int main(int argc, char **argv)
   std::vector<double> magnetic_field_covariance(9, 0);
   std::copy(magnetic_field_covariance.begin(), magnetic_field_covariance.end(), std::begin(compass_msg.magnetic_field_covariance));
 
-  //create publishers to publish IMU and compass messages with buffer size 10, and latch set to false
-  ros::Publisher imu_pub = node_private.advertise<sensor_msgs::Imu>("imu", 10, false);
+  //create publisher to publish compass messages with buffer size 10, and latch set to false
   ros::Publisher compass_pub = node_private.advertise<sensor_msgs::MagneticField>("compass", 10, false);
 
+  //create publisher to publish IMU messages with buffer size 10, and latch set to false
+  ros::Publisher imu_pub = node_private.advertise<sensor_msgs::Imu>("imu", 10, false);
+  
   //set refresh rate of ROS loop to defined refresh rate of sensor parameter
   ros::Rate loop_rate(refresh_rate);
 
