@@ -96,19 +96,19 @@ int main(int argc, char **argv)
   //override the default SIGINT handler
   signal(SIGINT, sigintHandler);
 
-  //retrieve steering servo max rotation angle from parameter server
-  float servo_max_angle;
-  if (!node_private.getParam("/steering_servo/max_rotation_angle", servo_max_angle))
-  {
-    ROS_ERROR("[manual_control_node] steering servo max rotation angle not defined in config file: avc_bringup/config/global.yaml");
-    ROS_BREAK();
-  }
-
   //retrieve refresh rate of node in hertz from parameter server
   float refresh_rate;
   if (!node_private.getParam("/control/manual_control_node/refresh_rate", refresh_rate))
   {
     ROS_ERROR("[manual_control_node] manual control node refresh rate not defined in config file: avc_control/config/control.yaml");
+    ROS_BREAK();
+  }
+  
+  //retrieve steering servo max rotation angle from parameter server
+  float servo_max_angle;
+  if (!node_private.getParam("/steering_servo/max_rotation_angle", servo_max_angle))
+  {
+    ROS_ERROR("[manual_control_node] steering servo max rotation angle not defined in config file: avc_bringup/config/global.yaml");
     ROS_BREAK();
   }
 
