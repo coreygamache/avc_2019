@@ -1,6 +1,8 @@
 //map waypoints node
 //this node controls mapping mode, which allows for mapping of GPS waypoints
 //while mapping mode is enabled the robot can be manually controlled
+#include <iostream> //dependency for fstream (must be included first)
+#include <fstream>
 #include <errno.h>
 #include <ros/ros.h>
 #include <avc_msgs/ChangeControlMode.h>
@@ -131,6 +133,14 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
+  //retrieve map waypoint delay from parameter server [ms]
+  std::string output_file_path;
+  if (!node_private.getParam("/mapping/output_file_path", output_file_path))
+  {
+    ROS_ERROR("[map_waypoints_node] GPS waypoint output file path not defined in config file: avc_bringup/config/global.yaml");
+    ROS_BREAK();
+  }
+
   //retrieve refresh rate of node in hertz from parameter server
   float refresh_rate;
   if (!node_private.getParam("/control/map_waypoints_node/refresh_rate", refresh_rate))
@@ -198,9 +208,22 @@ int main(int argc, char **argv)
     {
 
       //output list to csv file
+      //create file object and open file path
+      std::ofstream output_file;
+      output_file.open(output_file_path.c_str());
 
-      //flash LED three times to indicate waypoint list was saved
-      for (int i = 0; i < 3; i++)
+      //output header to top of file
+      output_file << "latitude" << "longitude\n";
+
+      //output each waypoint in list to file
+      for (int i = 0; i < gpsWaypoints.size(); i++)
+        output_file << gpsWaypoints[i][0] << "," << gpsWaypoints[i][1] << "\n";
+
+      //close file after all waypoints have been output
+      output_file.close();
+
+      //flash LED twice to indicate waypoint list was saved
+      for (int i = 0; i < 2; i++)
       {
 
         //flash LED
@@ -215,7 +238,7 @@ int main(int argc, char **argv)
       }
 
       //output text to indicate waypoint list was saved
-      ROS_INFO("[map_waypoints_node] waypoint list saved to %s (%d total waypoints)", "file_path", int(gpsWaypoints.size()));
+      ROS_INFO("[map_waypoints_node] waypoint list saved to %s (%d total waypoints)", output_file_path.c_str(), int(gpsWaypoints.size()));
 
     }
 
