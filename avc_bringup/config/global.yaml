@@ -22,6 +22,9 @@ led:
   mode_red_pin: 251
   power_pin: 248
 
+mapping:
+  output_file_path: ~/avc_ws/files/gpsWaypoints.csv
+
 # steering servo parameters
 steering_servo:
   max_rotation_angle: 30.0 # max rotation from neutral position in either direction [deg]
