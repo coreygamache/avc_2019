@@ -116,7 +116,7 @@ int main(int argc, char **argv)
   //override the default SIGINT handler
   signal(SIGINT, sigintHandler);
 
-  //retrieve indicator LED from parameter server
+  //retrieve indicator LED pin from parameter server
   if (!node_private.getParam("/led/indicator_pin", indicator_LED))
   {
     ROS_ERROR("[map_waypoints_node] indicator LED pin not defined in config file: avc_bringup/config/global.yaml");
