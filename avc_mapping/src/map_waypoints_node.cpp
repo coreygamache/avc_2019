@@ -150,16 +150,16 @@ int main(int argc, char **argv)
   }
 
   //create service to process service requests on the disable mapping topic
-  ros::ServiceServer disable_mapping_srv = node_public.advertiseService("disable_mapping", disableMappingCallback);
+  ros::ServiceServer disable_mapping_srv = node_public.advertiseService("/control/disable_mapping", disableMappingCallback);
 
   //create subscriber to subscribe to control messages topic with queue size set to 1000
-  ros::Subscriber control_sub = node_public.subscribe("control", 1000, controlCallback);
+  ros::Subscriber control_sub = node_public.subscribe("/control/control", 1000, controlCallback);
 
   //create subscriber to subscribe to joy messages topic with queue size set to 1000
   ros::Subscriber controller_sub = node_public.subscribe("joy", 1000, controllerCallback);
 
   //create subscriber to subscribe to conveyor motor messages message topic with queue size set to 1000
-  ros::Subscriber gps_fix_sub = node_public.subscribe("fix", 1000, gpsFixCallback);
+  ros::Subscriber gps_fix_sub = node_public.subscribe("/sensor/fix", 1000, gpsFixCallback);
 
   //run wiringPi GPIO setup function and set pin modes
   wiringPiSetup();
