@@ -13,6 +13,7 @@
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Joy.h>
 #include <sensor_msgs/MagneticField.h>
+#include <sensor_msgs/NavSatFix.h> //TEMPORARY UNTIL ODOMETRY NODE IS FINISHED
 #include <signal.h>
 #include <wiringPi.h>
 
@@ -26,6 +27,7 @@ std::vector<int> controller_buttons(13, 0);
 
 //global GPS and heading variables
 float heading; //[deg]
+std::vector<double> gpsFix(2, 0); //TEMPORARY UNTIL ODOMETRY NODE IS FINISHED
 std::vector< std::vector<double> > gpsWaypoints;
 
 
@@ -115,6 +117,17 @@ bool disableNavigationCallback(avc_msgs::ChangeControlMode::Request& req, avc_ms
 
 }
 
+//TEMPORARY UNTIL ODOMETRY NODE IS FINISHED
+//callback function called to process messages on odometry topic
+void navSatFixCallback(const sensor_msgs::NavSatFix::ConstPtr& msg)
+{
+
+  //set local values to match message values
+  gpsFix[0] = msg->latitude;
+  gpsFix[1] = msg->longitude;
+
+}
+
 //callback function called to process messages on odometry topic
 void odometryCallback(const nav_msgs::Odometry::ConstPtr& msg)
 {
@@ -162,6 +175,13 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
+  float waypoint_radius;
+  if (!node_private.getParam("/navigation_node/waypoint_radius", waypoint_radius))
+  {
+    ROS_ERROR("[navigation_node] waypoint radius not defined in config file: avc_navigation/config/navigation.yaml");
+    ROS_BREAK();
+  }
+
   //create ESC message object and set default parameters
   avc_msgs::ESC esc_msg;
   esc_msg.header.frame_id = "0";
@@ -184,6 +204,10 @@ int main(int argc, char **argv)
 
   //create subscriber to subscribe to control messages topic with queue size set to 1000
   ros::Subscriber control_sub = node_public.subscribe("/control/control", 1000, controlCallback);
+
+  //TEMPORARY UNTIL ODOMETRY NODE IS FINISHED
+  //create subscriber to subscribe to GPS location messages topic with queue size set to 1000
+  ros::Subscriber nav_sat_fix_sub = node_public.subscribe("/sensor/fix", 1000, navSatFixCallback);
 
   //create subscriber to subscribe to odometry messages topic with queue size set to 1000
   ros::Subscriber odometry_sub = node_public.subscribe("odometry", 1000, odometryCallback);
@@ -231,7 +255,7 @@ int main(int argc, char **argv)
         }
 
         if (gpsWaypoints.size() > 0)
-          ROS_INFO("[navigation_node] GPS waypoint list read from file, %d total waypoints", gpsWaypoints.size());
+          ROS_INFO("[navigation_node] GPS waypoint list read from file, %d total waypoints", int(gpsWaypoints.size()));
         else
           ROS_INFO("[navigation_node] GPS waypoint list read from file but no waypoints found; switch to mapping mode to record waypoints");
       }
@@ -246,12 +270,26 @@ int main(int argc, char **argv)
       if (gpsWaypoints.size() > 0)
       {
 
-        //navigation algorithm
+        //calculate x and y values of vector from current position to next target waypoint
+        double delta_x = gpsWaypoints[0][1] - gpsFix[1];
+        double delta_y = gpsWaypoints[0][0] - gpsFix[0];
 
-        steering_servo_msg.steering_angle = 0;
+        //calculate target heading angle from vector pointing from current position to next target waypoint
+        float target_heading = atan2(delta_y, delta_x) * 180 / 3.14159;
+
+        //calculate error between target heading and current heading
+        float error = target_heading - heading;
+
+        //set desired servo angle to error value if valid
+        if (error > servo_max_angle)
+          steering_servo_msg.steering_angle = servo_max_angle;
+        else if (error < -servo_max_angle)
+          steering_servo_msg.steering_angle = -servo_max_angle;
+        else
+          steering_servo_msg.steering_angle = error;
 
         //calculate throttle percent from resulting steering angle
-        esc_msg.throttle_percent = 0;
+        esc_msg.throttle_percent = (fabs(error) / servo_max_angle) * 100;
 
         //set time of ESC message and publish
         esc_msg.header.stamp = ros::Time::now();
@@ -260,6 +298,14 @@ int main(int argc, char **argv)
         //set time of steering servo message and publish
         steering_servo_msg.header.stamp = ros::Time::now();
         steering_servo_pub.publish(steering_servo_msg);
+
+        //convert delta_x and y values to values in meters (s = r * theta)
+        delta_x = 6378137 * ((delta_x / 180) *  3.14159);
+        delta_y = 6378137 * ((delta_y / 180) *  3.14159);
+
+        //check if robot is within defined distance of waypoint, and set target to next waypoint if true
+        if (sqrt(pow(delta_x, 2) + pow(delta_y, 2)) < waypoint_radius)
+          gpsWaypoints.erase(gpsWaypoints.begin());
 
       }
       else
@@ -272,6 +318,7 @@ int main(int argc, char **argv)
       }
 
     }
+    //if autonomous running is disabled then stop robot and reset steering angle
     else if (autonomous_control && !autonomous_running)
     {
 
