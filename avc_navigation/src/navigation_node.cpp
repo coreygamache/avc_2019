@@ -1,10 +1,5 @@
-//subscribe to odometry
-//get GPS waypoint list (read from csv file?)
-//get direction vector to next gps waypoint (waypoint - current <x, y>)
-//calculate error between desired direction vector and current heading direction
-//publish error as angle [rad]
-//manual control node
-//this node handles manual control of the robot when autonomous control is disabled
+//navigation node
+//this node controls autonomous navigation
 #include <iostream> //dependency for fstream (must be included first)
 #include <fstream>
 #include <string>
@@ -16,6 +11,7 @@
 #include <avc_msgs/ESC.h>
 #include <avc_msgs/SteeringServo.h>
 #include <nav_msgs/Odometry.h>
+#include <sensor_msgs/Joy.h>
 #include <sensor_msgs/MagneticField.h>
 #include <signal.h>
 #include <wiringPi.h>
@@ -26,6 +22,9 @@ bool autonomous_running = false;
 bool mode_change_requested = false;
 
 //global controller variables
+std::vector<int> controller_buttons(13, 0);
+
+//global GPS and heading variables
 float heading; //[deg]
 std::vector< std::vector<double> > gpsWaypoints;
 
@@ -59,6 +58,27 @@ void controlCallback(const avc_msgs::Control::ConstPtr& msg)
     //modes do not match; send notification and shut down node
     ROS_INFO("[navigation_node] local control mode does not match global control mode; killing program");
     ROS_BREAK();
+
+  }
+
+}
+
+//callback function called to process messages on joy topic
+void controllerCallback(const sensor_msgs::Joy::ConstPtr& msg)
+{
+
+  //set local values to match message values
+  controller_buttons = msg->buttons;
+
+  //if autonomous running button on controller is pressed then toggle autonomous running status
+  if (controller_buttons[7] == 1)
+  {
+
+    //set autonomous running status to opposite of current status
+    autonomous_running = !autonomous_running;
+
+    //reset controller button if pressed to prevent status from toggling twice on one button press
+    controller_buttons[7] = 0;
 
   }
 
@@ -168,7 +188,6 @@ int main(int argc, char **argv)
   //create subscriber to subscribe to odometry messages topic with queue size set to 1000
   ros::Subscriber odometry_sub = node_public.subscribe("odometry", 1000, odometryCallback);
 
-
   //set loop rate in Hz
   ros::Rate loop_rate(refresh_rate);
 
@@ -181,32 +200,80 @@ int main(int argc, char **argv)
       //set mode change requested to false to prevent two mode changes on change request
       mode_change_requested = false;
 
-      //load most recent GPS waypoint list from file
-      //create local variables and vector to store GPS waypoints
-      std::string latitude, longitude;
-      std::vector< std::vector<double> > gpsWaypoints;
-
-      //open input file to read GPS waypoints and skip header line
-      std::ifstream input_file(output_file_path.c_str());
-      std::getline(input_file, latitude);
-
-      //read waypoints into list from file line by line
-      while (input_file.good())
+      //if autonomous control is enabled then load most recent GPS waypoint list from file
+      if (autonomous_control)
       {
 
-        //get latitude and longitude from current line in file
-        std::getline(input_file, latitude, ',');
-        std::getline(input_file, longitude);
+        //create local variables and vector to store GPS waypoints
+        std::string latitude, longitude;
+        std::vector< std::vector<double> > gpsWaypoints;
 
-        //convert latitude and longitude strings into doubles
-        std::vector<double> waypoint(2);
-        waypoint[0] = std::stod(latitude);
-        waypoint[1] = std::stod(longitude);
+        //open input file to read GPS waypoints and skip header line
+        std::ifstream input_file(output_file_path.c_str());
+        std::getline(input_file, latitude);
 
-        //add waypoint from current line to GPS waypoints list
-        gpsWaypoints.push_back(waypoint);
+        //read waypoints into list from file line by line
+        while (input_file.good())
+        {
+
+          //get latitude and longitude from current line in file
+          std::getline(input_file, latitude, ',');
+          std::getline(input_file, longitude);
+
+          //convert latitude and longitude strings into doubles
+          std::vector<double> waypoint(2);
+          waypoint[0] = std::stod(latitude);
+          waypoint[1] = std::stod(longitude);
+
+          //add waypoint from current line to GPS waypoints list
+          gpsWaypoints.push_back(waypoint);
+
+        }
+
+        if (gpsWaypoints.size() > 0)
+          ROS_INFO("[navigation_node] GPS waypoint list read from file, %d total waypoints", gpsWaypoints.size());
+        else
+          ROS_INFO("[navigation_node] GPS waypoint list read from file but no waypoints found; switch to mapping mode to record waypoints");
+      }
+
+    }
+
+    //autonomous (navigation) mode handling
+    if (autonomous_control && autonomous_running)
+    {
+
+      //if there are a non-zero number of GPS waypoints remaining then run navigation algorithm
+      if (gpsWaypoints.size() > 0)
+      {
+
+        //navigation algorithm
+
+        steering_servo_msg.steering_angle = 0;
+
+        //calculate throttle percent from resulting steering angle
+        esc_msg.throttle_percent = 0;
+
+        //set time of ESC message and publish
+        esc_msg.header.stamp = ros::Time::now();
+        esc_pub.publish(esc_msg);
+
+        //set time of steering servo message and publish
+        steering_servo_msg.header.stamp = ros::Time::now();
+        steering_servo_pub.publish(steering_servo_msg);
 
       }
+      else
+      {
+
+        //inform that there are no remaining GPS waypoints to navigate to
+        ROS_INFO("[navigation_node] no GPS waypoints remaining in list; navigation complete");
+        ROS_INFO("[navigation_node] switch to mapping mode and back to reload GPS waypoints");
+
+      }
+
+    }
+    else if (autonomous_control && !autonomous_running)
+    {
 
       //reset ESC msg, set time, and publish
       esc_msg.header.stamp = ros::Time::now();
@@ -216,26 +283,6 @@ int main(int argc, char **argv)
       //reset steering msg, set time, and publish
       steering_servo_msg.header.stamp = ros::Time::now();
       steering_servo_msg.steering_angle = 0;
-      steering_servo_pub.publish(steering_servo_msg);
-
-    }
-    //autonomous (navigation) mode handling
-    else if (autonomous_control)
-    {
-
-      //navigation algorithm
-      
-      steering_servo_msg.steering_angle = 0;
-
-      //calculate throttle percent from resulting steering angle
-      esc_msg.throttle_percent = 0;
-
-      //set time of ESC message and publish
-      esc_msg.header.stamp = ros::Time::now();
-      esc_pub.publish(esc_msg);
-
-      //set time of steering servo message and publish
-      steering_servo_msg.header.stamp = ros::Time::now();
       steering_servo_pub.publish(steering_servo_msg);
 
     }
