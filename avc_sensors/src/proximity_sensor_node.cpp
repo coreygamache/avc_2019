@@ -5,6 +5,16 @@
 //other includes
 #include <proximity_sensor.hpp>
 
+
+//callback function called to process SIGINT command
+void sigintHandler(int sig)
+{
+
+  //call the default shutdown function
+  ros::shutdown();
+
+}
+
 int main(int argc, char **argv)
 {
 
@@ -14,6 +24,10 @@ int main(int argc, char **argv)
   //initialize node and create node handler
   ros::init(argc, argv, "proximity_pub_node");
   ros::NodeHandle node_private("~");
+  ros::NodeHandle node_public;
+
+  //override the default SIGINT handler
+  signal(SIGINT, sigintHandler);
 
   //get echo pin from parameters
   int echo_pin;
@@ -82,7 +96,7 @@ int main(int argc, char **argv)
   //----------------------------------------------------------
 
   //create publisher to publish proximity sensor message with buffer size 10, and latch set to false
-  ros::Publisher proximity_pub = node_private.advertise<sensor_msgs::Range>("proximity", 10, false);
+  ros::Publisher proximity_pub = node_public.advertise<sensor_msgs::Range>("proximity", 10, false);
 
   //get refresh rate of sensor in hertz
   float refresh_rate;
