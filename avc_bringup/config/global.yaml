@@ -4,23 +4,16 @@
 arduino:
   i2c_address: 0x04 # i2c protocol address
 
-# button parameters
-button:
-  emergency_stop:
-    input_pin: 255
-  mode_change: 252
-
 # controller parameters
 joy_node:
   dev: "/dev/input/js0"
 
 # indicator LED parameters
 led:
-  indicator_pin: 254
-  mode_blue_pin: 249
-  mode_green_pin: 250
-  mode_red_pin: 251
-  power_pin: 248
+  indicator_pin: 1
+  mode_blue_pin: 27
+  mode_green_pin: 28
+  mode_red_pin: 29
 
 mapping:
   output_file_path: ~/avc_ws/files/gpsWaypoints.csv
