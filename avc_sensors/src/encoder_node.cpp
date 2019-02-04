@@ -9,6 +9,16 @@
 //volatile unsigned int last_pulse_time = 0;
 volatile unsigned int encoder_pulses = 0;
 
+
+//callback function called to process SIGINT command
+void sigintHandler(int sig)
+{
+
+  //call the default shutdown function
+  ros::shutdown();
+
+}
+
 void encoderInterruptCallback()
 {
 
@@ -78,6 +88,10 @@ int main(int argc, char **argv)
   //initialize node and create node handler
   ros::init(argc, argv, "encoder_pub_node");
   ros::NodeHandle node_private("~");
+  ros::NodeHandle node_public;
+
+  //override the default SIGINT handler
+  signal(SIGINT, sigintHandler);
 
   //if correct number of arguments has been passed to node, capture arguments and convert to strings
   std::string position_arg;
@@ -142,7 +156,7 @@ int main(int argc, char **argv)
   avc_msgs::Encoder encoder_msg;
 
   //create publisher to publish proximity sensor message with buffer size 10, and latch set to false
-  ros::Publisher encoder_pub = node_private.advertise<avc_msgs::Encoder>(encoder_name, 10, false);
+  ros::Publisher encoder_pub = node_public.advertise<avc_msgs::Encoder>(encoder_name, 10, false);
 
   //set refresh rate of ROS loop to defined refresh rate of sensor parameter
   ros::Rate loop_rate(refresh_rate);
