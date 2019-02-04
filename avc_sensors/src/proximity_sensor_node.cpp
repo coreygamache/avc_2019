@@ -1,6 +1,7 @@
 //ROS includes
 #include <ros/ros.h>
 #include <sensor_msgs/Range.h>
+#include <signal.h>
 
 //other includes
 #include <proximity_sensor.hpp>

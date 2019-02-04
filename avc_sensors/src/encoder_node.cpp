@@ -1,6 +1,7 @@
 //ROS includes
 #include <ros/ros.h>
 #include <avc_msgs/Encoder.h>
+#include <signal.h>
 #include <wiringPi.h>
 
 //global variables

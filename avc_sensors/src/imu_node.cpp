@@ -2,6 +2,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/MagneticField.h>
+#include <signal.h>
 
 //external library includes
 #include <RTIMULib.h>
