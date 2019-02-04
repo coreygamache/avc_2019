@@ -3,6 +3,7 @@
 <!-- set arguments -->
 <arg name="control_enabled" value="true" />
 <arg name="hardware_enabled" value="false" />
+<arg name="nav_mapping_enabled" value="false" />
 <arg name="sensors_enabled" value="false" />
 
 <!-- set sensors_enabled parameter from setting on parameter server -->
@@ -21,9 +22,24 @@
 <!-- if control is enabled then load control parameters to parameter server and launch control nodes -->
 <group if="$(arg control_enabled)">
   <rosparam command="load" file="$(find avc_control)/config/control.yaml" ns="control" />
-  <rosparam command="load" file="$(find avc_mapping)/config/mapping.yaml" ns="control" />
   <node name="control_node" pkg="avc_control" type="control_node" ns="control" output="screen" />
   <node name="controller_node" pkg="joy" type="joy_node" ns="control" output="screen" />
+  <node name="manual_control_node" pkg="avc_control" type="manual_control_node" ns="control" output="screen">
+    <remap from="/control/esc" to="/hardware/esc" />
+    <remap from="/control/steering_servo" to="/hardware/steering_servo" />
+  </node>
+</group>
+
+<!-- if navigation and mapping are enabled then load control parameters to parameter server and launch control nodes -->
+<group if="$(arg nav_mapping_enabled)">
+  <rosparam command="load" file="$(find avc_mapping)/config/mapping.yaml" ns="mapping" />
+   <rosparam command="load" file="$(find avc_navigation)/config/navigation.yaml" ns="navigation" />
+  <node name="map_waypoints_node" pkg="avc_mapping" type="map_waypoints_node" ns="mapping" output="screen" />
+  <node name="navigation_node" pkg="avc_navigation" type="navigation_node" ns="navigation" output="screen">
+    <remap from="/navigation/esc" to="/hardware/esc" />
+    <remap from="/navigation/steering_servo" to="/hardware/steering_servo" />
+  </node>
+  <!-- <node name="odometry_node" pkg="avc_navigation" type="odometry_node" ns="navigation" output="screen" /> -->
 </group>
 
 </launch>
