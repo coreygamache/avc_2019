@@ -50,8 +50,7 @@ void controllerCallback(const sensor_msgs::Joy::ConstPtr& msg)
     mode_change_requested = true;
 
     //reset controller button if pressed to prevent mode from toggling twice on one button press
-    if (controller_buttons[10] == 1)
-      controller_buttons[10] = 0;
+    controller_buttons[10] = 0;
 
   }
 
