@@ -17,13 +17,13 @@
 
   <!-- if encoders are enabled, launch encoder publisher nodes and broadcast transforms -->
   <group if="$(arg sensors_encoder_enable)">
-    <node name="fl_encoder_pub_node" pkg="avc_sensors" type="encoder_pub_node" ns="sensor" args="f l" output="screen" />
+    <node name="fl_encoder_node" pkg="avc_sensors" type="encoder_node" ns="sensor" args="f l" output="screen" />
     <!-- <node name="imu_link_broadcaster" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 base_link imu_link" /> -->
-    <node name="fr_encoder_pub_node" pkg="avc_sensors" type="encoder_pub_node" ns="sensor" args="f r" output="screen" />
+    <node name="fr_encoder_node" pkg="avc_sensors" type="encoder_node" ns="sensor" args="f r" output="screen" />
     <!-- <node name="imu_link_broadcaster" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 base_link imu_link" /> -->
-    <node name="rl_encoder_pub_node" pkg="avc_sensors" type="encoder_pub_node" ns="sensor" args="r l" output="screen" />
+    <node name="rl_encoder_node" pkg="avc_sensors" type="encoder_node" ns="sensor" args="r l" output="screen" />
     <!-- <node name="imu_link_broadcaster" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 base_link imu_link" /> -->
-    <node name="rr_encoder_pub_node" pkg="avc_sensors" type="encoder_pub_node" ns="sensor" args="r r" output="screen" />
+    <node name="rr_encoder_node" pkg="avc_sensors" type="encoder_node" ns="sensor" args="r r" output="screen" />
     <!-- <node name="imu_link_broadcaster" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 base_link imu_link" /> -->
   </group>
 
@@ -37,13 +37,13 @@
 
   <!-- if IMU is enabled, launch IMU publisher node and broadcast transform -->
   <group if="$(arg sensors_imu_enable)">
-    <node name="imu_pub_node" pkg="avc_sensors" type="imu_pub_node" ns="sensor" output="screen" />
+    <node name="imu_node" pkg="avc_sensors" type="imu_node" ns="sensor" output="screen" />
     <!-- <node name="imu_link_broadcaster" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 base_link imu_link" /> -->
   </group>
 
   <!-- if proximity sensor is enabled, launch proximity sensor publisher node and broadcast transform -->
   <group if="$(arg sensors_proximity_enable)">
-    <node name="proximity_pub_node" pkg="avc_sensors" type="proximity_pub_node" ns="sensor" output="screen" />
+    <node name="proximity_sensor_node" pkg="avc_sensors" type="proximity_sensor_node" ns="sensor" output="screen" />
     <!-- <node name="proximity_sensor_link_broadcaster" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 base_link proximity_sensor_link" /> -->
   </group>
 
