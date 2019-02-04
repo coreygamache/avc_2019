@@ -84,19 +84,22 @@ add_library(proximity_sensor src/proximity_sensor.cpp)
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/avc_sensors_node.cpp)
-add_executable(encoder_pub_node src/encoder_pub_node.cpp)
-add_executable(imu_pub_node src/imu_pub_node.cpp)
-add_executable(proximity_pub_node src/proximity_pub_node.cpp)
+add_executable(encoder_node src/encoder_node.cpp)
+add_executable(imu_node src/imu_node.cpp)
+add_executable(proximity_sensor_node src/proximity_pub_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(encoder_node ${catkin_EXPORTED_TARGETS})
+add_dependencies(imu_node ${catkin_EXPORTED_TARGETS})
+add_dependencies(proximity_sensor_node ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
 target_link_libraries(proximity_sensor ${catkin_LIBRARIES} wiringPi)
-target_link_libraries(encoder_pub_node ${catkin_LIBRARIES} wiringPi)
-target_link_libraries(imu_pub_node ${catkin_LIBRARIES} RTIMULib)
-target_link_libraries(proximity_pub_node ${catkin_LIBRARIES} proximity_sensor)
+target_link_libraries(encoder_node ${catkin_LIBRARIES} wiringPi)
+target_link_libraries(imu_node ${catkin_LIBRARIES} RTIMULib)
+target_link_libraries(proximity_sensor_node ${catkin_LIBRARIES} proximity_sensor)
