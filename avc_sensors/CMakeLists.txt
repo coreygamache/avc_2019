@@ -86,7 +86,7 @@ add_library(proximity_sensor src/proximity_sensor.cpp)
 # add_executable(${PROJECT_NAME}_node src/avc_sensors_node.cpp)
 add_executable(encoder_node src/encoder_node.cpp)
 add_executable(imu_node src/imu_node.cpp)
-add_executable(proximity_sensor_node src/proximity_pub_node.cpp)
+add_executable(proximity_sensor_node src/proximity_sensor_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
