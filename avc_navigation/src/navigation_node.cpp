@@ -177,13 +177,13 @@ int main(int argc, char **argv)
   ros::Publisher steering_servo_pub = node_public.advertise<avc_msgs::SteeringServo>("steering_servo", 10, false);
 
   //create service to process service requests on the disable manual control topic
-  ros::ServiceServer disable_navigation_srv = node_public.advertiseService("disable_navigation", disableNavigationCallback);
+  ros::ServiceServer disable_navigation_srv = node_public.advertiseService("/control/disable_navigation", disableNavigationCallback);
 
   //create subscriber to subscribe to compass messages topic with queue size set to 1000
-  ros::Subscriber compass_sub = node_public.subscribe("compass", 1000, compassCallback);
+  ros::Subscriber compass_sub = node_public.subscribe("/sensor/compass", 1000, compassCallback);
 
   //create subscriber to subscribe to control messages topic with queue size set to 1000
-  ros::Subscriber control_sub = node_public.subscribe("control", 1000, controlCallback);
+  ros::Subscriber control_sub = node_public.subscribe("/control/control", 1000, controlCallback);
 
   //create subscriber to subscribe to odometry messages topic with queue size set to 1000
   ros::Subscriber odometry_sub = node_public.subscribe("odometry", 1000, odometryCallback);
