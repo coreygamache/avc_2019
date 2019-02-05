@@ -14,7 +14,7 @@
 
 //global variables
 bool mapping = false;
-bool mapping_mode = false;
+bool mapping_mode = true;
 
 //global controller variables
 std::vector<int> controller_buttons(13, 0);
