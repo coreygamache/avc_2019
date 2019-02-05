@@ -1,10 +1,10 @@
 <launch>
 
 <!-- set arguments -->
-<arg name="control_enabled" value="true" />
+<arg name="control_enabled" value="false" />
 <arg name="hardware_enabled" value="false" />
 <arg name="nav_mapping_enabled" value="false" />
-<arg name="sensors_enabled" value="false" />
+<arg name="sensors_enabled" value="true" />
 
 <!-- set sensors_enabled parameter from setting on parameter server -->
 <!-- <param name="sensors_enabled" value="$(arg sensors/enable)" /> -->
