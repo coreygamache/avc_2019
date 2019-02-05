@@ -43,14 +43,14 @@ void controllerCallback(const sensor_msgs::Joy::ConstPtr& msg)
   controller_buttons = msg->buttons;
 
   //if mode change controller button is pressed then set change mode request true
-  if (controller_buttons[10] == 1)
+  if (controller_buttons[12] == 1)
   {
 
     //set mode change requested to true to indicate request to change modes
     mode_change_requested = true;
 
     //reset controller button if pressed to prevent mode from toggling twice on one button press
-    controller_buttons[10] = 0;
+    controller_buttons[12] = 0;
 
   }
 
