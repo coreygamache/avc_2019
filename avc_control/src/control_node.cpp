@@ -49,6 +49,9 @@ void controllerCallback(const sensor_msgs::Joy::ConstPtr& msg)
     //set mode change requested to true to indicate request to change modes
     mode_change_requested = true;
 
+    //inform of control made change request
+    ROS_INFO("[control_node] control mode change requested");
+
     //reset controller button if pressed to prevent mode from toggling twice on one button press
     controller_buttons[12] = 0;
 
@@ -165,53 +168,41 @@ int main(int argc, char **argv)
     if (mode_change_requested)
     {
 
-      //reset mode change requested to prevent mode from toggling twice on one button press
-      mode_change_requested = false;
-
-      //wait for verification from manual control program that it's safe to change modes
-      do
+      //check for verification from manual control program that it's safe to change modes
+      if (!disable_manual_control_clt.call(disable_manual_control_srv))
       {
-
-        //call service and verify success
-        if (!disable_manual_control_clt.call(disable_manual_control_srv))
-        {
-          ROS_INFO("[control_node] failed to call disable manual control service");
-          ROS_BREAK();
-        }
-
+        ROS_INFO("[control_node] failed to call disable manual control service");
+        ROS_BREAK();
       }
-      while (!disable_manual_control_srv.response.ready_to_change);
 
       //wait for verification from mapping program that it's safe to change modes
-      do
+      if (!disable_mapping_clt.call(disable_mapping_srv))
       {
-
-        //call service and verify success
-        if (!disable_mapping_clt.call(disable_mapping_srv))
-        {
-          ROS_INFO("[control_node] failed to call disable mapping service");
-          ROS_BREAK();
-        }
-
+        ROS_INFO("[control_node] failed to call disable mapping service");
+        ROS_BREAK();
       }
-      while (!disable_mapping_srv.response.ready_to_change);
 
       //wait for verification from navigation program that it's safe to change modes
-      do
+      if (!disable_navigation_clt.call(disable_navigation_srv))
       {
-
-        if (!disable_navigation_clt.call(disable_navigation_srv))
-        {
-          ROS_INFO("[control_node] failed to call disable mapping service");
-          ROS_BREAK();
-        }
-
+        ROS_INFO("[control_node] failed to call disable navigation service");
+        ROS_BREAK();
       }
-      while (!disable_navigation_srv.response.ready_to_change);
+
+      //notify of any busy nodes
+      if (!disable_manual_control_srv.response.ready_to_change)
+        ROS_INFO("[control_node] manual control node not ready for mode change");
+      if (!disable_mapping_srv.response.ready_to_change)
+        ROS_INFO("[control_node] mapping node not ready for mode change");
+      if (!disable_navigation_srv.response.ready_to_change)
+        ROS_INFO("[control_node] navigation node not ready for mode change");
 
       //if mapping and navigation programs are ready to change control modes, then switch control modes and publish message
-      if (disable_mapping_srv.response.ready_to_change && disable_navigation_srv.response.ready_to_change)
+      if (disable_manual_control_srv.response.ready_to_change && disable_mapping_srv.response.ready_to_change && disable_navigation_srv.response.ready_to_change)
       {
+
+        //reset mode change requested to prevent mode from toggling twice on one button press
+        mode_change_requested = false;
 
         //switch control modes
         autonomous_control = !autonomous_control;
@@ -239,11 +230,10 @@ int main(int argc, char **argv)
           digitalWrite(mode_LED_blue_pin, led_mapping_mode[2]);
         }
 
-        //reset message parameters
-        disable_mapping_srv.response.ready_to_change = false;
-        disable_navigation_srv.response.ready_to_change = false;
-
       }
+      //if one more more nodes aren't ready for mode change then notify of failure and retry on next iteration
+      else
+        ROS_INFO("[control_node] one or more nodes not yet ready to change modes; retrying");
 
     }
 
