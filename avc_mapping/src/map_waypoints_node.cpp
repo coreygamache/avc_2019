@@ -143,7 +143,7 @@ int main(int argc, char **argv)
 
   //retrieve refresh rate of node in hertz from parameter server
   float refresh_rate;
-  if (!node_private.getParam("/control/map_waypoints_node/refresh_rate", refresh_rate))
+  if (!node_private.getParam("/mapping/map_waypoints_node/refresh_rate", refresh_rate))
   {
     ROS_ERROR("[map_waypoints_node] control node refresh rate not defined in config file: avc_mapping/config/mapping.yaml");
     ROS_BREAK();
