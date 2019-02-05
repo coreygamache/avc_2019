@@ -1,13 +1,13 @@
 <launch>
 
 <!-- set arguments -->
-<arg name="control_enabled" value="false" />
+<arg name="control_enabled" value="true" />
 <arg name="hardware_enabled" value="false" />
 <arg name="nav_mapping_enabled" value="false" />
 <arg name="sensors_enabled" value="true" />
 
-<!-- set sensors_enabled parameter from setting on parameter server -->
-<!-- <param name="sensors_enabled" value="$(arg sensors/enable)" /> -->
+<!-- load global parameters to parameter server -->
+<rosparam command="load" file="$(find avc_bringup)/config/global.yaml" ns="/" />
 
 <!-- if sensors are enabled then include sensor launch file  -->
 <group if="$(arg hardware_enabled)">
