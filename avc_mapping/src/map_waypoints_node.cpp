@@ -127,7 +127,7 @@ int main(int argc, char **argv)
 
   //retrieve map waypoint delay from parameter server [ms]
   int map_waypoint_delay;
-  if (!node_private.getParam("/control/map_waypoints_node/map_waypoint_delay", map_waypoint_delay))
+  if (!node_private.getParam("/mapping/map_waypoints_node/map_waypoint_delay", map_waypoint_delay))
   {
     ROS_ERROR("[map_waypoints_node] map waypoint delay not defined in config file: avc_mapping/config/mapping.yaml");
     ROS_BREAK();
