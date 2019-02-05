@@ -42,6 +42,8 @@ void controllerCallback(const sensor_msgs::Joy::ConstPtr& msg)
   //set local values to match message values
   controller_buttons = msg->buttons;
 
+  ROS_INFO("[control_node] controller input received");
+
   //if mode change controller button is pressed then set change mode request true
   if (controller_buttons[12] == 1)
   {
@@ -76,21 +78,21 @@ int main(int argc, char **argv)
   //retrieve mode LED pin (blue) from parameter server
   if (!node_private.getParam("/led/mode_blue_pin", mode_LED_blue_pin))
   {
-    ROS_ERROR("[map_waypoints_node] mode LED pin (blue) not defined in config file: avc_bringup/config/global.yaml");
+    ROS_ERROR("[control_node] mode LED pin (blue) not defined in config file: avc_bringup/config/global.yaml");
     ROS_BREAK();
   }
 
   //retrieve mode LED pin (green) from parameter server
   if (!node_private.getParam("/led/mode_green_pin", mode_LED_green_pin))
   {
-    ROS_ERROR("[map_waypoints_node] mode LED pin (green) not defined in config file: avc_bringup/config/global.yaml");
+    ROS_ERROR("[control_node] mode LED pin (green) not defined in config file: avc_bringup/config/global.yaml");
     ROS_BREAK();
   }
 
   //retrieve mode LED pin (red) from parameter server
   if (!node_private.getParam("/led/mode_red_pin", mode_LED_red_pin))
   {
-    ROS_ERROR("[map_waypoints_node] mode LED pin (red) not defined in config file: avc_bringup/config/global.yaml");
+    ROS_ERROR("[control_node] mode LED pin (red) not defined in config file: avc_bringup/config/global.yaml");
     ROS_BREAK();
   }
 
@@ -138,9 +140,6 @@ int main(int argc, char **argv)
   pinMode(mode_LED_blue_pin, OUTPUT);
   pinMode(mode_LED_green_pin, OUTPUT);
   pinMode(mode_LED_red_pin, OUTPUT);
-
-  //create variable for status of autonomous control
-  bool autonomous_control = false;
 
   //create vectors for storing LED RGB values corresponding to each control mode (R, G, B)
   std::vector<int> led_autonomous_mode;
