@@ -172,7 +172,7 @@ int main(int argc, char **argv)
   {
 
    //if save waypoint button on controller is pressed, mapping mode is enabled, and not currently saving a waypoint then save waypoint
-   if (mapping_mode && (controller_buttons[0] == 1))
+   if (mapping_mode && (controller_buttons[1] == 1))
     {
 
       //set mapping variable to true to indicate waypoint is being saved
@@ -204,7 +204,7 @@ int main(int argc, char **argv)
     }
     //if save list button on controller is pressed, mapping mode is enabled, and not currently saving a waypoint then save list
     //else is used to prevent attempting to save waypoint and waypoint list if buttons are pressed at same time
-    else if (mapping_mode && (controller_buttons[0] == 1))
+    else if (mapping_mode && (controller_buttons[3] == 1))
     {
 
       //output list to csv file
