@@ -119,9 +119,6 @@ int main(int argc, char **argv)
     //get distance to nearest object from proximity sensor with 25ms timeout
     proximity_msg.range = sensor.getDistance(25);
 
-    //add ROS_INFO output to display current proximity sensor range to terminal (for testing)
-    ROS_INFO("current range: %f", proximity_msg.range);
-
     //publish proximity sensor range message
     proximity_pub.publish(proximity_msg);
 
