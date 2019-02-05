@@ -209,8 +209,7 @@ int main(int argc, char **argv)
 
       //output list to csv file
       //create file object and open file path
-      std::ofstream output_file;
-      output_file.open(output_file_path.c_str());
+      std::fstream output_file(output_file_path.c_str(), std::fstream::out | std::fstream::trunc);
 
       //output header to top of file
       output_file << "latitude" << "longitude\n";
