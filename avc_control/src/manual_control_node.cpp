@@ -103,7 +103,7 @@ int main(int argc, char **argv)
     ROS_ERROR("[manual_control_node] manual control node refresh rate not defined in config file: avc_control/config/control.yaml");
     ROS_BREAK();
   }
-  
+
   //retrieve steering servo max rotation angle from parameter server
   float servo_max_angle;
   if (!node_private.getParam("/steering_servo/max_rotation_angle", servo_max_angle))
@@ -165,6 +165,12 @@ int main(int argc, char **argv)
       steering_servo_pub.publish(steering_servo_msg);
 
     }
+
+    //process callback functions
+    ros::spinOnce();
+
+    //sleep until next sensor reading
+    loop_rate.sleep();
 
   }
   return 0;

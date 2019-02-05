@@ -42,8 +42,6 @@ void controllerCallback(const sensor_msgs::Joy::ConstPtr& msg)
   //set local values to match message values
   controller_buttons = msg->buttons;
 
-  ROS_INFO("[control_node] controller input received");
-
   //if mode change controller button is pressed then set change mode request true
   if (controller_buttons[12] == 1)
   {
@@ -235,6 +233,12 @@ int main(int argc, char **argv)
         ROS_INFO("[control_node] one or more nodes not yet ready to change modes; retrying");
 
     }
+
+    //process callback functions
+    ros::spinOnce();
+
+    //sleep until next sensor reading
+    loop_rate.sleep();
 
   }
 

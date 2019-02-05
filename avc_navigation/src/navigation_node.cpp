@@ -334,6 +334,11 @@ int main(int argc, char **argv)
 
     }
 
+    //process callback functions
+    ros::spinOnce();
+
+    //sleep until next sensor reading
+    loop_rate.sleep();
 
   }
   return 0;
