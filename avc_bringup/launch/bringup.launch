@@ -33,7 +33,7 @@
 <!-- if navigation and mapping are enabled then load control parameters to parameter server and launch control nodes -->
 <group if="$(arg nav_mapping_enabled)">
   <rosparam command="load" file="$(find avc_mapping)/config/mapping.yaml" ns="mapping" />
-   <rosparam command="load" file="$(find avc_navigation)/config/navigation.yaml" ns="navigation" />
+  <rosparam command="load" file="$(find avc_navigation)/config/navigation.yaml" ns="navigation" />
   <node name="map_waypoints_node" pkg="avc_mapping" type="map_waypoints_node" ns="mapping" output="screen" />
   <node name="navigation_node" pkg="avc_navigation" type="navigation_node" ns="navigation" output="screen">
     <remap from="/navigation/esc" to="/hardware/esc" />
