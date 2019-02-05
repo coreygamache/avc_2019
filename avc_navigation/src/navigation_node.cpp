@@ -176,7 +176,7 @@ int main(int argc, char **argv)
   }
 
   float waypoint_radius;
-  if (!node_private.getParam("/navigation_node/waypoint_radius", waypoint_radius))
+  if (!node_private.getParam("/navigation/navigation_node/waypoint_radius", waypoint_radius))
   {
     ROS_ERROR("[navigation_node] waypoint radius not defined in config file: avc_navigation/config/navigation.yaml");
     ROS_BREAK();
