@@ -2,7 +2,7 @@
 
 <!-- set arguments -->
 <arg name="control_enabled" value="true" />
-<arg name="hardware_enabled" value="false" />
+<arg name="hardware_enabled" value="true" />
 <arg name="nav_mapping_enabled" value="true" />
 <arg name="sensors_enabled" value="true" />
 
