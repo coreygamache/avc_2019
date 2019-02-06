@@ -149,7 +149,7 @@ int main(int argc, char **argv)
       esc_msg.header.stamp = ros::Time::now();
 
       //translate controller axis value to percentage and set to esc msg value
-      esc_msg.throttle_percent = ((controller_axes[5] - 1) / -2) * 100;
+      esc_msg.throttle_percent = ((controller_axes[4] - 1) / -2) * 100;
 
       //publish drive motors message
       esc_pub.publish(esc_msg);
