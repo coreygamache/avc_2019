@@ -51,7 +51,7 @@ void compassCallback(const sensor_msgs::MagneticField::ConstPtr& msg)
 {
 
   //set local heading value to heading derived from compass data
-  heading = atan2(msg->magnetic_field.y, msg->magnetic_field.x) * 180 / 3.14159;
+  heading = atan2(msg->magnetic_field.y, msg->magnetic_field.x) * 180 / PI;
 
 }
 
@@ -135,8 +135,8 @@ void navSatFixCallback(const sensor_msgs::NavSatFix::ConstPtr& msg)
 {
 
   //set local values to match message values
-  gpsFix[0] = msg->latitude;
-  gpsFix[1] = msg->longitude;
+  gpsFix[0] = (msg->latitude / 180) * PI * pow(10, 6);
+  gpsFix[1] = (msg->longitude / 180) * PI * pow(10, 6);
 
 }
 
