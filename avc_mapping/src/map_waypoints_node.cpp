@@ -105,8 +105,8 @@ void gpsFixCallback(const sensor_msgs::NavSatFix::ConstPtr& msg)
 {
 
   //set local variables to match value received in message converted to micro radians [urad]
-  gpsFix[0] = (msg->latitude / double(180)) * PI * pow(double(10), 6.0);
-  gpsFix[1] = (msg->longitude / double(180)) * PI * pow(double(10), 6.0);
+  gpsFix[0] = (msg->latitude / 180.0) * PI * pow(10.0, 6.0);
+  gpsFix[1] = (msg->longitude / 180.0) * PI * pow(10.0, 6.0);
 
 }
 
@@ -202,6 +202,7 @@ int main(int argc, char **argv)
 
       //turn off LED and output text to indicate waypoint has been recorded
       ROS_INFO("[map_waypoints_node] waypoint saved (%d total waypoints)", int(gpsWaypoints.size()));
+      ROS_INFO("[map_waypoints_node] coordinates: %lf, %lf", gpsFix[0], gpsFix[1]);
       digitalWrite(indicator_LED, LOW);
 
       //set mapping variable to false to indicate waypoint saving is complete
