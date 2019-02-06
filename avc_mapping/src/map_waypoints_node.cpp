@@ -221,6 +221,10 @@ int main(int argc, char **argv)
       //close file after all waypoints have been output
       output_file.close();
 
+
+      //output text to indicate waypoint list was saved
+      ROS_INFO("[map_waypoints_node] waypoint list saved to %s (%d total waypoints)", output_file_path.c_str(), int(gpsWaypoints.size()));
+
       //flash LED twice to indicate waypoint list was saved
       for (int i = 0; i < 2; i++)
       {
@@ -235,9 +239,6 @@ int main(int argc, char **argv)
           delay(500);
 
       }
-
-      //output text to indicate waypoint list was saved
-      ROS_INFO("[map_waypoints_node] waypoint list saved to %s (%d total waypoints)", output_file_path.c_str(), int(gpsWaypoints.size()));
 
     }
 
