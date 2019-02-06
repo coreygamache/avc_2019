@@ -102,8 +102,8 @@ void gpsFixCallback(const sensor_msgs::NavSatFix::ConstPtr& msg)
 {
 
   //set local variables to match value received in message converted to micro radians [urad]
-  gpsFix[0] = (msg->latitude / 180) * PI * 0.000001;
-  gpsFix[1] = (msg->longitude / 180) * PI * 0.000001;
+  gpsFix[0] = (msg->latitude / 180) * PI * pow(10, 6);
+  gpsFix[1] = (msg->longitude / 180) * PI * pow(10, 6);
 
 }
 
