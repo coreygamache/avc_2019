@@ -13,7 +13,7 @@
 bool autonomous_control = false;
 
 //global controller variables
-std::vector<float> controller_axes(8, 0);
+std::vector<float> controller_axes(8, 999);
 std::vector<int> controller_buttons(13, 0);
 
 
@@ -148,8 +148,11 @@ int main(int argc, char **argv)
       //set time of ESC message
       esc_msg.header.stamp = ros::Time::now();
 
-      //translate controller axis value to percentage and set to esc msg value
-      esc_msg.throttle_percent = ((controller_axes[4] - 1) / -2) * 100;
+      //if button has been pressed, translate controller axis value to percentage and set to esc msg value
+      if (controller_axes[4] == 999)
+        esc_msg.throttle_percent = 0;
+      else
+        esc_msg.throttle_percent = ((controller_axes[4] - 1) / -2) * 100;
 
       //publish drive motors message
       esc_pub.publish(esc_msg);
@@ -158,8 +161,11 @@ int main(int argc, char **argv)
       //set time of steering servo message
       steering_servo_msg.header.stamp = ros::Time::now();
 
-      //translate controller axis value to percentage and set to esc msg value
-      steering_servo_msg.steering_angle = controller_axes[0] * servo_max_angle;
+      //if stick is pressed, translate controller axis value to percentage and set to esc msg value
+      if (controller_axes[0] == -0)
+        steering_servo_msg.steering_angle = 0;
+      else
+        steering_servo_msg.steering_angle = controller_axes[0] * servo_max_angle;
 
       //publish drive motors message
       steering_servo_pub.publish(steering_servo_msg);
