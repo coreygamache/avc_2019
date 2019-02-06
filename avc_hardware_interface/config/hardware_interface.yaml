@@ -1,5 +1,8 @@
 esc:
   output_pin: 254
 
+arduino_output_node:
+  refresh_rate: 10
+
 servo:
   output_pin: 255
