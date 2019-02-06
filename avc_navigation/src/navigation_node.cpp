@@ -287,7 +287,7 @@ int main(int argc, char **argv)
     {
 
       //if there are a non-zero number of GPS waypoints remaining then run navigation algorithm
-      if (gpsWaypoints.size() > 0)
+      if (!gpsWaypoints.empty())
       {
 
         //calculate x and y values of vector from current position to next target waypoint
