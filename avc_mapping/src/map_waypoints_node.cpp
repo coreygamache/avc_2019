@@ -195,8 +195,8 @@ int main(int argc, char **argv)
       gpsWaypoints.push_back(gpsFix);
 
       //turn off LED and output text to indicate waypoint has been recorded
-      digitalWrite(indicator_LED, LOW);
       ROS_INFO("[map_waypoints_node] waypoint saved (%d total waypoints)", int(gpsWaypoints.size()));
+      digitalWrite(indicator_LED, LOW);
 
       //set mapping variable to false to indicate waypoint saving is complete
       mapping = false;
