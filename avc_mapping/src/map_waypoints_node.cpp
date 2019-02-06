@@ -81,6 +81,9 @@ bool disableMappingCallback(avc_msgs::ChangeControlMode::Request& req, avc_msgs:
     //change modes
     mapping_mode = !mapping_mode;
 
+    //clear list of GPS waypoints on mode change`
+    gpsWaypoints.clear();
+
     //output notification
     ROS_INFO("[map_waypoints_node] mode change requested; changing control modes");
 
@@ -102,8 +105,8 @@ void gpsFixCallback(const sensor_msgs::NavSatFix::ConstPtr& msg)
 {
 
   //set local variables to match value received in message converted to micro radians [urad]
-  gpsFix[0] = (msg->latitude / 180) * PI * pow(10, 6);
-  gpsFix[1] = (msg->longitude / 180) * PI * pow(10, 6);
+  gpsFix[0] = (msg->latitude / double(180)) * PI * pow(double(10), 6.0);
+  gpsFix[1] = (msg->longitude / double(180)) * PI * pow(double(10), 6.0);
 
 }
 
