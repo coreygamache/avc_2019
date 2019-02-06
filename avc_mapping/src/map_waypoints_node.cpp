@@ -98,9 +98,9 @@ bool disableMappingCallback(avc_msgs::ChangeControlMode::Request& req, avc_msgs:
 void gpsFixCallback(const sensor_msgs::NavSatFix::ConstPtr& msg)
 {
 
-  //set local variables to match value received in message
-  gpsFix[0] = msg->latitude;
-  gpsFix[1] = msg->longitude;
+  //set local variables to match value received in message converted to micro radians [urad]
+  gpsFix[0] = (msg->latitude / 180) * 3.1415926535897 * 0.000001;
+  gpsFix[1] = (msg->longitude / 180) * 3.1415926535897 * 0.000001;
 
 }
 
@@ -212,7 +212,7 @@ int main(int argc, char **argv)
       std::fstream output_file(output_file_path.c_str(), std::fstream::out | std::fstream::trunc);
 
       //output header to top of file
-      output_file << "latitude," << "longitude\n";
+      output_file << "latitude [urad]," << "longitude [urad]\n";
 
       //output each waypoint in list to file
       for (int i = 0; i < gpsWaypoints.size(); i++)
