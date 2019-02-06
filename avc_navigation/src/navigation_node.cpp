@@ -232,9 +232,12 @@ int main(int argc, char **argv)
         std::string latitude, longitude;
         std::vector< std::vector<double> > gpsWaypoints;
 
-        //open input file to read GPS waypoints and skip header line
+        //open input file to read GPS waypoints
         std::fstream input_file(output_file_path.c_str(), std::fstream::in);
-        std::getline(input_file, latitude);
+
+        //if file was read successfully then skip header line
+        if (input_file.good())
+          std::getline(input_file, latitude);
 
         //read waypoints into list from file line by line
         while (input_file.good())
