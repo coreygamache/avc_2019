@@ -323,13 +323,26 @@ int main(int argc, char **argv)
         delta_x = 6378137 * ((delta_x / 180) *  3.14159);
         delta_y = 6378137 * ((delta_y / 180) *  3.14159);
 
-        //check if robot is within defined distance of waypoint, and set target to next waypoint if true
+        //check if robot is within defined distance of waypoint, notify and set target to next waypoint if true
         if (sqrt(pow(delta_x, 2) + pow(delta_y, 2)) < waypoint_radius)
+        {
+
+          //notify that waypoint has been reached
+          ROS_INFO("[navigation_node] target reached; navigating to next waypoint");
+
+          //remove current waypoint from list
           gpsWaypoints.erase(gpsWaypoints.begin());
 
+        }
+
+
       }
+      //end autonomous running and notify if there are no waypoints remaining in list
       else
       {
+
+        //end autonomous running
+        autonomous_running = false;
 
         //inform that there are no remaining GPS waypoints to navigate to
         ROS_INFO("[navigation_node] no GPS waypoints remaining in list; navigation complete");
