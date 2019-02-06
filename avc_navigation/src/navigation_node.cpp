@@ -135,8 +135,8 @@ void navSatFixCallback(const sensor_msgs::NavSatFix::ConstPtr& msg)
 {
 
   //set local values to match message values
-  gpsFix[0] = (msg->latitude / 180) * PI * pow(10, 6);
-  gpsFix[1] = (msg->longitude / 180) * PI * pow(10, 6);
+  gpsFix[0] = (msg->latitude / 180.0) * PI * pow(10.0, 6.0);
+  gpsFix[1] = (msg->longitude / 180.0) * PI * pow(10.0, 6.0);
 
 }
 
