@@ -74,7 +74,7 @@ void controllerCallback(const sensor_msgs::Joy::ConstPtr& msg)
   controller_buttons = msg->buttons;
 
   //if autonomous running button on controller is pressed then toggle autonomous running status
-  if (controller_buttons[7] == 1)
+  if (controller_buttons[1] == 1)
   {
 
     //set autonomous running status to opposite of current status
@@ -205,6 +205,9 @@ int main(int argc, char **argv)
 
   //create subscriber to subscribe to control messages topic with queue size set to 1000
   ros::Subscriber control_sub = node_public.subscribe("/control/control", 1000, controlCallback);
+
+  //create subscriber to subscribe to joy messages topic with queue size set to 1000
+  ros::Subscriber controller_sub = node_public.subscribe("/control/joy", 1000, controllerCallback);
 
   //TEMPORARY UNTIL ODOMETRY NODE IS FINISHED
   //create subscriber to subscribe to GPS location messages topic with queue size set to 1000
