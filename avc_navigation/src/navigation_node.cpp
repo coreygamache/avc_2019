@@ -79,7 +79,7 @@ void controllerCallback(const sensor_msgs::Joy::ConstPtr& msg)
   controller_buttons = msg->buttons;
 
   //if autonomous running button on controller is pressed then toggle autonomous running status
-  if (controller_buttons[1] == 1)
+  if ((controller_buttons[1] == 1) && (autonomous_control))
   {
 
     //set autonomous running status to opposite of current status
@@ -92,7 +92,7 @@ void controllerCallback(const sensor_msgs::Joy::ConstPtr& msg)
       ROS_INFO("[navigation_node] disabling autonomous running");
 
     //reset controller button if pressed to prevent status from toggling twice on one button press
-    controller_buttons[7] = 0;
+    controller_buttons[1] = 0;
 
   }
 
