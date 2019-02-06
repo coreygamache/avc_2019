@@ -22,7 +22,6 @@
 const double EARTH_RADIUS = 6371008.7714;
 const double PI = 3.1415926535897;
 
-
 //global variables
 bool autonomous_control = false;
 bool autonomous_running = false;
@@ -35,6 +34,10 @@ std::vector<int> controller_buttons(13, 0);
 float heading; //[deg]
 std::vector<double> gpsFix(2, 0); //TEMPORARY UNTIL ODOMETRY NODE IS FINISHED
 std::vector< std::vector<double> > gpsWaypoints;
+
+//pin variables
+//must be global so that they can be accessed by callback function
+int indicator_LED;
 
 
 //callback function called to process SIGINT command
@@ -84,6 +87,9 @@ void controllerCallback(const sensor_msgs::Joy::ConstPtr& msg)
 
     //set autonomous running status to opposite of current status
     autonomous_running = !autonomous_running;
+
+    //set indicator LED pin to match autonomous running status
+    digitalWrite(indicator_LED, autonomous_running);
 
     //notify that autonomous running is being enabled/disabled
     if (autonomous_running)
@@ -162,6 +168,13 @@ int main(int argc, char **argv)
 
   //override the default SIGINT handler
   signal(SIGINT, sigintHandler);
+
+  //retrieve indicator LED pin from parameter server
+  if (!node_private.getParam("/led/indicator_pin", indicator_LED))
+  {
+    ROS_ERROR("[navigation_node] indicator LED pin not defined in config file: avc_bringup/config/global.yaml");
+    ROS_BREAK();
+  }
 
   //retrieve minimum throttle value from parameter server [%]
   float minimum_throttle;
