@@ -16,7 +16,7 @@ led:
   mode_red_pin: 29
 
 mapping:
-  output_file_path: "~/avc_ws/files/gpsWaypoints.csv"
+  output_file_path: "/home/corey/avc_ws/files/gpsWaypoints.csv"
 
 # steering servo parameters
 steering_servo:
