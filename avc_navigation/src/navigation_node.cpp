@@ -18,6 +18,11 @@
 #include <signal.h>
 #include <wiringPi.h>
 
+//math constants
+const double EARTH_RADIUS = 6371008.7714;
+const double PI = 3.1415926535897;
+
+
 //global variables
 bool autonomous_control = false;
 bool autonomous_running = false;
@@ -79,6 +84,12 @@ void controllerCallback(const sensor_msgs::Joy::ConstPtr& msg)
 
     //set autonomous running status to opposite of current status
     autonomous_running = !autonomous_running;
+
+    //notify that autonomous running is being enabled/disabled
+    if (autonomous_running)
+      ROS_INFO("[navigation_node] enabling autonomous running");
+    else
+      ROS_INFO("[navigation_node] disabling autonomous running");
 
     //reset controller button if pressed to prevent status from toggling twice on one button press
     controller_buttons[7] = 0;
@@ -151,6 +162,15 @@ int main(int argc, char **argv)
 
   //override the default SIGINT handler
   signal(SIGINT, sigintHandler);
+
+  //retrieve minimum throttle value from parameter server [%]
+  float minimum_throttle;
+  if (!node_private.getParam("/navigation/navigation_node/minimum_throttle", minimum_throttle))
+  {
+    ROS_ERROR("[navigation_node] minimum throttle not defined in config file: avc_navigation/config/navigation.yaml");
+    ROS_BREAK();
+  }
+
 
   //retrieve map waypoint delay from parameter server [ms]
   std::string output_file_path;
@@ -232,6 +252,9 @@ int main(int argc, char **argv)
       if (autonomous_control)
       {
 
+        //clear GPS waypoint list of previously loaded waypoints
+        gpsWaypoints.clear();
+
         //create local variables to store file line data
         std::string line, latitude, longitude;
 
@@ -290,11 +313,15 @@ int main(int argc, char **argv)
       {
 
         //calculate x and y values of vector from current position to next target waypoint
-        double delta_x = gpsWaypoints[0][1] - gpsFix[1];
-        double delta_y = gpsWaypoints[0][0] - gpsFix[0];
+        double delta_x = gpsWaypoints[0][1] - gpsFix[1]; //longitude
+        double delta_y = gpsWaypoints[0][0] - gpsFix[0]; //latitude
+
+        //convert delta_x and y values to values in meters (s = r * theta)
+        delta_x = delta_x * pow(10, -6) * EARTH_RADIUS;
+        delta_y = delta_y * pow(10, -6) * EARTH_RADIUS;
 
         //calculate target heading angle from vector pointing from current position to next target waypoint
-        float target_heading = atan2(delta_y, delta_x) * 180 / 3.14159;
+        float target_heading = (atan2(delta_y, delta_x) / PI) * 180;
 
         //calculate error between target heading and current heading
         float error = target_heading - heading;
@@ -308,7 +335,11 @@ int main(int argc, char **argv)
           steering_servo_msg.steering_angle = error;
 
         //calculate throttle percent from resulting steering angle
-        esc_msg.throttle_percent = (fabs(error) / servo_max_angle) * 100;
+        esc_msg.throttle_percent = (1 - (fabs(error) / servo_max_angle)) * 100;
+
+        //if throttle percent is requested below minimum value, set to minimum value
+        if (esc_msg.throttle_percent < minimum_throttle)
+          esc_msg.throttle_percent = minimum_throttle;
 
         //set time of ESC message and publish
         esc_msg.header.stamp = ros::Time::now();
@@ -318,9 +349,6 @@ int main(int argc, char **argv)
         steering_servo_msg.header.stamp = ros::Time::now();
         steering_servo_pub.publish(steering_servo_msg);
 
-        //convert delta_x and y values to values in meters (s = r * theta)
-        delta_x = 6378137 * ((delta_x / 180) *  3.14159);
-        delta_y = 6378137 * ((delta_y / 180) *  3.14159);
 
         //check if robot is within defined distance of waypoint, notify and set target to next waypoint if true
         if (sqrt(pow(delta_x, 2) + pow(delta_y, 2)) < waypoint_radius)
