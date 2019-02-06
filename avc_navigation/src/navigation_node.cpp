@@ -232,9 +232,8 @@ int main(int argc, char **argv)
       if (autonomous_control)
       {
 
-        //create local variables and vector to store file line data and GPS waypoints
+        //create local variables to store file line data
         std::string line, latitude, longitude;
-        std::vector< std::vector<double> > gpsWaypoints;
 
         //open input file to read GPS waypoints
         std::fstream input_file(output_file_path.c_str(), std::fstream::in);
@@ -274,7 +273,7 @@ int main(int argc, char **argv)
         }
 
         //output result of file read
-        if (gpsWaypoints.size() > 0)
+        if (!gpsWaypoints.empty())
           ROS_INFO("[navigation_node] GPS waypoint list read from file, %d total waypoints", int(gpsWaypoints.size()));
         else
           ROS_INFO("[navigation_node] GPS waypoint list read from file but no waypoints found; switch to mapping mode to record waypoints");
@@ -328,7 +327,7 @@ int main(int argc, char **argv)
         {
 
           //notify that waypoint has been reached
-          ROS_INFO("[navigation_node] target reached; navigating to next waypoint");
+          ROS_INFO("[navigation_node] target reached; navigating to next waypoint (%d remaining)", int(gpsWaypoints.size()));
 
           //remove current waypoint from list
           gpsWaypoints.erase(gpsWaypoints.begin());
