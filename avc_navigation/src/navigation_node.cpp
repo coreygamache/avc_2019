@@ -2,6 +2,7 @@
 //this node controls autonomous navigation
 #include <iostream> //dependency for fstream (must be included first)
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <errno.h>
 #include <math.h>
@@ -228,8 +229,8 @@ int main(int argc, char **argv)
       if (autonomous_control)
       {
 
-        //create local variables and vector to store GPS waypoints
-        std::string latitude, longitude;
+        //create local variables and vector to store file line data and GPS waypoints
+        std::string line, latitude, longitude;
         std::vector< std::vector<double> > gpsWaypoints;
 
         //open input file to read GPS waypoints
@@ -243,9 +244,15 @@ int main(int argc, char **argv)
         while (input_file.good())
         {
 
+          //read next line in file
+          std::getline(input_file, line);
+
+          //convert string read from file to istringstream for parsing by comma
+          std::istringstream line_stream(line);
+
           //get latitude and longitude from current line in file
-          std::getline(input_file, latitude, ',');
-          std::getline(input_file, longitude);
+          std::getline(line_stream, latitude, ',');
+          std::getline(line_stream, longitude);
 
           //convert latitude and longitude strings into doubles
           std::vector<double> waypoint(2);
@@ -257,6 +264,7 @@ int main(int argc, char **argv)
 
         }
 
+        //output result of file read
         if (gpsWaypoints.size() > 0)
           ROS_INFO("[navigation_node] GPS waypoint list read from file, %d total waypoints", int(gpsWaypoints.size()));
         else
