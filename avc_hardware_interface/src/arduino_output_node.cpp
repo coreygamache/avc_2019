@@ -78,7 +78,7 @@ int main(int argc, char **argv)
 
   //retrieve refresh rate of sensor in hertz from parameter server
   float refresh_rate;
-  if (!node_private.getParam("/hardware/drive_motor/refresh_rate", refresh_rate))
+  if (!node_private.getParam("/hardware/arduino_output_node/refresh_rate", refresh_rate))
   {
     ROS_ERROR("[arduino_output_node] arduino output node refresh rate not defined in config file: sd_hardware_interface/config/hardware_interface.yaml");
     ROS_BREAK();
