@@ -212,7 +212,7 @@ int main(int argc, char **argv)
       std::fstream output_file(output_file_path.c_str(), std::fstream::out | std::fstream::trunc);
 
       //output header to top of file
-      output_file << "latitude" << "longitude\n";
+      output_file << "latitude," << "longitude\n";
 
       //output each waypoint in list to file
       for (int i = 0; i < gpsWaypoints.size(); i++)
