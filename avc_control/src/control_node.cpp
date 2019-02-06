@@ -149,6 +149,11 @@ int main(int argc, char **argv)
   led_mapping_mode.push_back(1);
   led_mapping_mode.push_back(0);
 
+  //set initial state of LED pins
+  digitalWrite(mode_LED_red_pin, led_autonomous_mode[0]);
+  digitalWrite(mode_LED_green_pin, led_autonomous_mode[1]);
+  digitalWrite(mode_LED_blue_pin, led_autonomous_mode[2]);
+
   //initialize control message to disable autonomous control globally
   control_msg.header.stamp = ros::Time::now();
   control_msg.autonomous_control = false;
