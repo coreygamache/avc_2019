@@ -223,7 +223,7 @@ int main(int argc, char **argv)
 
       //output each waypoint in list to file
       for (int i = 0; i < gpsWaypoints.size(); i++)
-        output_file << gpsWaypoints[i][0] << "," << gpsWaypoints[i][1] << "\n";
+        output_file << std::fixed << std::setprecision(6) << gpsWaypoints[i][0] << "," << gpsWaypoints[i][1] << "\n";
 
       //close file after all waypoints have been output
       output_file.close();
