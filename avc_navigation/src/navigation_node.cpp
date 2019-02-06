@@ -237,7 +237,7 @@ int main(int argc, char **argv)
         std::fstream input_file(output_file_path.c_str(), std::fstream::in);
 
         //if file was read successfully then skip header line
-        if (input_file.good())
+        if (input_file && input_file.good())
           std::getline(input_file, latitude);
 
         //read waypoints into list from file line by line
@@ -252,15 +252,21 @@ int main(int argc, char **argv)
 
           //get latitude and longitude from current line in file
           std::getline(line_stream, latitude, ',');
-          std::getline(line_stream, longitude);
+          std::getline(line_stream, longitude, '\n');
 
-          //convert latitude and longitude strings into doubles
-          std::vector<double> waypoint(2);
-          waypoint[0] = std::stod(latitude);
-          waypoint[1] = std::stod(longitude);
+          //store waypoint in list of waypoints if latitude and longitude values are valid
+          if (!latitude.empty() && !longitude.empty())
+          {
 
-          //add waypoint from current line to GPS waypoints list
-          gpsWaypoints.push_back(waypoint);
+            //convert latitude and longitude strings into doubles
+            std::vector<double> waypoint(2);
+            waypoint[0] = std::stod(latitude);
+            waypoint[1] = std::stod(longitude);
+
+            //add waypoint from current line to GPS waypoints list
+            gpsWaypoints.push_back(waypoint);
+
+          }
 
         }
 
