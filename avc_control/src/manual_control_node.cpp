@@ -1,6 +1,7 @@
 //manual control node
 //this node handles manual control of the robot when autonomous control is disabled
 #include <errno.h>
+#include <math.h>
 #include <ros/ros.h>
 #include <avc_msgs/ChangeControlMode.h>
 #include <avc_msgs/Control.h>
@@ -13,7 +14,7 @@
 bool autonomous_control = false;
 
 //global controller variables
-std::vector<float> controller_axes(8, 999);
+std::vector<float> controller_axes{0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0};
 std::vector<int> controller_buttons(13, 0);
 
 
@@ -149,10 +150,7 @@ int main(int argc, char **argv)
       esc_msg.header.stamp = ros::Time::now();
 
       //if button has been pressed, translate controller axis value to percentage and set to esc msg value
-      if (controller_axes[4] == 999)
-        esc_msg.throttle_percent = 0;
-      else
-        esc_msg.throttle_percent = ((controller_axes[4] - 1) / -2) * 100;
+      esc_msg.throttle_percent = fabs(((controller_axes[4] - 1) / -2) * 100);
 
       //publish drive motors message
       esc_pub.publish(esc_msg);
