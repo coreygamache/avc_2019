@@ -227,12 +227,12 @@ int main(int argc, char **argv)
 
         //flash LED
         digitalWrite(indicator_LED, HIGH);
-        delay(250);
+        delay(500);
         digitalWrite(indicator_LED, LOW);
 
         //delay between flashes
         if (i < 2)
-          delay(250);
+          delay(500);
 
       }
 
