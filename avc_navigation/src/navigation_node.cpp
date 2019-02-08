@@ -112,7 +112,10 @@ bool disableNavigationCallback(avc_msgs::ChangeControlMode::Request& req, avc_ms
 {
 
   //if node isn't currently busy then ready to change modes, otherwise not ready to change
-  res.ready_to_change = true;
+  if (!autonomous_running)
+    res.ready_to_change = true;
+  else
+    res.ready_to_change = false;
 
   //output ROS INFO message to inform of mode change request and reply status
   if (req.mode_change_requested && res.ready_to_change)
