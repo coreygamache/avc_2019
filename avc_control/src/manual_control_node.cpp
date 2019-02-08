@@ -12,10 +12,12 @@
 
 //global variables
 bool autonomous_control = false;
+bool reverse_pressed = false;
+bool throttle_pressed = false;
 
 //global controller variables
-std::vector<float> controller_axes{0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0};
-std::vector<int> controller_buttons(13, 0);
+std::vector<float> controller_axes(13, 0);
+std::vector<int> controller_buttons(15, 0);
 
 
 //callback function called to process SIGINT command
@@ -50,6 +52,13 @@ void controllerCallback(const sensor_msgs::Joy::ConstPtr& msg)
   //set local values to match message values
   controller_axes = msg->axes;
   controller_buttons = msg->buttons;
+
+  //if throttle axis value isn't zero then change throttle pressed flag to allow normal control
+  if (!throttle_pressed && (controller_axes[4] != 0.0))
+    throttle_pressed = true;
+  //if throttle trigger has not yet been pressed then default throttle axis to 1.0 (equivalent to 0% throttle)
+  else if (!throttle_pressed)
+    controller_axes[4] = 1.0;
 
 }
 
