@@ -252,6 +252,10 @@ int main(int argc, char **argv)
   //create subscriber to subscribe to odometry messages topic with queue size set to 1000
   ros::Subscriber odometry_sub = node_public.subscribe("odometry", 1000, odometryCallback);
 
+  //run wiringPi GPIO setup function and set pin modes
+  wiringPiSetup();
+  pinMode(indicator_LED, OUTPUT);
+
   //set loop rate in Hz
   ros::Rate loop_rate(refresh_rate);
 
