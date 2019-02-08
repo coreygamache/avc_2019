@@ -16,7 +16,7 @@ bool reverse_pressed = false;
 bool throttle_pressed = false;
 
 //global controller variables
-std::vector<float> controller_axes(13, 0);
+std::vector<float> controller_axes{0, 0, 0, 1.0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0};
 std::vector<int> controller_buttons(15, 0);
 
 
