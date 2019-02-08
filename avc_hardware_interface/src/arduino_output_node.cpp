@@ -117,9 +117,7 @@ int main(int argc, char **argv)
 
     //output notification message if error occurs
     if (result == -1)
-    {
       ROS_INFO("[arduino_output_node] error writing to arduino via i2c: %d", errno);
-    }
 
     //process callback function calls
     ros::spinOnce();
