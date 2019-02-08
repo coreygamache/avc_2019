@@ -46,15 +46,12 @@ void sigintHandler(int sig)
 void controlCallback(const avc_msgs::Control::ConstPtr& msg)
 {
 
-  //verify that local mode matches global mode
-  if (mapping_mode == msg->autonomous_control)
-  {
+  //change local control mode to match message
+  mapping_mode = !msg->autonomous_control;
 
-    //modes do not match; send notification and shut down node
-    ROS_INFO("[map_waypoints_node] local control mode does not match global control mode; killing program");
-    ROS_BREAK();
-
-  }
+  //clear list of GPS waypoints on mode change`
+  if (!mapping_mode)
+    gpsWaypoints.clear();
 
 }
 
@@ -76,18 +73,7 @@ bool disableMappingCallback(avc_msgs::ChangeControlMode::Request& req, avc_msgs:
 
   //output ROS INFO message to inform of mode change request and reply status
   if (req.mode_change_requested && res.ready_to_change)
-  {
-
-    //change modes
-    mapping_mode = !mapping_mode;
-
-    //clear list of GPS waypoints on mode change`
-    gpsWaypoints.clear();
-
-    //output notification
     ROS_INFO("[map_waypoints_node] mode change requested; changing control modes");
-
-  }
   else if (!req.mode_change_requested && res.ready_to_change)
     ROS_INFO("[map_waypoints_node] ready to change modes status requested; indicating ready to change");
   else if (req.mode_change_requested && !res.ready_to_change)
