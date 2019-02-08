@@ -88,8 +88,11 @@ void controllerCallback(const sensor_msgs::Joy::ConstPtr& msg)
     //set autonomous running status to opposite of current status
     autonomous_running = !autonomous_running;
 
-    //set indicator LED pin to match autonomous running status
-    digitalWrite(indicator_LED, autonomous_running);
+    //turn on indicator LED during autonomous running
+    if (autonomous_running)
+      digitalWrite(indicator_LED, HIGH);
+    else
+      digitalWrite(indicator_LED, LOW);
 
     //notify that autonomous running is being enabled/disabled
     if (autonomous_running)
