@@ -53,6 +53,13 @@ void controllerCallback(const sensor_msgs::Joy::ConstPtr& msg)
   else if (!throttle_pressed)
     controller_axes[4] = 1.0;
 
+  //if reverse throttle axis value isn't zero then change reverse pressed flag to allow normal control
+  if (!reverse_pressed && (controller_axes[3] != 0.0))
+    reverse_pressed = true;
+  //if reverse throttle trigger has not yet been pressed then default reverse axis to 1.0 (equivalent to 0% throttle)
+  else if (!reverse_pressed)
+    controller_axes[3] = 1.0;
+
 }
 
 //callback function called to process service requests on the disable mapping mode topic
@@ -143,8 +150,15 @@ int main(int argc, char **argv)
       //set time of ESC message
       esc_msg.header.stamp = ros::Time::now();
 
-      //if button has been pressed, translate controller axis value to percentage and set to esc msg value
-      esc_msg.throttle_percent = fabs(((controller_axes[4] - 1) / -2) * 100);
+      //if forward throttle is pressed and reverse isn't then produce positive throttle percent value
+      if ((controller_axes[3] != 1.0) && (controller_axes[4] == 1.0))
+        esc_msg.throttle_percent = fabs(((controller_axes[4] - 1) / -2) * 100);
+      //if reverse is pressed and forward isn't then produce negative throttle percent value
+      else if ((controller_axes[3] == 1.0) && (controller_axes[4] != 1.0))
+        esc_msg.throttle_percent = fabs(((controller_axes[4] - 1) / 2) * 100);
+      //if neither or both are pressed then set throttle percent to zero
+      else
+        esc_msg.throttle_percent = 0;
 
       //publish drive motors message
       esc_pub.publish(esc_msg);
