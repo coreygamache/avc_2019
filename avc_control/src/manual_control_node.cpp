@@ -150,10 +150,10 @@ int main(int argc, char **argv)
       //set time of ESC message
       esc_msg.header.stamp = ros::Time::now();
 
-      //if forward throttle is pressed and reverse isn't then produce positive throttle percent value
-      if ((controller_axes[3] != 1.0) && (controller_axes[4] == 1.0))
-        esc_msg.throttle_percent = fabs(((controller_axes[4] - 1) / -2) * 100);
       //if reverse is pressed and forward isn't then produce negative throttle percent value
+      if ((controller_axes[3] != 1.0) && (controller_axes[4] == 1.0))
+        esc_msg.throttle_percent = ((controller_axes[3] - 1) / 2) * 100;
+      //if forward throttle is pressed and reverse isn't then produce positive throttle percent value
       else if ((controller_axes[3] == 1.0) && (controller_axes[4] != 1.0))
         esc_msg.throttle_percent = fabs(((controller_axes[4] - 1) / 2) * 100);
       //if neither or both are pressed then set throttle percent to zero
