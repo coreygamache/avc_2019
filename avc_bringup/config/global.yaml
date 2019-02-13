@@ -11,8 +11,8 @@ joy_node:
 # indicator LED parameters
 led:
   indicator_pin: 1
-  mode_blue_pin: 27
-  mode_green_pin: 28
+  mode_blue_pin: 28
+  mode_green_pin: 27
   mode_red_pin: 29
 
 mapping:
