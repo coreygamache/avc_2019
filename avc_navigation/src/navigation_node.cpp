@@ -44,6 +44,9 @@ int indicator_LED;
 void sigintHandler(int sig)
 {
 
+  //set all pins LOW
+  digitalWrite(indicator_LED, LOW);
+
   //call the default shutdown function
   ros::shutdown();
 
@@ -298,6 +301,8 @@ int main(int argc, char **argv)
             //add waypoint from current line to GPS waypoints list
             gpsWaypoints.push_back(waypoint);
 
+            //output waypoint read from file
+            ROS_INFO("[navigation_node] waypoint read from file (latitude, longitude): %lf, %lf", waypoint[0], waypoint[1]);
           }
 
         }
@@ -345,7 +350,7 @@ int main(int argc, char **argv)
         esc_msg.throttle_percent = (1 - (fabs(error) / servo_max_angle)) * 100;
 
         //if throttle percent is requested below minimum value, set to minimum value
-        if (esc_msg.throttle_percent < minimum_throttle)
+        //if (esc_msg.throttle_percent < minimum_throttle)
           esc_msg.throttle_percent = minimum_throttle;
 
         //set time of ESC message and publish
@@ -355,7 +360,6 @@ int main(int argc, char **argv)
         //set time of steering servo message and publish
         steering_servo_msg.header.stamp = ros::Time::now();
         steering_servo_pub.publish(steering_servo_msg);
-
 
         //check if robot is within defined distance of waypoint, notify and set target to next waypoint if true
         if (sqrt(pow(delta_x, 2) + pow(delta_y, 2)) < waypoint_radius)
@@ -377,6 +381,23 @@ int main(int argc, char **argv)
 
         //end autonomous running
         autonomous_running = false;
+
+        //flash LED twice to indicate goal has been reached
+        for (int i = 0; i < 2; i++)
+        {
+
+          //flash LED
+          digitalWrite(indicator_LED, LOW);
+          delay(500);
+          digitalWrite(indicator_LED, HIGH);
+
+          //delay between flashes or turn off LED if flashing is finished
+          if (i < 1)
+            delay(500);
+          else
+            digitalWrite(indicator_LED, LOW);
+
+        }
 
         //inform that there are no remaining GPS waypoints to navigate to
         ROS_INFO("[navigation_node] no GPS waypoints remaining in list; navigation complete");
