@@ -228,7 +228,7 @@ int main(int argc, char **argv)
         digitalWrite(indicator_LED, LOW);
 
         //delay between flashes
-        if (i < 2)
+        if (i < 1)
           delay(500);
 
       }
