@@ -20,10 +20,10 @@ int main(int argc, char **argv)
 {
 
   //send notification that node is launching
-  ROS_INFO("[NODE LAUNCH]: starting proximity_pub_node");
+  ROS_INFO("[NODE LAUNCH]: starting proximity_sensor_node");
 
   //initialize node and create node handler
-  ros::init(argc, argv, "proximity_pub_node");
+  ros::init(argc, argv, "proximity_sensor_node");
   ros::NodeHandle node_private("~");
   ros::NodeHandle node_public;
 
@@ -34,7 +34,7 @@ int main(int argc, char **argv)
   int echo_pin;
   if (!node_private.getParam("/sensor/proximity_sensor/echo_pin", echo_pin))
   {
-    ROS_ERROR("proximity sensor echo pin not defined in config file: avc_sensors/config/sensors.yaml");
+    ROS_ERROR("[proximity_sensor_node]proximity sensor echo pin not defined in config file: avc_sensors/config/sensors.yaml");
     ROS_BREAK();
   }
 
@@ -42,7 +42,7 @@ int main(int argc, char **argv)
   int trigger_pin;
   if (!node_private.getParam("/sensor/proximity_sensor/trigger_pin", trigger_pin))
   {
-    ROS_ERROR("proximity sensor trigger pin not defined in config file: avc_sensors/config/sensors.yaml");
+    ROS_ERROR("[proximity_sensor_node]proximity sensor trigger pin not defined in config file: avc_sensors/config/sensors.yaml");
     ROS_BREAK();
   }
 
@@ -62,7 +62,7 @@ int main(int argc, char **argv)
   int radiation_type;
   if (!node_private.getParam("/sensor/proximity_sensor/radiation_type", radiation_type))
   {
-    ROS_ERROR("proximity sensor radiation type not defined in config file: avc_sensors/config/sensors.yaml");
+    ROS_ERROR("[proximity_sensor_node]proximity sensor radiation type not defined in config file: avc_sensors/config/sensors.yaml");
     ROS_BREAK();
   }
   proximity_msg.radiation_type = radiation_type;
@@ -71,7 +71,7 @@ int main(int argc, char **argv)
   float field_of_view;
   if (!node_private.getParam("/sensor/proximity_sensor/field_of_view", field_of_view))
   {
-    ROS_ERROR("proximity sensor field of view not defined in config file: avc_sensors/config/sensors.yaml");
+    ROS_ERROR("[proximity_sensor_node]proximity sensor field of view not defined in config file: avc_sensors/config/sensors.yaml");
     ROS_BREAK();
   }
   proximity_msg.field_of_view = field_of_view;
@@ -80,7 +80,7 @@ int main(int argc, char **argv)
   float min_range;
   if (!node_private.getParam("/sensor/proximity_sensor/min_range", min_range))
   {
-    ROS_ERROR("proximity sensor minimum range not defined in config file: avc_sensors/config/sensors.yaml");
+    ROS_ERROR("[proximity_sensor_node]proximity sensor minimum range not defined in config file: avc_sensors/config/sensors.yaml");
     ROS_BREAK();
   }
   proximity_msg.min_range = min_range;
@@ -89,7 +89,7 @@ int main(int argc, char **argv)
   float max_range;
   if (!node_private.getParam("/sensor/proximity_sensor/max_range", max_range))
   {
-    ROS_ERROR("proximity sensor maximum range not defined in config file: avc_sensors/config/sensors.yaml");
+    ROS_ERROR("[proximity_sensor_node]proximity sensor maximum range not defined in config file: avc_sensors/config/sensors.yaml");
     ROS_BREAK();
   }
   proximity_msg.max_range = max_range;
@@ -103,7 +103,7 @@ int main(int argc, char **argv)
   float refresh_rate;
   if (!node_private.getParam("/sensor/proximity_sensor/refresh_rate", refresh_rate))
   {
-    ROS_ERROR("proximity sensor refresh rate not defined in config file: avc_sensors/config/sensors.yaml");
+    ROS_ERROR("[proximity_sensor_node] sensor refresh rate not defined in config file: avc_sensors/config/sensors.yaml");
     ROS_BREAK();
   }
 
