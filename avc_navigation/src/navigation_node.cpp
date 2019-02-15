@@ -1,5 +1,6 @@
 //navigation node
 //this node controls autonomous navigation
+#include <deque>
 #include <iostream> //dependency for fstream (must be included first)
 #include <fstream>
 #include <sstream>
@@ -30,7 +31,7 @@ bool mode_change_requested = false;
 std::vector<int> controller_buttons(13, 0);
 
 //global GPS and heading variables
-std::vector<double> lastGpsFix(2, 0); //TEMPORARY UNTIL ODOMETRY NODE IS FINISHED
+std::deque< std::vector<double> > lastGpsFix(5); //TEMPORARY UNTIL ODOMETRY NODE IS FINISHED
 std::vector<double> gpsFix(2, 0); //TEMPORARY UNTIL ODOMETRY NODE IS FINISHED
 std::vector< std::vector<double> > gpsWaypoints;
 
@@ -123,8 +124,12 @@ bool disableNavigationCallback(avc_msgs::ChangeControlMode::Request& req, avc_ms
 void navSatFixCallback(const sensor_msgs::NavSatFix::ConstPtr& msg)
 {
 
-  //update last GPS fix values
-  lastGpsFix = gpsFix;
+  //insert last GPS fix value at beginning of last values vector
+  lastGpsFix.push_front(gpsFix);
+
+  //remove oldest element of last GPS fix values if necessary to keep vector size == n
+  if (lastGpsFix.size() > 5)
+    lastGpsFix.erase(lastGpsFix.end());
 
   //set local values to match new message values
   gpsFix[0] = (msg->latitude / 180.0) * PI * pow(10.0, 6.0);
@@ -314,9 +319,25 @@ int main(int argc, char **argv)
       if (!gpsWaypoints.empty())
       {
 
+        //initialize vector for calculating average GPS fix position from last n positions
+        std::vector<double> lastGpsFixAvg(2, 0);
+
+        //add latitude and longitude values from last n positions to average
+        for (int i = 0; i < lastGpsFix.size(); i++)
+        {
+
+          lastGpsFixAvg[0] += lastGpsFix[i][0];
+          lastGpsFixAvg[1] += lastGpsFix[i][1];
+
+        }
+
+        //calculate average last position from sum of last n positions divided by n
+        for (int i = 0; i < 2; i++)
+          lastGpsFixAvg[i] = lastGpsFixAvg[i] / lastGpsFix.size();
+
         //calculate x and y values of vector from last position to current position
-        double heading_delta_x = gpsFix[1] - lastGpsFix[1]; //longitude
-        double heading_delta_y = gpsFix[0] - lastGpsFix[0]; //latitude
+        double heading_delta_x = gpsFix[1] - lastGpsFixAvg[1]; //longitude
+        double heading_delta_y = gpsFix[0] - lastGpsFixAvg[0]; //latitude
 
         //convert heading delta_x and y values to values in meters (s = r * theta)
         heading_delta_x = heading_delta_x * pow(10, -6) * EARTH_RADIUS;
