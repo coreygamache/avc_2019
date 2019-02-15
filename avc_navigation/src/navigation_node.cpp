@@ -13,7 +13,6 @@
 #include <avc_msgs/SteeringServo.h>
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Joy.h>
-#include <sensor_msgs/MagneticField.h>
 #include <sensor_msgs/NavSatFix.h> //TEMPORARY UNTIL ODOMETRY NODE IS FINISHED
 #include <signal.h>
 #include <wiringPi.h>
@@ -31,7 +30,7 @@ bool mode_change_requested = false;
 std::vector<int> controller_buttons(13, 0);
 
 //global GPS and heading variables
-float heading; //[deg]
+std::vector<double> lastGpsFix(2, 0); //TEMPORARY UNTIL ODOMETRY NODE IS FINISHED
 std::vector<double> gpsFix(2, 0); //TEMPORARY UNTIL ODOMETRY NODE IS FINISHED
 std::vector< std::vector<double> > gpsWaypoints;
 
@@ -49,15 +48,6 @@ void sigintHandler(int sig)
 
   //call the default shutdown function
   ros::shutdown();
-
-}
-
-//callback function called to process messages on compass topic
-void compassCallback(const sensor_msgs::MagneticField::ConstPtr& msg)
-{
-
-  //set local heading value to heading derived from compass data
-  heading = atan2(msg->magnetic_field.y, msg->magnetic_field.x) * 180 / PI;
 
 }
 
@@ -133,7 +123,10 @@ bool disableNavigationCallback(avc_msgs::ChangeControlMode::Request& req, avc_ms
 void navSatFixCallback(const sensor_msgs::NavSatFix::ConstPtr& msg)
 {
 
-  //set local values to match message values
+  //update last GPS fix values
+  lastGpsFix = gpsFix;
+
+  //set local values to match new message values
   gpsFix[0] = (msg->latitude / 180.0) * PI * pow(10.0, 6.0);
   gpsFix[1] = (msg->longitude / 180.0) * PI * pow(10.0, 6.0);
 
@@ -225,9 +218,6 @@ int main(int argc, char **argv)
 
   //create service to process service requests on the disable manual control topic
   ros::ServiceServer disable_navigation_srv = node_public.advertiseService("/control/disable_navigation", disableNavigationCallback);
-
-  //create subscriber to subscribe to compass messages topic with queue size set to 1000
-  ros::Subscriber compass_sub = node_public.subscribe("/sensor/compass", 1000, compassCallback);
 
   //create subscriber to subscribe to control messages topic with queue size set to 1000
   ros::Subscriber control_sub = node_public.subscribe("/control/control", 1000, controlCallback);
@@ -324,16 +314,27 @@ int main(int argc, char **argv)
       if (!gpsWaypoints.empty())
       {
 
-        //calculate x and y values of vector from current position to next target waypoint
-        double delta_x = gpsWaypoints[0][1] - gpsFix[1]; //longitude
-        double delta_y = gpsWaypoints[0][0] - gpsFix[0]; //latitude
+        //calculate x and y values of vector from last position to current position
+        double heading_delta_x = gpsFix[1] - lastGpsFix[1]; //longitude
+        double heading_delta_y = gpsFix[0] - lastGpsFix[0]; //latitude
 
-        //convert delta_x and y values to values in meters (s = r * theta)
-        delta_x = delta_x * pow(10, -6) * EARTH_RADIUS;
-        delta_y = delta_y * pow(10, -6) * EARTH_RADIUS;
+        //convert heading delta_x and y values to values in meters (s = r * theta)
+        heading_delta_x = heading_delta_x * pow(10, -6) * EARTH_RADIUS;
+        heading_delta_y = heading_delta_y * pow(10, -6) * EARTH_RADIUS;
 
         //calculate target heading angle from vector pointing from current position to next target waypoint
-        float target_heading = (atan2(delta_y, delta_x) / PI) * 180;
+        float heading = (atan2(heading_delta_y, heading_delta_x) / PI) * 180;
+
+        //calculate x and y values of vector from current position to next target waypoint
+        double target_delta_x = gpsWaypoints[0][1] - gpsFix[1]; //longitude
+        double target_delta_y = gpsWaypoints[0][0] - gpsFix[0]; //latitude
+
+        //convert target delta_x and y values to values in meters (s = r * theta)
+        target_delta_x = target_delta_x * pow(10, -6) * EARTH_RADIUS;
+        target_delta_y = target_delta_y * pow(10, -6) * EARTH_RADIUS;
+
+        //calculate target heading angle from vector pointing from current position to next target waypoint
+        float target_heading = (atan2(target_delta_y, target_delta_x) / PI) * 180;
 
         //calculate error between target heading and current heading
         float error = target_heading - heading;
@@ -362,7 +363,7 @@ int main(int argc, char **argv)
         steering_servo_pub.publish(steering_servo_msg);
 
         //check if robot is within defined distance of waypoint, notify and set target to next waypoint if true
-        if (sqrt(pow(delta_x, 2) + pow(delta_y, 2)) < waypoint_radius)
+        if (sqrt(pow(target_delta_x, 2) + pow(target_delta_y, 2)) < waypoint_radius)
         {
 
           //notify that waypoint has been reached
