@@ -84,10 +84,10 @@ int main(int argc, char **argv)
 {
 
   //send notification that node is launching
-  ROS_INFO("[NODE LAUNCH]: starting encoder_pub_node");
+  ROS_INFO("[NODE LAUNCH]: starting encoder_node");
 
   //initialize node and create node handler
-  ros::init(argc, argv, "encoder_pub_node");
+  ros::init(argc, argv, "encoder_node");
   ros::NodeHandle node_private("~");
   ros::NodeHandle node_public;
 
@@ -116,7 +116,7 @@ int main(int argc, char **argv)
   int counts_per_rev;
   if (!node_private.getParam(encoder_path + "/counts_per_rev", counts_per_rev))
   {
-    ROS_ERROR("counts per rev not defined in config file: avc_sensors/config/sensors.yaml");
+    ROS_ERROR("[encoder_node] counts per rev not defined in config file: avc_sensors/config/sensors.yaml");
     ROS_BREAK();
   }
 
@@ -124,7 +124,7 @@ int main(int argc, char **argv)
   int input_pin;
   if (!node_private.getParam(encoder_path + "/input_pin", input_pin))
   {
-    ROS_ERROR("encoder input pin not defined in config file: avc_sensors/config/sensors.yaml");
+    ROS_ERROR("[encoder_node] encoder input pin not defined in config file: avc_sensors/config/sensors.yaml");
     ROS_BREAK();
   }
 
@@ -132,7 +132,7 @@ int main(int argc, char **argv)
   float refresh_rate;
   if (!node_private.getParam(encoder_path + "/refresh_rate", refresh_rate))
   {
-    ROS_ERROR("encoder refresh rate not defined in config file: avc_sensors/config/sensors.yaml");
+    ROS_ERROR("[encoder_node] encoder refresh rate not defined in config file: avc_sensors/config/sensors.yaml");
     ROS_BREAK();
   }
 
@@ -140,7 +140,7 @@ int main(int argc, char **argv)
   int sample_num;
   if (!node_private.getParam(encoder_path + "/sample_num", sample_num))
   {
-    ROS_ERROR("number of samples to use not defined in config file: avc_sensors/config/sensors.yaml");
+    ROS_ERROR("[encoder_node] number of samples to use not defined in config file: avc_sensors/config/sensors.yaml");
     ROS_BREAK();
   }
 
