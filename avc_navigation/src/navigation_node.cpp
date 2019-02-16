@@ -11,6 +11,7 @@
 #include <avc_msgs/ChangeControlMode.h>
 #include <avc_msgs/Control.h>
 #include <avc_msgs/ESC.h>
+#include <avc_msgs/Heading.h>
 #include <avc_msgs/SteeringServo.h>
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Joy.h>
@@ -31,8 +32,8 @@ bool mode_change_requested = false;
 std::vector<int> controller_buttons(13, 0);
 
 //global GPS and heading variables
-std::deque< std::vector<double> > lastGpsFix(5); //TEMPORARY UNTIL ODOMETRY NODE IS FINISHED
-std::vector<double> gpsFix(2, 0); //TEMPORARY UNTIL ODOMETRY NODE IS FINISHED
+double heading = 0; //[deg]
+std::vector<double> gpsFix(2, 0);
 std::vector< std::vector<double> > gpsWaypoints;
 
 //pin variables
@@ -119,17 +120,19 @@ bool disableNavigationCallback(avc_msgs::ChangeControlMode::Request& req, avc_ms
 
 }
 
+//callback function called to process messages on heading topic
+void headingCallback(const avc_msgs::Heading::ConstPtr& msg)
+{
+
+  //set local values to match message values [deg]
+  heading = msg->heading_angle;
+
+}
+
 //TEMPORARY UNTIL ODOMETRY NODE IS FINISHED
 //callback function called to process messages on odometry topic
 void navSatFixCallback(const sensor_msgs::NavSatFix::ConstPtr& msg)
 {
-
-  //insert last GPS fix value at beginning of last values vector
-  lastGpsFix.push_front(gpsFix);
-
-  //remove oldest element of last GPS fix values if necessary to keep vector size == n
-  if (lastGpsFix.size() > 5)
-    lastGpsFix.erase(lastGpsFix.end());
 
   //set local values to match new message values
   gpsFix[0] = (msg->latitude / 180.0) * PI * pow(10.0, 6.0);
@@ -230,7 +233,9 @@ int main(int argc, char **argv)
   //create subscriber to subscribe to joy messages topic with queue size set to 1000
   ros::Subscriber controller_sub = node_public.subscribe("/control/joy", 1000, controllerCallback);
 
-  //TEMPORARY UNTIL ODOMETRY NODE IS FINISHED
+  //create subscriber to subscribe to heading messages topic with queue size set to 1000
+  ros::Subscriber heading_sub = node_public.subscribe("/sensor/heading", 1000, headingCallback);
+
   //create subscriber to subscribe to GPS location messages topic with queue size set to 1000
   ros::Subscriber nav_sat_fix_sub = node_public.subscribe("/sensor/fix", 1000, navSatFixCallback);
 
@@ -318,33 +323,6 @@ int main(int argc, char **argv)
       //if there are a non-zero number of GPS waypoints remaining then run navigation algorithm
       if (!gpsWaypoints.empty())
       {
-
-        //initialize vector for calculating average GPS fix position from last n positions
-        std::vector<double> lastGpsFixAvg(2, 0);
-
-        //add latitude and longitude values from last n positions to average
-        for (int i = 0; i < lastGpsFix.size(); i++)
-        {
-
-          lastGpsFixAvg[0] += lastGpsFix[i][0];
-          lastGpsFixAvg[1] += lastGpsFix[i][1];
-
-        }
-
-        //calculate average last position from sum of last n positions divided by n
-        for (int i = 0; i < 2; i++)
-          lastGpsFixAvg[i] = lastGpsFixAvg[i] / lastGpsFix.size();
-
-        //calculate x and y values of vector from last position to current position
-        double heading_delta_x = gpsFix[1] - lastGpsFixAvg[1]; //longitude
-        double heading_delta_y = gpsFix[0] - lastGpsFixAvg[0]; //latitude
-
-        //convert heading delta_x and y values to values in meters (s = r * theta)
-        heading_delta_x = heading_delta_x * pow(10, -6) * EARTH_RADIUS;
-        heading_delta_y = heading_delta_y * pow(10, -6) * EARTH_RADIUS;
-
-        //calculate target heading angle from vector pointing from current position to next target waypoint
-        float heading = (atan2(heading_delta_y, heading_delta_x) / PI) * 180;
 
         //calculate x and y values of vector from current position to next target waypoint
         double target_delta_x = gpsWaypoints[0][1] - gpsFix[1]; //longitude
