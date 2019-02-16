@@ -32,6 +32,7 @@ add_message_files(
   Control.msg
   Encoder.msg
   ESC.msg
+  Heading.msg
   SteeringServo.msg
 #   Message2.msg
 )
