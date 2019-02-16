@@ -15,7 +15,7 @@
 #include <avc_msgs/SteeringServo.h>
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Joy.h>
-#include <sensor_msgs/NavSatFix.h> //TEMPORARY UNTIL ODOMETRY NODE IS FINISHED
+#include <sensor_msgs/NavSatFix.h>
 #include <signal.h>
 #include <wiringPi.h>
 
@@ -333,10 +333,14 @@ int main(int argc, char **argv)
         target_delta_y = target_delta_y * pow(10, -6) * EARTH_RADIUS;
 
         //calculate target heading angle from vector pointing from current position to next target waypoint
-        float target_heading = (atan2(target_delta_y, target_delta_x) / PI) * 180;
+        float target_heading = atan2(target_delta_y, target_delta_x) / PI * 180 - 90;
 
-        //calculate error between target heading and current heading
-        float error = target_heading - heading;
+        //if target heading is negative then add 360 degrees to make it positive to make it match format of robot heading
+        if (target_heading < 0)
+          target_heading += 360;
+
+        //calculate error between current heading and target heading; positive error values indicate CCW rotation needed
+        float error = heading - target_heading;
 
         //set desired servo angle to error value if valid
         if (error > servo_max_angle)
