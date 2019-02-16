@@ -1,5 +1,6 @@
 //ROS includes
 #include <ros/ros.h>
+#include <avc_msgs/Heading.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/MagneticField.h>
 #include <signal.h>
@@ -9,6 +10,9 @@
 
 //gravity to m/s^2 conversion factor
 static const double G_TO_MPSS = 9.80665;
+
+//math constants
+const double PI = 3.1415926535897;
 
 
 //callback function called to process SIGINT command
@@ -126,6 +130,10 @@ int main(int argc, char **argv)
   }
   std::copy(linear_acceleration_covariance.begin(), linear_acceleration_covariance.end(), std::begin(imu_msg.linear_acceleration_covariance));
 
+  //create disable mapping service object and set default parameters
+  avc_msgs::Heading heading_msg;
+  heading_msg.header.frame_id = "0";
+
   //create sensor_msgs/MagneticField type message to publish compass data
   sensor_msgs::MagneticField compass_msg;
 
@@ -135,6 +143,9 @@ int main(int argc, char **argv)
 
   //create publisher to publish compass messages with buffer size 10, and latch set to false
   ros::Publisher compass_pub = node_public.advertise<sensor_msgs::MagneticField>("compass", 10, false);
+
+  //create publisher to publish compass heading messages with buffer size 10, and latch set to false
+  ros::Publisher heading_pub = node_public.advertise<avc_msgs::Heading>("heading", 10, false);
 
   //create publisher to publish IMU messages with buffer size 10, and latch set to false
   ros::Publisher imu_pub = node_public.advertise<sensor_msgs::Imu>("imu", 10, false);
@@ -191,6 +202,16 @@ int main(int argc, char **argv)
 
         //publish compass message
         compass_pub.publish(compass_msg);
+
+        //set heading message headers
+        heading_msg.header.frame_id = frame_id;
+        heading_msg.header.stamp = ros::Time::now();
+
+        //set heading angle of heading msg to yaw value from IMU
+        heading_msg.heading_angle = imu_data.fusionPose.y() / PI * 180;
+
+        //publish heading message
+        heading_pub.publish(heading_msg);
 
       }
 
