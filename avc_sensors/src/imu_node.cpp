@@ -207,8 +207,12 @@ int main(int argc, char **argv)
         heading_msg.header.frame_id = frame_id;
         heading_msg.header.stamp = ros::Time::now();
 
-        //set heading angle of heading msg to yaw value from IMU
+        //set heading angle of heading msg to yaw value from IMU [deg]
         heading_msg.heading_angle = imu_data.fusionPose.z() / PI * 180;
+
+        //convert heading angle to a positive value if it's negative [0 - 360 deg]
+        if (heading_msg.heading_angle < 0)
+          heading_msg.heading_angle += 360;
 
         //publish heading message
         heading_pub.publish(heading_msg);
