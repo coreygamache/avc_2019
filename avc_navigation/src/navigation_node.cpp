@@ -324,16 +324,13 @@ int main(int argc, char **argv)
       if (!gpsWaypoints.empty())
       {
 
-        //calculate x and y values of vector from current position to next target waypoint
-        double target_delta_x = gpsWaypoints[0][1] - gpsFix[1]; //longitude
-        double target_delta_y = gpsWaypoints[0][0] - gpsFix[0]; //latitude
+        //------------------------HEADING TO NEXT WAYPOINT CALCULATION--------------------------
 
-        //convert target delta_x and y values to values in meters (s = r * theta)
-        target_delta_x = target_delta_x * pow(10, -6) * EARTH_RADIUS;
-        target_delta_y = target_delta_y * pow(10, -6) * EARTH_RADIUS;
+        //calculate delta of latitude from current position to next waypoint in radians
+        double delta_longitude = (gpsWaypoints[0][1] - gpsFix[1]) * pow(10, -6);
 
         //calculate target heading angle from vector pointing from current position to next target waypoint
-        float target_heading = atan2(target_delta_y, target_delta_x) / PI * 180 - 90;
+        float target_heading = atan2(sin(delta_longitude)*cos(gpsWaypoints[0][0]), cos(gpsFix[0])*sin(gpsWaypoints[0][0])-sin(gpsFix[0])*cos(gpsWaypoints[0][0])*cos(delta_longitude)) / PI * 180;
 
         //if target heading is negative then add 360 degrees to make it positive to make it match format of robot heading
         if (target_heading < 0)
@@ -364,6 +361,16 @@ int main(int argc, char **argv)
         //set time of steering servo message and publish
         steering_servo_msg.header.stamp = ros::Time::now();
         steering_servo_pub.publish(steering_servo_msg);
+
+        //------------------------DISTANCE TO NEXT WAYPOINT CALCULATION-------------------------
+
+        //calculate x and y values of vector from current position to next target waypoint
+        double target_delta_x = gpsWaypoints[0][1] - gpsFix[1]; //longitude
+        double target_delta_y = gpsWaypoints[0][0] - gpsFix[0]; //latitude
+
+        //convert target delta_x and y values to values in meters (s = r * theta)
+        target_delta_x = target_delta_x * pow(10, -6) * EARTH_RADIUS;
+        target_delta_y = target_delta_y * pow(10, -6) * EARTH_RADIUS;
 
         //check if robot is within defined distance of waypoint, notify and set target to next waypoint if true
         if (sqrt(pow(target_delta_x, 2) + pow(target_delta_y, 2)) < waypoint_radius)
