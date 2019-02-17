@@ -338,6 +338,12 @@ int main(int argc, char **argv)
         //calculate error between current heading and target heading; positive error values indicate CCW rotation needed
         float error = heading - target_heading;
 
+        //correct error so robot turns the smallest angle possible to reach target heading
+        if (error > 180)
+          error -= 360;
+        else if (error < 180)
+          error += 360;
+
         //output target heading, current heading, and error for debugging purposes
         ROS_INFO("[navigation_node] target heading: target heading: %lf, current heading: %lf , error: %f", target_heading, heading, error);
 
