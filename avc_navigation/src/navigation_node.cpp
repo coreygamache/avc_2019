@@ -336,11 +336,11 @@ int main(int argc, char **argv)
         if (target_heading < 0)
           target_heading += 360;
 
-        //output target heading for debugging purposes
-        ROS_INFO("[navigation_node] target heading: target heading: %lf", target_heading);
-
         //calculate error between current heading and target heading; positive error values indicate CCW rotation needed
         float error = heading - target_heading;
+
+        //output target heading, current heading, and error for debugging purposes
+        ROS_INFO("[navigation_node] target heading: target heading: %lf, current heading: %lf , error: %f", target_heading, heading, error);
 
         //set desired servo angle to error value if valid
         if (error > servo_max_angle)
