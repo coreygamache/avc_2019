@@ -330,11 +330,10 @@ int main(int argc, char **argv)
         double delta_longitude = (gpsWaypoints[0][1] - gpsFix[1]) * pow(10, -6);
 
         //calculate target heading angle from vector pointing from current position to next target waypoint
-        float target_heading = atan2(sin(delta_longitude)*cos(gpsWaypoints[0][0]), cos(gpsFix[0])*sin(gpsWaypoints[0][0])-sin(gpsFix[0])*cos(gpsWaypoints[0][0])*cos(delta_longitude)) / PI * 180;
+        float target_heading = atan2(sin(delta_longitude)*cos(gpsWaypoints[0][0]), cos(gpsFix[0])*sin(gpsWaypoints[0][0])-sin(gpsFix[0])*cos(gpsWaypoints[0][0])*cos(delta_longitude));
 
-        //if target heading is negative then add 360 degrees to make it positive to make it match format of robot heading
-        if (target_heading < 0)
-          target_heading += 360;
+        //normalize target heading to compass bearing in degrees (0 - 360 deg)
+        target_heading = fmod((target_heading / PI * 180) + 360, 360);
 
         //calculate error between current heading and target heading; positive error values indicate CCW rotation needed
         float error = heading - target_heading;
