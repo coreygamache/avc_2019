@@ -336,6 +336,9 @@ int main(int argc, char **argv)
         if (target_heading < 0)
           target_heading += 360;
 
+        //output target heading for debugging purposes
+        ROS_INFO("[navigation_node] target heading: target heading: %lf", target_heading);
+
         //calculate error between current heading and target heading; positive error values indicate CCW rotation needed
         float error = heading - target_heading;
 
