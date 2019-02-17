@@ -341,7 +341,7 @@ int main(int argc, char **argv)
         //correct error so robot turns the smallest angle possible to reach target heading
         if (error > 180)
           error -= 360;
-        else if (error < 180)
+        else if (error < -180)
           error += 360;
 
         //output target heading, current heading, and error for debugging purposes
