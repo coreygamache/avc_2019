@@ -327,10 +327,12 @@ int main(int argc, char **argv)
         //------------------------HEADING TO NEXT WAYPOINT CALCULATION--------------------------
 
         //calculate delta of latitude from current position to next waypoint in radians
-        double delta_longitude = (gpsWaypoints[0][1] - gpsFix[1]) * pow(10, -6);
+        double delta_longitude = (gpsWaypoints[0][1] - gpsFix[1]);
 
         //calculate target heading angle from vector pointing from current position to next target waypoint
-        float target_heading = atan2(sin(delta_longitude)*cos(gpsWaypoints[0][0]), cos(gpsFix[0])*sin(gpsWaypoints[0][0])-sin(gpsFix[0])*cos(gpsWaypoints[0][0])*cos(delta_longitude));
+        float bearing_y = cos(gpsWaypoints[0][0]) * sin(delta_longitude);
+        float bearing_x = (cos(gpsFix[0]) * sin(gpsWaypoints[0][0])) - (sin(gpsFix[0]) * cos(gpsWaypoints[0][0]) * cos(delta_longitude));
+        float target_heading = atan2(bearing_y, bearing_x);
 
         //normalize target heading to compass bearing in degrees (0 - 360 deg)
         target_heading = fmod((target_heading / PI * 180) + 360, 360);
