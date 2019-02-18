@@ -1,4 +1,4 @@
 navigation_node:
-  minimum_throttle: 12
+  minimum_throttle: 18
   refresh_rate: 20
   waypoint_radius: 1.0 # [m]
