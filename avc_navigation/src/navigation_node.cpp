@@ -135,8 +135,8 @@ void navSatFixCallback(const sensor_msgs::NavSatFix::ConstPtr& msg)
 {
 
   //set local values to match new message values
-  gpsFix[0] = (msg->latitude / 180.0) * PI * pow(10.0, 6.0);
-  gpsFix[1] = (msg->longitude / 180.0) * PI * pow(10.0, 6.0);
+  gpsFix[0] = msg->latitude / 180 * PI;
+  gpsFix[1] = msg->longitude / 180 * PI;
 
 }
 
@@ -293,10 +293,10 @@ int main(int argc, char **argv)
           if (!latitude.empty() && !longitude.empty())
           {
 
-            //convert latitude and longitude strings into doubles
+            //convert latitude and longitude strings into doubles in units of radians [rad]
             std::vector<double> waypoint(2);
-            waypoint[0] = std::stod(latitude);
-            waypoint[1] = std::stod(longitude);
+            waypoint[0] = std::stod(latitude) / 180 * PI;
+            waypoint[1] = std::stod(longitude) / 180 * PI;
 
             //add waypoint from current line to GPS waypoints list
             gpsWaypoints.push_back(waypoint);
@@ -379,8 +379,8 @@ int main(int argc, char **argv)
         double target_delta_y = gpsWaypoints[0][0] - gpsFix[0]; //latitude
 
         //convert target delta_x and y values to values in meters (s = r * theta)
-        target_delta_x = target_delta_x * pow(10, -6) * EARTH_RADIUS;
-        target_delta_y = target_delta_y * pow(10, -6) * EARTH_RADIUS;
+        target_delta_x = target_delta_x  * EARTH_RADIUS;
+        target_delta_y = target_delta_y  * EARTH_RADIUS;
 
         //check if robot is within defined distance of waypoint, notify and set target to next waypoint if true
         if (sqrt(pow(target_delta_x, 2) + pow(target_delta_y, 2)) < waypoint_radius)
@@ -393,7 +393,6 @@ int main(int argc, char **argv)
           gpsWaypoints.erase(gpsWaypoints.begin());
 
         }
-
 
       }
       //end autonomous running and notify if there are no waypoints remaining in list
