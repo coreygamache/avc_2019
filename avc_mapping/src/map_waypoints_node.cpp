@@ -12,9 +12,6 @@
 #include <signal.h>
 #include <wiringPi.h>
 
-//math constants
-const double PI = 3.1415926535897;
-
 //global variables
 bool mapping = false;
 bool mapping_mode = true;
@@ -90,9 +87,9 @@ bool disableMappingCallback(avc_msgs::ChangeControlMode::Request& req, avc_msgs:
 void gpsFixCallback(const sensor_msgs::NavSatFix::ConstPtr& msg)
 {
 
-  //set local variables to match value received in message converted to micro radians [urad]
-  gpsFix[0] = (msg->latitude / 180.0) * PI * pow(10.0, 6.0);
-  gpsFix[1] = (msg->longitude / 180.0) * PI * pow(10.0, 6.0);
+  //set local variables to match value received in message [deg]
+  gpsFix[0] = msg->latitude;
+  gpsFix[1] = msg->longitude;
 
 }
 
@@ -187,7 +184,7 @@ int main(int argc, char **argv)
       gpsWaypoints.push_back(gpsFix);
 
       //turn off LED and output text to indicate waypoint has been recorded
-      ROS_INFO("[map_waypoints_node] waypoint saved (%d total waypoints)", int(gpsWaypoints.size()));
+      ROS_INFO("[map_waypoints_node] waypoint saved (%d total waypoints)", gpsWaypoints.size());
       ROS_INFO("[map_waypoints_node] coordinates: %lf, %lf", gpsFix[0], gpsFix[1]);
       digitalWrite(indicator_LED, LOW);
 
@@ -205,11 +202,11 @@ int main(int argc, char **argv)
       std::fstream output_file(output_file_path.c_str(), std::fstream::out | std::fstream::trunc);
 
       //output header to top of file
-      output_file << "latitude [urad]," << "longitude [urad]\n";
+      output_file << "latitude [deg]," << "longitude [deg]\n";
 
       //output each waypoint in list to file
       for (int i = 0; i < gpsWaypoints.size(); i++)
-        output_file << std::fixed << std::setprecision(6) << gpsWaypoints[i][0] << "," << gpsWaypoints[i][1] << "\n";
+        output_file << std::fixed << std::setprecision(12) << gpsWaypoints[i][0] << "," << gpsWaypoints[i][1] << "\n";
 
       //close file after all waypoints have been output
       output_file.close();
