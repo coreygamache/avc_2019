@@ -1,8 +1,20 @@
-esc:
-  output_pin: 254
-
 arduino_output_node:
   refresh_rate: 50
 
-servo:
-  output_pin: 255
+esc_node:
+  esc_max_value: 2000
+  esc_min_value: 1000
+  esc_neutral_value: 1350
+  refresh_rate: 50
+
+servoblaster:
+  esc_servo_number: 0; # GPIO pin #4 (BCM)
+  sb_driver_path: "/dev/servoblaster"
+  ss_servo_number: 1 # GPIO pin #17 (BCM)
+
+steering_servo_node:
+  ss_max_angle: 30.0
+  ss_max_value: 1700
+  ss_min_value: 950
+  ss_neutral_value: 1350
+  refresh_rate: 50
