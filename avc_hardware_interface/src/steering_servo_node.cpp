@@ -99,9 +99,9 @@ int main(int argc, char **argv)
   }
 
   //retrieve servoblaster servo number from parameter server
-  if (!node_private.getParam("/hardware/servoblaster/esc_servo_number", esc_servo_number))
+  if (!node_private.getParam("/hardware/servoblaster/ss_servo_number", ss_servo_number))
   {
-    ROS_ERROR("[steering_servo_node] ESC servo number not defined in config file: avc_hardware_interface/config/hardware_interface.yaml");
+    ROS_ERROR("[steering_servo_node] steering servo number not defined in config file: avc_hardware_interface/config/hardware_interface.yaml");
     ROS_BREAK();
   }
 
@@ -114,8 +114,8 @@ int main(int argc, char **argv)
   ros::Subscriber steering_servo_sub = node_public.subscribe("steering_servo", 1000, steeringServoCallback);
 
   //calculate throttle forward and reverse ranges
-  int ss_left_range = servo_neutral_value - servo_max_left;
-  int ss_right_range = servo_max_right - servo_neutral_value;
+  int ss_left_range = ss_neutral_value - ss_max_left;
+  int ss_right_range = ss_max_right - ss_neutral_value;
 
   //create variable for remembering last throttle value
   float last_steering_value = 9999;
