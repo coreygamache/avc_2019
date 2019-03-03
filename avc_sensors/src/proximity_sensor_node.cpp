@@ -1,10 +1,8 @@
 //ROS includes
+#include <proximity_sensor.hpp>
 #include <ros/ros.h>
 #include <sensor_msgs/Range.h>
 #include <signal.h>
-
-//other includes
-#include <proximity_sensor.hpp>
 
 
 //callback function called to process SIGINT command
@@ -116,7 +114,7 @@ int main(int argc, char **argv)
     //set time of current distance reading
     proximity_msg.header.stamp = ros::Time::now();
 
-    //get distance to nearest object from proximity sensor with 25ms timeout
+    //get distance to nearest object from proximity sensor with 25ms timeout [m]
     proximity_msg.range = sensor.getDistance(25);
 
     //publish proximity sensor range message
