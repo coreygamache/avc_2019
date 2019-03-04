@@ -63,15 +63,15 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
-  int ss_max_value;
-  if (!node_private.getParam("/hardware/steering_servo_node/ss_max_value", ss_max_value))
+  int ss_max_right;
+  if (!node_private.getParam("/hardware/steering_servo_node/ss_max_right", ss_max_right))
   {
     ROS_ERROR("[steering_servo_node] steering servo max value not defined in config file: avc_hardware_interface/config/hardware_interface.yaml");
     ROS_BREAK();
   }
 
-  int ss_min_value;
-  if (!node_private.getParam("/hardware/steering_servo_node/ss_min_value", ss_min_value))
+  int ss_max_left;
+  if (!node_private.getParam("/hardware/steering_servo_node/ss_max_left", ss_max_left))
   {
     ROS_ERROR("[steering_servo_node] steering servo min value not defined in config file: avc_hardware_interface/config/hardware_interface.yaml");
     ROS_BREAK();
@@ -106,8 +106,8 @@ int main(int argc, char **argv)
   }
 
   //divide esc values by 10 to match units used by servoblaster driver
-  ss_max_value = ss_max_value / 10;
-  ss_min_value = ss_min_value / 10;
+  ss_max_right = ss_max_right / 10;
+  ss_max_left = ss_max_left / 10;
   ss_neutral_value = ss_neutral_value / 10;
 
   //create subscriber to subscribe to steering servo message topic with queue size set to 1000
@@ -135,9 +135,9 @@ int main(int argc, char **argv)
 
       //convert throttle value to pulsewidth [us / 10]
       if (steering_angle >= 0)
-        pulsewidth = ss_neutral_value - int(steering_angle / ss_max_angle * ss_max_left)
+        pulsewidth = ss_neutral_value - int(steering_angle / ss_max_angle * ss_max_left);
       else
-        pulsewidth = ss_neutral_value + int(abs(steering_angle) / ss_max_angle * ss_max_right)
+        pulsewidth = ss_neutral_value + int(abs(steering_angle) / ss_max_angle * ss_max_right);
 
       //open servo driver
       std::fstream sb_driver(sb_driver_path.c_str(), std::fstream::out | std::fstream::trunc);
