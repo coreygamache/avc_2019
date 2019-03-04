@@ -1,0 +1,9 @@
+<launch>
+
+  <!-- load sensor parameters to parameter server -->
+  <rosparam command="load" file="$(find avc_sensors)/config/sensors.yaml" ns="setup" />
+
+  <!-- launch GPS setup node -->
+  <node name="gps_setup_node" pkg="avc_sensors" type="gps_setup_node" ns="setup" output="screen" />
+
+</launch>
