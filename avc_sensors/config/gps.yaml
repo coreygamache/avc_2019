@@ -1,0 +1,4 @@
+# GPS parameters
+
+baud_rate: 9600
+serial_port: "/dev/serial0"
