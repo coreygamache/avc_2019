@@ -87,7 +87,7 @@ int main(int argc, char **argv)
   float refresh_rate;
   if (!node_private.getParam("/hardware/steering_servo_node/refresh_rate", refresh_rate))
   {
-    ROS_ERROR("[steering_servo_node] arduino output node refresh rate not defined in config file: sd_hardware_interface/config/hardware_interface.yaml");
+    ROS_ERROR("[steering_servo_node] arduino output node refresh rate not defined in config file: avc_hardware_interface/config/hardware_interface.yaml");
     ROS_BREAK();
   }
 
