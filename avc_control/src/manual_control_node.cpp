@@ -123,10 +123,10 @@ int main(int argc, char **argv)
   steering_servo_msg.header.frame_id = "0";
 
   //create publisher to publish ESC message status with buffer size 10, and latch set to false
-  ros::Publisher esc_pub = node_public.advertise<avc_msgs::ESC>("esc", 10, false);
+  ros::Publisher esc_pub = node_public.advertise<avc_msgs::ESC>("esc_raw", 10, false);
 
   //create publisher to publish steering servo message status with buffer size 10, and latch set to false
-  ros::Publisher steering_servo_pub = node_public.advertise<avc_msgs::SteeringServo>("steering_servo", 10, false);
+  ros::Publisher steering_servo_pub = node_public.advertise<avc_msgs::SteeringServo>("steering_servo_raw", 10, false);
 
   //create service to process service requests on the disable manual control topic
   ros::ServiceServer disable_manual_control_srv = node_public.advertiseService("disable_manual_control", disableManualControlCallback);
