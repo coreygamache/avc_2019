@@ -31,10 +31,10 @@ bool sendCommand(std::string str)
     return false;
 
   //inform of command being sent to GPS chip
-  ROS_INFO("[gps_setup_node] sending command to GPS chip: %s", str);
+  ROS_INFO("[gps_setup_node] sending command to GPS chip: %s", str.c_str());
 
   //output received command to serial buffer
-  serialPrintF(fd, str.c_str());
+  serialPrintf(fd, str.c_str());
 
   //sleep briefly while waiting for reply
   ros::Duration(0.5).sleep();
@@ -48,13 +48,13 @@ bool sendCommand(std::string str)
 
     //receive reply character by character
     while (serialDataAvail > 0)
-      gps_reply.push_back(serialGetchar());
+      gps_reply.push_back(serialGetchar(fd));
 
     //create string to output reply contents
     std::string gps_reply_str(gps_reply.begin(), gps_reply.end());
 
     //inform of reply contents
-    ROS_INFO("[gps_setup_node] reply received from GPS chip: %s", gps_reply_str);
+    ROS_INFO("[gps_setup_node] reply received from GPS chip: %s", gps_reply_str.c_str());
 
     //if GPS chip acknowledgement packet indicates success then return true
     if ((gps_reply.size() > 13) && (gps_reply[13] == '3'))
@@ -81,7 +81,7 @@ bool sendCommand(std::string str)
   else if (serialDataAvail(fd) == 0)
     ROS_INFO("[gps_setup_node] no reply received from GPS chip");
   else if (serialDataAvail(fd) == -1)
-    ROS_INFO("[gps_setup_node] attempt to check for available serial data failed: %s", strerror (errno));
+    ROS_INFO("[gps_setup_node] attempt to check for available serial data failed: %s", strerror(errno));
 
   //return false to indicate failure
   return false;
@@ -117,8 +117,6 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
-  //set refresh rate of ROS loop to defined refresh rate of sensor parameter
-  ros::Rate loop_rate(refresh_rate);
 
   //--------------------------SET CHIP BAUD RATE--------------------------------
 
@@ -139,7 +137,7 @@ int main(int argc, char **argv)
     ROS_BREAK();
 
   //close serial device
-  serialClose();
+  serialClose(fd);
 
   //sleep briefly before reopening serial device
   ros::Duration(0.5).sleep();
@@ -179,6 +177,9 @@ int main(int argc, char **argv)
   //set GPS chip data output type to RMC only
   if (!sendCommand("$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29"))
     ROS_BREAK();
+
+  //close serial device
+  serialClose(fd);
 
   //if program is still running at this point then everything has completed successfully
   //indicate that program has completed setup successfully
