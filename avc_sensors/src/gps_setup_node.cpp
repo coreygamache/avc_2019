@@ -36,6 +36,8 @@ bool sendCommand(std::string str)
   //output received command to serial buffer
   serialPrintf(fd, str.c_str());
 
+  /*-----------------------------REPLY HANDLING---------------------------------
+
   ROS_INFO("[gps_setup_node] command sent");
 
   //sleep briefly while waiting for reply
@@ -92,6 +94,8 @@ bool sendCommand(std::string str)
 
   //return false to indicate failure
   return false;
+
+  -----------------------------END REPLY HANDLING-----------------------------*/
 
 }
 
