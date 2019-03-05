@@ -103,7 +103,7 @@ int main(int argc, char **argv)
 
   //retrieve baud rate of sensor in hertz from parameter server
   int baud_rate;
-  if (!node_private.getParam("/setup/gps/baud_rate", baud_rate))
+  if (!node_private.getParam("/setup/baud_rate", baud_rate))
   {
     ROS_ERROR("[gps_setup_node] GPS chip baud rate not defined in config file: avc_sensors/config/gps.yaml");
     ROS_BREAK();
@@ -111,7 +111,7 @@ int main(int argc, char **argv)
 
   //retrieve serial port address from parameter server
   std::string serial_port;
-  if (!node_private.getParam("/setup/gps/serial_port", serial_port))
+  if (!node_private.getParam("/setup/serial_port", serial_port))
   {
     ROS_ERROR("[gps_setup_node] GPS chip serial port not defined in config file: avc_sensors/config/gps.yaml");
     ROS_BREAK();
