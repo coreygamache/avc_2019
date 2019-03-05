@@ -85,6 +85,7 @@ add_library(proximity_sensor src/proximity_sensor.cpp)
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/avc_sensors_node.cpp)
 add_executable(encoder_node src/encoder_node.cpp)
+add_executable(gps_setup_node src/gps_setup_node.cpp)
 add_executable(imu_node src/imu_node.cpp)
 add_executable(proximity_sensor_node src/proximity_sensor_node.cpp)
 
@@ -92,6 +93,7 @@ add_executable(proximity_sensor_node src/proximity_sensor_node.cpp)
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(encoder_node ${catkin_EXPORTED_TARGETS})
+add_dependencies(gps_setup_node ${catkin_EXPORTED_TARGETS})
 add_dependencies(imu_node ${catkin_EXPORTED_TARGETS})
 add_dependencies(proximity_sensor_node ${catkin_EXPORTED_TARGETS})
 
@@ -101,5 +103,6 @@ add_dependencies(proximity_sensor_node ${catkin_EXPORTED_TARGETS})
 # )
 target_link_libraries(proximity_sensor ${catkin_LIBRARIES} wiringPi)
 target_link_libraries(encoder_node ${catkin_LIBRARIES} wiringPi)
+target_link_libraries(gps_setup_node ${catkin_LIBRARIES} wiringPi)
 target_link_libraries(imu_node ${catkin_LIBRARIES} RTIMULib)
 target_link_libraries(proximity_sensor_node ${catkin_LIBRARIES} proximity_sensor)
