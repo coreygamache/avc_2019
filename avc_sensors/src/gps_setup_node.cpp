@@ -34,6 +34,11 @@ bool sendCommand(std::string str)
   //inform of command being sent to GPS chip
   ROS_INFO("[gps_setup_node] sending command to GPS chip: %s", str.c_str());
 
+  //add carriage return and line feed characters to end of command string
+  str += "\r\n";
+
+  //char *command_str = new char[str.length() + 1];
+
   //output received command to serial buffer
   serialPrintf(fd, str.c_str());
 
