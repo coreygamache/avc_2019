@@ -31,7 +31,7 @@
   <group if="$(arg sensors_gps_enable)">
     <!-- run nmea_navsat_driver with arguments _port and _baud specified -->
     <!-- equivelant of "rosrun nmea_navsat_driver nmea_serial_driver _port:=/dev/ttyUSB0 _baud:=115200" -->
-    <node name="nmea_serial_driver" pkg="nmea_navsat_driver" type="nmea_serial_driver" ns="sensor" output="screen" args="_port:=/dev/serial0 _baud:=57600" />
+    <node name="nmea_serial_driver" pkg="nmea_navsat_driver" type="nmea_serial_driver" ns="sensor" output="screen" args="_port:=/dev/serial0 _baud:=9600" />
     <!-- <node name="gps_link_broadcaster" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 base_link gps_link" /> -->
   </group>
 
