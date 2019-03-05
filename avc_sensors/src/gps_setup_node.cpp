@@ -45,14 +45,17 @@ bool sendCommand(std::string str)
   if (serialDataAvail(fd) > 0)
   {
 
-    ROS_INFO("[gps_setup_node] reply received");
+    ROS_INFO("[gps_setup_node] reply received: %d", serialDataAvail(fd));
 
     //create vector container for reply
     std::vector<char> gps_reply;
 
     //receive reply character by character
     while (serialDataAvail > 0)
+    {
       gps_reply.push_back(serialGetchar(fd));
+      ROS_INFO("[gps_setup_node] character read: %c", gps_reply.back());
+    }
 
     //create string to output reply contents
     std::string gps_reply_str(gps_reply.begin(), gps_reply.end());
