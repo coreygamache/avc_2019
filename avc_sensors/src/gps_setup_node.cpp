@@ -34,7 +34,7 @@ bool sendCommand(std::string str)
   ROS_INFO("[gps_setup_node] sending command to GPS chip: %s", str.c_str());
 
   //output received command to serial buffer
-  serialPuts(fd, str.c_str());
+  serialPrintf(fd, str.c_str());
 
   //return true to indicate command sent successfully
   return true;
@@ -131,11 +131,12 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
-  //--------------------------SET CHIP BAUD RATE--------------------------------
+  //---------------------------OPEN SERIAL DEVICE-------------------------------
 
   //open serial device with default baud rate
   fd = serialOpen(serial_port.c_str(), baud_rate);
 
+  //check if serial open succeeded
   if (fd == -1)
   {
     ROS_ERROR("[gps_setup_node] failed to open serial device");
@@ -145,11 +146,43 @@ int main(int argc, char **argv)
     ROS_INFO("[gps_setup_node] opened serial device %s with baud rate %d", serial_port.c_str(), baud_rate);
 
   //sleep briefly before running command
-  ros::Duration(1.0).sleep();
+  ros::Duration(3.0).sleep();
+
+  //-----------------------SET CHIP FIX UPDATE RATE-----------------------------
+
+  //set GPS chip fix update rate to 5 Hz
+  if (!sendCommand("$PMTK300,200,0,0,0,0*2F"))
+    ROS_BREAK();
+
+  //sleep briefly before running command
+  ros::Duration(3.0).sleep();
+
+  //-----------------------SET CHIP DATA OUTPUT RATE----------------------------
+
+  //set GPS chip data output rate to 5 Hz
+  if (!sendCommand("$PMTK220,200*2C"))
+    ROS_BREAK();
+
+  //sleep briefly before running command
+  ros::Duration(3.0).sleep();
+
+  //-----------------------SET CHIP DATA OUTPUT TYPE----------------------------
+
+  //set GPS chip data output type to RMC only
+  if (!sendCommand("$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29"))
+    ROS_BREAK();
+
+  //sleep briefly before running command
+  ros::Duration(3.0).sleep();
+
+  //--------------------------SET CHIP BAUD RATE--------------------------------
 
   //set GPS chip baud rate to 57600
   if (!sendCommand("$PMTK251,57600*2C"))
     ROS_BREAK();
+
+  //sleep briefly before closing serial device
+  ros::Duration(3.0).sleep();
 
   //close serial device
   serialClose(fd);
@@ -160,6 +193,7 @@ int main(int argc, char **argv)
   //open serial device with new baud rate
   fd = serialOpen(serial_port.c_str(), 57600);
 
+  //check if serial open succeeded
   if (fd == -1)
   {
     ROS_ERROR("[gps_setup_node] failed to open serial device");
@@ -169,34 +203,7 @@ int main(int argc, char **argv)
     ROS_INFO("[gps_setup_node] opened serial device %s with baud rate 57600", serial_port.c_str());
 
   //sleep briefly before running command
-  ros::Duration(1.0).sleep();
-
-  //-----------------------SET CHIP FIX UPDATE RATE-----------------------------
-
-  //set GPS chip fix update rate to 5 Hz
-  if (!sendCommand("$PMTK300,200,0,0,0,0*2F"))
-    ROS_BREAK();
-
-  //sleep briefly before running command
-  ros::Duration(1.0).sleep();
-
-  //-----------------------SET CHIP DATA OUTPUT RATE----------------------------
-
-  //set GPS chip data output rate to 5 Hz
-  if (!sendCommand("$PMTK220,200*2C"))
-    ROS_BREAK();
-
-  //sleep briefly before running command
-  ros::Duration(1.0).sleep();
-
-  //-----------------------SET CHIP DATA OUTPUT TYPE----------------------------
-
-  //set GPS chip data output type to RMC only
-  if (!sendCommand("$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29"))
-    ROS_BREAK();
-
-  //sleep briefly before running command
-  ros::Duration(1.0).sleep();
+  ros::Duration(3.0).sleep();
 
   //close serial device
   serialClose(fd);
