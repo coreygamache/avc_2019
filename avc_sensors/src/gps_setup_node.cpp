@@ -36,12 +36,16 @@ bool sendCommand(std::string str)
   //output received command to serial buffer
   serialPrintf(fd, str.c_str());
 
+  ROS_INFO("[gps_setup_node] command sent");
+
   //sleep briefly while waiting for reply
   ros::Duration(0.5).sleep();
 
   //check for reply from GPS
   if (serialDataAvail(fd) > 0)
   {
+
+    ROS_INFO("[gps_setup_node] reply received");
 
     //create vector container for reply
     std::vector<char> gps_reply;
