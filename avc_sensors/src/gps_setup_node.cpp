@@ -36,6 +36,9 @@ bool sendCommand(std::string str)
   //output received command to serial buffer
   serialPrintf(fd, str.c_str());
 
+  //return true to indicate command sent successfully
+  return true;
+
   /*-----------------------------REPLY HANDLING---------------------------------
 
   ROS_INFO("[gps_setup_node] command sent");
