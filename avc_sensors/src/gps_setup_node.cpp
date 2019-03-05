@@ -42,7 +42,8 @@ bool sendCommand(std::string str)
 
   //output received command to serial buffer
   //serialPrintf(fd, str.c_str());
-  serialPuts(fd, str.c_str());
+  //serialPuts(fd, str.c_str());
+  write(fd, str.c_str(), str.size());
 
   //return true to indicate command sent successfully
   return true;
