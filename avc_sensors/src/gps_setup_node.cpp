@@ -38,9 +38,11 @@ bool sendCommand(std::string str)
   str += "\r\n";
 
   //char *command_str = new char[str.length() + 1];
+  //std::strcpy(command_str, str.c_str());
 
   //output received command to serial buffer
-  serialPrintf(fd, str.c_str());
+  //serialPrintf(fd, str.c_str());
+  serialPuts(fd, str.c_str());
 
   //return true to indicate command sent successfully
   return true;
