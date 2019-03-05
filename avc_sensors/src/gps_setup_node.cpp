@@ -2,6 +2,7 @@
 #include <ros/ros.h>
 #include <signal.h>
 #include <string.h>
+#include <wiringPi.h>
 #include <wiringSerial.h>
 
 //global variables
@@ -128,6 +129,14 @@ int main(int argc, char **argv)
   if (!node_private.getParam("/setup/serial_port", serial_port))
   {
     ROS_ERROR("[gps_setup_node] GPS chip serial port not defined in config file: avc_sensors/config/gps.yaml");
+    ROS_BREAK();
+  }
+
+  //-----------------------------SETUP WIRINGPI---------------------------------
+
+  if (wiringPiSetup() == -1)
+  {
+    ROS_INFO("[gps_setup_node] wiringPi setup failed");
     ROS_BREAK();
   }
 
