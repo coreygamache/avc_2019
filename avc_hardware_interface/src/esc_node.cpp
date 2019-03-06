@@ -97,11 +97,6 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
-  //divide esc values by 10 to match units used by servoblaster driver
-  esc_max_value = esc_max_value / 10;
-  esc_min_value = esc_min_value / 10;
-  esc_neutral_value = esc_neutral_value / 10;
-
   //create subscriber to subscribe to ESC message topic with queue size set to 1000
   ros::Subscriber esc_sub = node_public.subscribe("esc", 1000, escCallback);
 
@@ -130,6 +125,9 @@ int main(int argc, char **argv)
         pulsewidth = esc_neutral_value + int(throttle_percent / 100 * esc_fwd_range);
       else
         pulsewidth = esc_neutral_value - int(abs(throttle_percent) / 100 * esc_rev_range);
+
+      //divide pulsewidth by 10 because servoblaster uses units of tens of microseconds
+      pulsewidth = pulsewidth / 10;
 
       //open servo driver
       std::fstream sb_driver(sb_driver_path.c_str(), std::fstream::out | std::fstream::trunc);
