@@ -101,19 +101,19 @@ int main(int argc, char **argv)
   //sleep briefly before running command
   ros::Duration(1.0).sleep();
 
-  //-----------------------SET CHIP FIX UPDATE RATE-----------------------------
+  //-----------------------SET CHIP DATA OUTPUT RATE----------------------------
 
-  //set GPS chip fix update rate to 5 Hz
-  if (!sendCommand(PMTK_API_SET_FIX_CTL_5HZ))
+  //set GPS chip data output rate to 5 Hz
+  if (!sendCommand(PMTK_SET_NMEA_UPDATE_10HZ))
     ROS_BREAK();
 
   //sleep briefly before running command
   ros::Duration(3.0).sleep();
 
-  //-----------------------SET CHIP DATA OUTPUT RATE----------------------------
+  //-----------------------SET CHIP FIX UPDATE RATE-----------------------------
 
-  //set GPS chip data output rate to 5 Hz
-  if (!sendCommand(PMTK_SET_NMEA_UPDATE_10HZ))
+  //set GPS chip fix update rate to 5 Hz
+  if (!sendCommand(PMTK_API_SET_FIX_CTL_5HZ))
     ROS_BREAK();
 
   //sleep briefly before running command
