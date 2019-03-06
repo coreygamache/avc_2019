@@ -115,10 +115,10 @@ int main(int argc, char **argv)
   ros::Subscriber control_sub = node_public.subscribe("control", 1000, controlCallback);
 
   //create subscriber to subscribe to ESC message topic with queue size set to 1000
-  ros::Subscriber esc_sub = node_public.subscribe("esc_raw", 1000, escCallback);
+  ros::Subscriber esc_sub = node_public.subscribe("/hardware/esc_raw", 1000, escCallback);
 
   //create subscriber to subscribe to steering servo message topic with queue size set to 1000
-  ros::Subscriber steering_servo_sub = node_public.subscribe("steering_servo_raw", 1000, steeringServoCallback);
+  ros::Subscriber steering_servo_sub = node_public.subscribe("/hardware/steering_servo_raw", 1000, steeringServoCallback);
 
   //set loop rate in Hz
   ros::Rate loop_rate(refresh_rate);
