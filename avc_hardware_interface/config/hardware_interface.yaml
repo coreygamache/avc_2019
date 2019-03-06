@@ -13,7 +13,6 @@ servoblaster:
   ss_servo_number: 1 # GPIO pin #17 (BCM)
 
 steering_servo_node:
-  ss_max_angle: 30.0
   ss_max_right: 1700
   ss_max_left: 950
   ss_neutral_value: 1350
