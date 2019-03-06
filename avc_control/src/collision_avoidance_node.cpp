@@ -11,8 +11,8 @@
 //global variables
 bool autonomous_control = false;
 float range_to_nearest = -1; //range to nearest object [m]
-float throttle_percent; //requested throttle position [%]
-float steering_angle; //requested steering angle [deg]
+float throttle_percent = 0; //requested throttle position [%]
+float steering_angle = 0; //requested steering angle [deg]
 
 
 //callback function called to process SIGINT command
@@ -81,6 +81,14 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
+  //retrieve warning distance threshold from parameter server
+  float minimum_throttle;
+  if (!node_private.getParam("/control/collision_avoidance_node/minimum_throttle", minimum_throttle))
+  {
+    ROS_ERROR("[collision_avoidance_node] minimum throttle threshold not defined in config file: avc_control/config/control.yaml");
+    ROS_BREAK();
+  }
+
   //retrieve refresh rate of node in hertz from parameter server
   float refresh_rate;
   if (!node_private.getParam("/control/collision_avoidance_node/refresh_rate", refresh_rate))
@@ -129,28 +137,38 @@ int main(int argc, char **argv)
   while (ros::ok())
   {
 
-    //if robot is within warning distance threshold then reduce throttle proportionally to distance from nearest object
-    //robot will stop at danger distance threshold at which point it must be manually moved away from the object
-    if ((range_to_nearest > 0) && (range_to_nearest < warning_threshold))
-      throttle_percent = throttle_percent * ((range_to_nearest - danger_threshold) / (warning_threshold - danger_threshold));
+    //only enable collisioon avoidance logic in autonomous control mode
+    if (autonomous_control)
+    {
 
-    //set time of ESC message
-    esc_msg.header.stamp = ros::Time::now();
+      //if robot is within warning distance threshold then reduce throttle proportionally to distance from nearest object
+      //robot will stop at danger distance threshold at which point it must be manually moved away from the object
+      if ((range_to_nearest > 0) && (range_to_nearest < warning_threshold))
+        throttle_percent = throttle_percent * ((range_to_nearest - danger_threshold) / (warning_threshold - danger_threshold));
 
-    //set esc message throttle value to latest value
-    esc_msg.throttle_percent = throttle_percent;
+      //if throttle percent is below set threshold then set to zero
+      if (throttle_percent < minimum_throttle)
+        throttle_percent = 0;
 
-    //publish esc message
-    esc_pub.publish(esc_msg);
+      //set time of ESC message
+      esc_msg.header.stamp = ros::Time::now();
 
-    //set time of steering servo message
-    steering_servo_msg.header.stamp = ros::Time::now();
+      //set esc message throttle value to latest value
+      esc_msg.throttle_percent = throttle_percent;
 
-    //set steering servo message steering angle value to latest value
-    steering_servo_msg.steering_angle = steering_angle;
+      //publish esc message
+      esc_pub.publish(esc_msg);
 
-    //publish steering servo
-    steering_servo_pub.publish(steering_servo_msg);
+      //set time of steering servo message
+      steering_servo_msg.header.stamp = ros::Time::now();
+
+      //set steering servo message steering angle value to latest value
+      steering_servo_msg.steering_angle = steering_angle;
+
+      //publish steering servo
+      steering_servo_pub.publish(steering_servo_msg);
+
+    }
 
     //process callback functions
     ros::spinOnce();
