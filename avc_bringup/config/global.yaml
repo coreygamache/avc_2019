@@ -20,4 +20,4 @@ mapping:
 
 # steering servo parameters
 steering_servo:
-  max_rotation_angle: 20.0 # max rotation from neutral position in either direction [deg]
+  max_rotation_angle: 8.0 # max rotation from neutral position in either direction [deg]
