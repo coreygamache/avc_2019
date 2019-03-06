@@ -8,6 +8,7 @@
 #define PMTK_API_SET_FIX_CTL_5HZ "$PMTK300,200,0,0,0,0*2F\r\n"
 #define PMTK_SET_BAUD_57600 "$PMTK251,57600*2C\r\n"
 #define PMTK_SET_NMEA_OUTPUT_RMCONLY "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n"
+#define PMTK_SET_NMEA_OUTPUT_RMCGGA "$PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*28\r\n"
 #define PMTK_SET_NMEA_UPDATE_5HZ "$PMTK220,200*2C\r\n"
 #define PMTK_SET_NMEA_UPDATE_10HZ "$PMTK220,100*2F\r\n"
 
@@ -111,7 +112,7 @@ int main(int argc, char **argv)
   //-----------------------SET CHIP DATA OUTPUT TYPE----------------------------
 
   //set GPS chip data output type to RMC only
-  if (!sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY))
+  if (!sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA))
     ROS_BREAK();
 
   //sleep briefly before running command
