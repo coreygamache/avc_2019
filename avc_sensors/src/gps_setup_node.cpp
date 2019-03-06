@@ -2,6 +2,7 @@
 #include <ros/ros.h>
 #include <signal.h>
 #include <string.h>
+#include <wiringPi.h>
 #include <wiringSerial.h>
 
 //defines
@@ -81,13 +82,13 @@ int main(int argc, char **argv)
   }
 
   //-----------------------------SETUP WIRINGPI---------------------------------
-/*
+
   if (wiringPiSetup() == -1)
   {
     ROS_INFO("[gps_setup_node] wiringPi setup failed");
     ROS_BREAK();
   }
-*/
+
   //---------------------------OPEN SERIAL DEVICE-------------------------------
 
   //open serial device with default baud rate
