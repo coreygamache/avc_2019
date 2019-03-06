@@ -5,7 +5,7 @@
 encoder:
   fl:
     counts_per_rev: 4
-    input_pin: 3
+    input_pin: 252
     refresh_rate: 1
     sample_num: 10
   fr:
@@ -34,7 +34,6 @@ imu:
 
 # proximity sensor parameters
 proximity_sensor:
-  echo_pin: 4 # (using wiringPi numbering scheme)
   field_of_view: 0.3665 # (in radians)
   min_range: 0.5 # (in meters)
   max_range: 2.0 # (in meters)
@@ -42,4 +41,3 @@ proximity_sensor:
   radiation_type: 0 # (0 = ultrasonic, 1 = infrared)
   refresh_rate: 10.0
   timeout: 25.0 # (in milliseconds)
-  trigger_pin: 5 # (using wiringPi numbering scheme)
