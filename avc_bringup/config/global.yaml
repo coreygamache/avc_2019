@@ -1,4 +1,5 @@
 # global parameters
+# all pins use wiringPi numbering scheme
 
 # arduino parameters
 arduino:
@@ -10,24 +11,24 @@ joy_node:
 
 # indicator LED parameters
 led:
-  indicator_pin: 1
-  mode_blue_pin: 28 # pin may not work on Pi 3 B
+  indicator_pin: 25
+  mode_blue_pin: 26
   mode_green_pin: 27
-  mode_red_pin: 29 # pin may not work on Pi 3 B
+  mode_red_pin: 31
 
 mapping:
   output_file_path: "/home/corey/avc_ws/gpsWaypoints.csv"
 
 proximity_sensor:
   front:
-    echo_pin: 4 # (using wiringPi numbering scheme)
-    trigger_pin: 5 # (using wiringPi numbering scheme)
+    echo_pin: 4
+    trigger_pin: 5
   left:
-    echo_pin: 255 # (using wiringPi numbering scheme)
-    trigger_pin: 255 # (using wiringPi numbering scheme)
+    echo_pin: 255
+    trigger_pin: 255
   right:
-    echo_pin: 255 # (using wiringPi numbering scheme)
-    trigger_pin: 255 # (using wiringPi numbering scheme)
+    echo_pin: 255
+    trigger_pin: 255
 
 # steering servo parameters
 steering_servo:
