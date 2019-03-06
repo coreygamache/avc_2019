@@ -91,7 +91,7 @@ int main(int argc, char **argv)
 
   //retrieve warning distance threshold from parameter server
   float warning_threshold;
-  if (!node_private.getParam("/control/collision_avoidance_node/warning_threshold", danger_threshold))
+  if (!node_private.getParam("/control/collision_avoidance_node/warning_threshold", warning_threshold))
   {
     ROS_ERROR("[collision_avoidance_node] warning distance threshold not defined in config file: avc_control/config/control.yaml");
     ROS_BREAK();
