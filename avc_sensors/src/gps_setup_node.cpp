@@ -2,14 +2,14 @@
 #include <ros/ros.h>
 #include <signal.h>
 #include <string.h>
-#include <wiringPi.h>
 #include <wiringSerial.h>
 
 //defines
-#define PMTK_SET_NMEA_OUTPUT_RMCONLY "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n"
-#define PMTK_API_SET_FIX_CTL_5HZ  "$PMTK300,200,0,0,0,0*2F\r\n"
-#define PMTK_SET_NMEA_UPDATE_5HZ  "$PMTK220,200*2C\r\n"
+#define PMTK_API_SET_FIX_CTL_5HZ "$PMTK300,200,0,0,0,0*2F\r\n"
 #define PMTK_SET_BAUD_57600 "$PMTK251,57600*2C\r\n"
+#define PMTK_SET_NMEA_OUTPUT_RMCONLY "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n"
+#define PMTK_SET_NMEA_UPDATE_5HZ "$PMTK220,200*2C\r\n"
+#define PMTK_SET_NMEA_UPDATE_10HZ "$PMTK220,100*2F\r\n"
 
 //global variables
 int fd = -1;
@@ -29,7 +29,6 @@ void sigintHandler(int sig)
 }
 
 //function for sending messages to GPS via serial protocol
-//returns true if command was executed successfully
 bool sendCommand(const char command_str[])
 {
 
@@ -37,15 +36,10 @@ bool sendCommand(const char command_str[])
   if (fd == -1)
     return false;
 
-  //char *command_str = new char[str.length() + 1];
-  //std::strcpy(command_str, str.c_str());
-
   //inform of command being sent to GPS chip
   ROS_INFO("[gps_setup_node] sending command to GPS chip: %s", command_str);
 
   //output received command to serial buffer
-  //serialPrintf(fd, str.c_str());
-  //serialPuts(fd, str.c_str());
   serialPrintf(fd, command_str);
 
   //return true to indicate command sent successfully
@@ -83,13 +77,13 @@ int main(int argc, char **argv)
   }
 
   //-----------------------------SETUP WIRINGPI---------------------------------
-
+/*
   if (wiringPiSetup() == -1)
   {
     ROS_INFO("[gps_setup_node] wiringPi setup failed");
     ROS_BREAK();
   }
-
+*/
   //---------------------------OPEN SERIAL DEVICE-------------------------------
 
   //open serial device with default baud rate
@@ -119,7 +113,7 @@ int main(int argc, char **argv)
   //-----------------------SET CHIP DATA OUTPUT RATE----------------------------
 
   //set GPS chip data output rate to 5 Hz
-  if (!sendCommand(PMTK_SET_NMEA_UPDATE_5HZ))
+  if (!sendCommand(PMTK_SET_NMEA_UPDATE_10HZ))
     ROS_BREAK();
 
   //sleep briefly before running command
