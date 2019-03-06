@@ -10,7 +10,7 @@
 
 //global variables
 bool autonomous_control = false;
-float range_to_nearest = 9999; //range to nearest object [m]
+float range_to_nearest = -1; //range to nearest object [m]
 float throttle_percent; //requested throttle position [%]
 float steering_angle; //requested steering angle [deg]
 
@@ -83,9 +83,9 @@ int main(int argc, char **argv)
 
   //retrieve refresh rate of node in hertz from parameter server
   float refresh_rate;
-  if (!node_private.getParam("/control/control_node/refresh_rate", refresh_rate))
+  if (!node_private.getParam("/control/collision_avoidance_node/refresh_rate", refresh_rate))
   {
-    ROS_ERROR("[control_node] control node refresh rate not defined in config file: avc_control/config/control.yaml");
+    ROS_ERROR("[collision_avoidance_node] collision avoidance node refresh rate not defined in config file: avc_control/config/control.yaml");
     ROS_BREAK();
   }
 
