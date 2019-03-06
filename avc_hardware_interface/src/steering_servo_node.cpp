@@ -105,11 +105,6 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
-  //divide esc values by 10 to match units used by servoblaster driver
-  ss_max_right = ss_max_right / 10;
-  ss_max_left = ss_max_left / 10;
-  ss_neutral_value = ss_neutral_value / 10;
-
   //create subscriber to subscribe to steering servo message topic with queue size set to 1000
   ros::Subscriber steering_servo_sub = node_public.subscribe("steering_servo", 1000, steeringServoCallback);
 
@@ -135,9 +130,12 @@ int main(int argc, char **argv)
 
       //convert throttle value to pulsewidth [us / 10]
       if (steering_angle >= 0)
-        pulsewidth = ss_neutral_value - int(steering_angle / ss_max_angle * ss_max_left);
+        pulsewidth = ss_neutral_value - (steering_angle / ss_max_angle * ss_left_range);
       else
-        pulsewidth = ss_neutral_value + int(abs(steering_angle) / ss_max_angle * ss_max_right);
+        pulsewidth = ss_neutral_value + (fabs(steering_angle) / ss_max_angle * ss_right_range);
+
+      //divide pulsewidth by 10 because servoblaster uses units of tens of microseconds
+      pulsewidth = pulsewidth / 10;
 
       //open servo driver
       std::fstream sb_driver(sb_driver_path.c_str(), std::fstream::out | std::fstream::trunc);
