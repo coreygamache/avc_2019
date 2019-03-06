@@ -30,17 +30,17 @@ int main(int argc, char **argv)
 
   //get echo pin from parameters
   int echo_pin;
-  if (!node_private.getParam("/sensor/proximity_sensor/echo_pin", echo_pin))
+  if (!node_private.getParam("/proximity_sensor/front/echo_pin", echo_pin))
   {
-    ROS_ERROR("[proximity_sensor_node] proximity sensor echo pin not defined in config file: avc_sensors/config/sensors.yaml");
+    ROS_ERROR("[proximity_sensor_node] proximity sensor echo pin not defined in config file: avc_bringup/config/global.yaml");
     ROS_BREAK();
   }
 
   //get trigger pin from parameters
   int trigger_pin;
-  if (!node_private.getParam("/sensor/proximity_sensor/trigger_pin", trigger_pin))
+  if (!node_private.getParam("/proximity_sensor/front/trigger_pin", trigger_pin))
   {
-    ROS_ERROR("[proximity_sensor_node] proximity sensor trigger pin not defined in config file: avc_sensors/config/sensors.yaml");
+    ROS_ERROR("[proximity_sensor_node] proximity sensor trigger pin not defined in config file: avc_bringup/config/global.yaml");
     ROS_BREAK();
   }
 
