@@ -117,6 +117,9 @@ int main(int argc, char **argv)
   //create subscriber to subscribe to ESC message topic with queue size set to 1000
   ros::Subscriber esc_sub = node_public.subscribe("/hardware/esc", 1000, escCallback);
 
+  //create subscriber to subscribe to proximity message topic with queue size set to 1000
+  ros::Subscriber range_sub = node_public.subscribe("/sensor/proximity", 1000, rangeCallback);
+
   //create subscriber to subscribe to steering servo message topic with queue size set to 1000
   ros::Subscriber steering_servo_sub = node_public.subscribe("/hardware/steering_servo", 1000, steeringServoCallback);
 
@@ -131,12 +134,22 @@ int main(int argc, char **argv)
     if ((range_to_nearest > 0) && (range_to_nearest < warning_threshold))
       throttle_percent = throttle_percent * ((range_to_nearest - danger_threshold) / (warning_threshold - danger_threshold));
 
-    //set esc message throttle value to latest value and publish message
+    //set time of ESC message
+    esc_msg.header.stamp = ros::Time::now();
+
+    //set esc message throttle value to latest value
     esc_msg.throttle_percent = throttle_percent;
+
+    //publish esc message
     esc_pub.publish(esc_msg);
 
-    //set steering servo message steering angle value to latest value and publish message
+    //set time of steering servo message
+    steering_servo_msg.header.stamp = ros::Time::now();
+
+    //set steering servo message steering angle value to latest value
     steering_servo_msg.steering_angle = steering_angle;
+
+    //publish steering servo
     steering_servo_pub.publish(steering_servo_msg);
 
     //process callback functions
