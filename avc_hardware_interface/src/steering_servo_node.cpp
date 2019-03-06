@@ -57,9 +57,9 @@ int main(int argc, char **argv)
   signal(SIGINT, sigintHandler);
 
   float ss_max_angle;
-  if (!node_private.getParam("/hardware/steering_servo_node/ss_max_angle", ss_max_angle))
+  if (!node_private.getParam("/steering_servo/max_rotation_angle", ss_max_angle))
   {
-    ROS_ERROR("[steering_servo_node] steering servo max angle not defined in config file: avc_hardware_interface/config/hardware_interface.yaml");
+    ROS_ERROR("[steering_servo_node] steering servo max angle not defined in config file: avc_bringup/config/global.yaml");
     ROS_BREAK();
   }
 
@@ -129,6 +129,8 @@ int main(int argc, char **argv)
     //if new throttle value was requested then output new value to ESC
     if (steering_angle != last_steering_value)
     {
+
+      ROS_INFO("[steering_servo_node] current steering angle: %f", steering_angle);
 
       //create pulsewidth variable to output calculated pulsewidth to esc
       int pulsewidth;
