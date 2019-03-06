@@ -3,7 +3,7 @@
   <!-- set arguments -->
   <arg name="hardware_arduino_enable" value="true" />
   <arg name="hardware_esc_enable" value="false" />
-  <arg name="hardware_ss_enable" value="false" />
+  <arg name="hardware_ss_enable" value="true" />
 
   <!-- load hardware interface parameters to parameter server -->
   <rosparam command="load" file="$(find avc_hardware_interface)/config/hardware_interface.yaml" ns="hardware" />
