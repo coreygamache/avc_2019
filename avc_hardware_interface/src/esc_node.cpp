@@ -122,9 +122,9 @@ int main(int argc, char **argv)
 
       //convert throttle value to pulsewidth [us / 10]
       if (throttle_percent >= 0)
-        pulsewidth = esc_neutral_value + int(throttle_percent / 100 * esc_fwd_range);
+        pulsewidth = esc_neutral_value + (throttle_percent / 100 * esc_fwd_range);
       else
-        pulsewidth = esc_neutral_value - int(abs(throttle_percent) / 100 * esc_rev_range);
+        pulsewidth = esc_neutral_value - (fabs(throttle_percent) / 100 * esc_rev_range);
 
       //divide pulsewidth by 10 because servoblaster uses units of tens of microseconds
       pulsewidth = pulsewidth / 10;
