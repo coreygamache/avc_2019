@@ -18,6 +18,17 @@ led:
 mapping:
   output_file_path: "/home/corey/avc_ws/gpsWaypoints.csv"
 
+proximity_sensor:
+  front:
+    echo_pin: 4 # (using wiringPi numbering scheme)
+    trigger_pin: 5 # (using wiringPi numbering scheme)
+  left:
+    echo_pin: 255 # (using wiringPi numbering scheme)
+    trigger_pin: 255 # (using wiringPi numbering scheme)
+  right:
+    echo_pin: 255 # (using wiringPi numbering scheme)
+    trigger_pin: 255 # (using wiringPi numbering scheme)
+
 # steering servo parameters
 steering_servo:
   max_rotation_angle: 30.0 # max rotation from neutral position in either direction [deg]
