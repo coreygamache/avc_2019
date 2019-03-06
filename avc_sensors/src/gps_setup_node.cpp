@@ -39,6 +39,9 @@ bool sendCommand(const char command_str[])
   //inform of command being sent to GPS chip
   ROS_INFO("[gps_setup_node] sending command to GPS chip: %s", command_str);
 
+  //flush serial buffer before sending command
+  serialFlush(fd);
+
   //output received command to serial buffer
   serialPrintf(fd, command_str);
 
@@ -99,7 +102,20 @@ int main(int argc, char **argv)
     ROS_INFO("[gps_setup_node] opened serial device %s with baud rate %d", serial_port.c_str(), baud_rate);
 
   //sleep briefly before running command
-  ros::Duration(1.0).sleep();
+  ros::Duration(3.0).sleep();
+
+  //----------------------------------------------------------------------------
+  //-----------------------SEND COMMANDS TO GPS CHIP----------------------------
+  //----------------------------------------------------------------------------
+
+  //-----------------------SET CHIP DATA OUTPUT TYPE----------------------------
+
+  //set GPS chip data output type to RMC only
+  if (!sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY))
+    ROS_BREAK();
+
+  //sleep briefly before running command
+  ros::Duration(3.0).sleep();
 
   //-----------------------SET CHIP DATA OUTPUT RATE----------------------------
 
@@ -119,15 +135,6 @@ int main(int argc, char **argv)
   //sleep briefly before running command
   ros::Duration(3.0).sleep();
 
-  //-----------------------SET CHIP DATA OUTPUT TYPE----------------------------
-
-  //set GPS chip data output type to RMC only
-  if (!sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY))
-    ROS_BREAK();
-
-  //sleep briefly before running command
-  ros::Duration(3.0).sleep();
-
   //--------------------------SET CHIP BAUD RATE--------------------------------
 
   //set GPS chip baud rate to 57600
@@ -136,6 +143,10 @@ int main(int argc, char **argv)
 
   //sleep briefly before closing serial device
   ros::Duration(3.0).sleep();
+
+  //----------------------------------------------------------------------------
+  //-----------------------END COMMANDS TO GPS CHIP-----------------------------
+  //----------------------------------------------------------------------------
 
   //close serial device
   serialClose(fd);
