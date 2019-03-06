@@ -130,8 +130,6 @@ int main(int argc, char **argv)
     if (steering_angle != last_steering_value)
     {
 
-      ROS_INFO("[steering_servo_node] current steering angle: %f", steering_angle);
-
       //create pulsewidth variable to output calculated pulsewidth to esc
       int pulsewidth;
 
@@ -149,6 +147,8 @@ int main(int argc, char **argv)
 
       //close file
       sb_driver.close();
+
+      ROS_INFO("[steering_servo_node] current steering angle: %f, current pulsewidth: %d", steering_angle, pulsewidth);
 
       //set last throttle value to current throttle value
       last_steering_value = steering_angle;
