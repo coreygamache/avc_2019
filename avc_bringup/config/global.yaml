@@ -11,10 +11,10 @@ joy_node:
 
 # indicator LED parameters
 led:
-  indicator_pin: 25
-  mode_blue_pin: 26
+  indicator_pin: 23
+  mode_blue_pin: 25
   mode_green_pin: 27
-  mode_red_pin: 31
+  mode_red_pin: 24
 
 mapping:
   output_file_path: "/home/corey/avc_ws/gpsWaypoints.csv"
