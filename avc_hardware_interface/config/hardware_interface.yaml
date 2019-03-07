@@ -8,7 +8,7 @@ esc_node:
   refresh_rate: 50
 
 servoblaster:
-  esc_servo_number: 0; # GPIO pin #4 (BCM)
+  esc_servo_number: 0 # GPIO pin #4 (BCM)
   sb_driver_path: "/dev/servoblaster"
   ss_servo_number: 1 # GPIO pin #17 (BCM)
 
