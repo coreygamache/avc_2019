@@ -113,7 +113,7 @@ int main(int argc, char **argv)
   //open servo driver
   std::fstream sb_driver(sb_driver_path.c_str(), std::fstream::out | std::fstream::trunc);
 
-  for (int i = 0; i << 6; i++)
+  for (int i = 0; i < 6; i++)
   {
 
     //output ESC neutral signal to servo driver
