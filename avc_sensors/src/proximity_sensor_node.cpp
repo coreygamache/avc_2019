@@ -4,6 +4,10 @@
 #include <sensor_msgs/Range.h>
 #include <signal.h>
 
+//macro definitions for median filter
+#define swap(a,b) a ^= b; b ^= a; a ^= b;
+#define sort(a,b) if (a > b) { swap(a,b); }
+
 
 //callback function called to process SIGINT command
 void sigintHandler(int sig)
@@ -11,6 +15,24 @@ void sigintHandler(int sig)
 
   //call the default shutdown function
   ros::shutdown();
+
+}
+
+float medianFilter(float lastReadings[])
+{
+
+    //perform optimal combination of sorts to produce sorted array
+    sort(lastReadings[0], lastReadings[1]);
+    sort(lastReadings[3], lastReadings[4]);
+    sort(lastReadings[0], lastReadings[2]);
+    sort(lastReadings[1], lastReadings[2]);
+    sort(lastReadings[0], lastReadings[3]);
+    sort(lastReadings[2], lastReadings[3]);
+    sort(lastReadings[1], lastReadings[4]);
+    sort(lastReadings[1], lastReadings[2]);
+
+    //return middle value of sorted array (the median value)
+    return lastReadings[2];
 
 }
 
@@ -105,6 +127,10 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
+  //create buffer for storing five most recent readings to be used by median filter
+  int numReadings = 0;
+  float lastReadings[5] = { -1, -1, -1, -1, -1 };
+
   //set refresh rate of ROS loop to defined refresh rate of sensor parameter
   ros::Rate loop_rate(refresh_rate);
 
@@ -115,10 +141,17 @@ int main(int argc, char **argv)
     proximity_msg.header.stamp = ros::Time::now();
 
     //get distance to nearest object from proximity sensor with 25ms timeout [m]
-    proximity_msg.range = sensor.getDistance(25);
+    lastReadings[numReadings++ % 5] = sensor.getDistance(25);
+
+    //set message range value to median filtered sensor reading
+    proximity_msg.range = medianFilter(lastReadings);
 
     //publish proximity sensor range message
     proximity_pub.publish(proximity_msg);
+
+    //prevent overflow of int type variable
+    if (numReadings == 2147483647)
+      numReadings = 0;
 
     //process callback functions
     ros::spinOnce();
