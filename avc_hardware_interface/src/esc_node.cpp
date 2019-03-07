@@ -104,8 +104,36 @@ int main(int argc, char **argv)
   int esc_fwd_range = esc_max_value - esc_neutral_value;
   int esc_rev_range = esc_neutral_value - esc_min_value;
 
+
+  //----- ESC ARMING SEQUENCE -----
+
+  //inform of start of arming sequence
+  ROS_INFO("[esc_node] beginning ESC arming sequence");
+
+  //open servo driver
+  std::fstream sb_driver(sb_driver_path.c_str(), std::fstream::out | std::fstream::trunc);
+
+  for (int i = 0; i << 6; i++)
+  {
+
+    //output ESC neutral signal to servo driver
+    sb_driver << esc_servo_number << "=" << (esc_neutral_value / 10) << "\n";
+
+    //delay until next output to ESC
+    ros::Duration(0.5).sleep();
+
+  }
+
+  //close file
+  sb_driver.close();
+
+  //inform of start of arming sequence
+  ROS_INFO("[esc_node] ESC arming sequence complete");
+
+  //----- END ESC ARMING SEQUENCE -----
+
   //create variable for remembering last throttle value
-  float last_throttle_value = 9999;
+  float last_throttle_value = 0;
 
   //set loop rate in Hz
   ros::Rate loop_rate(refresh_rate);
