@@ -139,17 +139,17 @@ int main(int argc, char **argv)
   signal(SIGINT, sigintHandler);
 
   //define encoder_number via passed argument
-  char *sensor_position;
+  /*char *sensor_position;
   if (argc == 2)
     sensor_position = argv[1];
   else
   {
     ROS_ERROR("[proximity_sensor_node] received incorrect number of arguments");
     ROS_BREAK();
-  }
+  }*/
 
   //set node parameter path for retrieving parameters from parameter server for this node
-  std::string parameter_path = "/proximity_sensor/" + boost::lexical_cast<std::string>(sensor_position) + "/";
+  std::string parameter_path = "/proximity_sensor/front/";//"/proximity_sensor/" + boost::lexical_cast<std::string>(sensor_position) + "/";
 
   //get echo pin from parameters
   int echo_pin;
