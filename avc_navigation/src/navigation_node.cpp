@@ -1,6 +1,5 @@
 //navigation node
 //this node controls autonomous navigation
-#include <deque>
 #include <iostream> //dependency for fstream (must be included first)
 #include <fstream>
 #include <sstream>
