@@ -129,8 +129,6 @@ int main(int argc, char **argv)
   //set node parameter path for retrieving parameters from parameter server for this node
   std::string parameter_path = "/proximity_sensor/" + boost::lexical_cast<std::string>(sensor_position) + "/";
 
-  ROS_INFO("[proximity_sensor_node][%s] parameter path: %s", sensor_position, parameter_path.c_str());
-
   //get echo pin from parameters
   int echo_pin;
   if (!node_private.getParam(parameter_path + "echo_pin", echo_pin))
