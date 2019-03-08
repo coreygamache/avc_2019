@@ -48,18 +48,18 @@ int medianFilter(int datum)
   if ((datpoint++ - buffer) >= MEDIAN_FILTER_SIZE)
     datpoint = buffer;                                 /* Increment and wrap data in pointer.*/
 
-  datpoint->value = datum;                           /* Copy in new datum */
-  successor = datpoint->point;                       /* Save pointer to old value's successor */
-  median = &big;                                     /* Median initially to first in chain */
-  scanold = NULL;                                    /* Scanold initially null. */
-  scan = &big;                                       /* Points to pointer to first (largest) datum in chain */
+  datpoint->value = datum;                             /* Copy in new datum */
+  successor = datpoint->point;                         /* Save pointer to old value's successor */
+  median = &big;                                       /* Median initially to first in chain */
+  scanold = NULL;                                      /* Scanold initially null. */
+  scan = &big;                                         /* Points to pointer to first (largest) datum in chain */
 
   /* Handle chain-out of first item in chain as special case */
   if (scan->point == datpoint)
     scan->point = successor;
 
-  scanold = scan;                                     /* Save this pointer and   */
-  scan = scan->point ;                                /* step down chain */
+  scanold = scan;                                      /* Save this pointer and   */
+  scan = scan->point ;                                 /* step down chain */
 
   /* Loop through the chain, normal loop exit via break. */
   for (int i = 0 ; i < MEDIAN_FILTER_SIZE; i++)
@@ -67,21 +67,21 @@ int medianFilter(int datum)
 
     /* Handle odd-numbered item in chain  */
     if (scan->point == datpoint)
-      scan->point = successor;                      /* Chain out the old datum.*/
+      scan->point = successor;                         /* Chain out the old datum.*/
 
-    if (scan->value < datum)                        /* If datum is larger than scanned value,*/
+    if (scan->value < datum)                           /* If datum is larger than scanned value,*/
     {
-      datpoint->point = scanold->point;             /* Chain it in here.  */
-      scanold->point = datpoint;                    /* Mark it chained in. */
+      datpoint->point = scanold->point;                /* Chain it in here.  */
+      scanold->point = datpoint;                       /* Mark it chained in. */
       datum = STOPPER;
     }
 
     /* Step median pointer down chain after doing odd-numbered element */
-    median = median->point;                       /* Step median pointer.  */
+    median = median->point;                            /* Step median pointer.  */
     if (scan == &small)
-      break;                                      /* Break at end of chain  */
-    scanold = scan;                               /* Save this pointer and   */
-    scan = scan->point;                           /* step down chain */
+      break;                                           /* Break at end of chain  */
+    scanold = scan;                                    /* Save this pointer and   */
+    scan = scan->point;                                /* step down chain */
 
     /* Handle even-numbered item in chain.  */
     if (scan->point == datpoint)
@@ -227,19 +227,22 @@ int main(int argc, char **argv)
     //set time of current distance reading
     proximity_msg.header.stamp = ros::Time::now();
 
-    //get distance to nearest object from proximity sensor with 25ms timeout [mm]
+    //get distance to nearest object from proximity sensor with 25ms timeout [m]
     //lastReadings[numReadings++ % 5] = sensor.getDistance(25) * 1000;
     proximity_msg.range = medianFilter(sensor.getDistance(25));
 
     //set message range value to median filtered sensor reading [m]
     //proximity_msg.range = float(medianFilter(lastReadings)) / 1000;
 
+    //verify distance from proximity sensor is valid
+    //if distance check timed out then report max range
+    if ((proximity_msg.range == -1) || (proximity_msg.range > max_range))
+      proximity_msg.range = max_range;
+    else if (proximity_msg.range < min_range)
+      proximity_msg.range = min_range;
+
     //publish proximity sensor range message
     proximity_pub.publish(proximity_msg);
-
-    //prevent overflow of int type variable
-    //if (numReadings == 2147483647)
-      //numReadings = 0;
 
     //process callback functions
     ros::spinOnce();
