@@ -46,12 +46,12 @@
     <node name="proximity_sensor_front_node" pkg="avc_sensors" type="proximity_sensor_node" ns="sensor" args="front" output="screen">
       <remap from="/sensor/proximity" to="/sensor/proximity/front" />
     </node>
-    <node name="proximity_sensor_left_node" pkg="avc_sensors" type="proximity_sensor_node" ns="sensor" args="left" output="screen">
+    <!--<node name="proximity_sensor_left_node" pkg="avc_sensors" type="proximity_sensor_node" ns="sensor" args="left" output="screen">
       <remap from="/sensor/proximity" to="/sensor/proximity/left" />
     </node>
     <node name="proximity_sensor_right_node" pkg="avc_sensors" type="proximity_sensor_node" ns="sensor" args="right" output="screen">
       <remap from="/sensor/proximity" to="/sensor/proximity/right" />
-    </node>
+    </node>-->
     <!-- <node name="proximity_sensor_link_broadcaster" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 base_link proximity_sensor_link" /> -->
   </group>
 
