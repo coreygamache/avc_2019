@@ -7,7 +7,7 @@
 
 //macro definitions for median filter (algorithm method)
 #define STOPPER 0 // smaller than any datum
-#define MEDIAN_FILTER_SIZE 7
+#define MEDIAN_FILTER_SIZE 9
 
 
 //callback function called to process SIGINT command
