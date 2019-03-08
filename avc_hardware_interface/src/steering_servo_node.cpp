@@ -10,6 +10,7 @@
 #include <signal.h>
 
 //global variables
+bool force_output = false;
 float steering_angle = 0;
 int ss_neutral_value;
 int ss_servo_number;
@@ -42,6 +43,15 @@ void steeringServoCallback(const avc_msgs::SteeringServo::ConstPtr& msg)
 
 }
 
+//callback function to process timer firing event
+void timerCallback(const ros::TimerEvent& event)
+{
+
+  //set force output to true to force servo output
+  force_output = true;
+
+}
+
 int main(int argc, char **argv)
 {
 
@@ -56,6 +66,15 @@ int main(int argc, char **argv)
   //override the default SIGINT handler
   signal(SIGINT, sigintHandler);
 
+  //retrieve force servo output time value from parameter server
+  float force_output_time;
+  if (!node_private.getParam("/hardware/servoblaster/force_output_time", force_output_time))
+  {
+    ROS_ERROR("[steering_servo_node] force servo output time not defined in config file: avc_hardware_interface/config/hardware_interface.yaml");
+    ROS_BREAK();
+  }
+
+  //retrieve servo max rotation angle value from parameter server [deg]
   float ss_max_angle;
   if (!node_private.getParam("/steering_servo/max_rotation_angle", ss_max_angle))
   {
@@ -63,6 +82,7 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
+  //retrieve servo max right pulsewidth value from parameter server [us]
   int ss_max_right;
   if (!node_private.getParam("/hardware/steering_servo_node/ss_max_right", ss_max_right))
   {
@@ -70,6 +90,7 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
+  //retrieve servo max left pulsewidth value from parameter server [us]
   int ss_max_left;
   if (!node_private.getParam("/hardware/steering_servo_node/ss_max_left", ss_max_left))
   {
@@ -77,6 +98,7 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
+  //retrieve servo neutral pulsewidth value from parameter server [us]
   if (!node_private.getParam("/hardware/steering_servo_node/ss_neutral_value", ss_neutral_value))
   {
     ROS_ERROR("[steering_servo_node] steering servo neutral value not defined in config file: avc_hardware_interface/config/hardware_interface.yaml");
@@ -115,6 +137,12 @@ int main(int argc, char **argv)
   //create variable for remembering last throttle value
   float last_steering_value = 9999;
 
+  //create timer object to be used to force servo output every set interval
+  ros::Timer timer;
+
+  //create timer to force servo write every predetermined interval
+  timer = node_private.createTimer(ros::Duration(force_output_time), timerCallback, true);
+
   //set loop rate in Hz
   ros::Rate loop_rate(refresh_rate);
 
@@ -122,8 +150,20 @@ int main(int argc, char **argv)
   {
 
     //if new throttle value was requested then output new value to ESC
-    if (steering_angle != last_steering_value)
+    if ((steering_angle != last_steering_value) || force_output)
     {
+
+      //if force output flag is true then reset to false
+      if (force_output)
+      {
+
+        //reset force output flag to false
+        force_output = false;
+
+        //reset timer
+        timer = node_private.createTimer(ros::Duration(force_output_time), timerCallback, true);
+
+      }
 
       //create pulsewidth variable to output calculated pulsewidth to esc
       int pulsewidth;
