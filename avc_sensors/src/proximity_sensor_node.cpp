@@ -3,6 +3,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/Range.h>
 #include <signal.h>
+#include <string.h>
 
 //macro definitions for median filter (sorting method)
 #define swap(a,b) a^=b; b^=a; a^=b;
@@ -137,17 +138,38 @@ int main(int argc, char **argv)
   //override the default SIGINT handler
   signal(SIGINT, sigintHandler);
 
+  //define encoder_number via passed argument
+  char *sensor_position;
+  if (argc == 2)
+    sensor_position = argv[1];
+  else
+  {
+    ROS_ERROR("[proximity_sensor_node] received incorrect number of arguments");
+    ROS_BREAK();
+  }
+
+  //set node parameter path for retrieving parameters from parameter server for this node
+  std::string parameter_path = "/proximity_sensor/" + boost::lexical_cast<std::string>(sensor_position) + "/";
+
   //get echo pin from parameters
   int echo_pin;
-  if (!node_private.getParam("/proximity_sensor/front/echo_pin", echo_pin))
+  if (!node_private.getParam(parameter_path + "echo_pin", echo_pin))
   {
     ROS_ERROR("[proximity_sensor_node] proximity sensor echo pin not defined in config file: avc_bringup/config/global.yaml");
     ROS_BREAK();
   }
 
+  //get refresh rate of sensor in hertz
+  float refresh_rate;
+  if (!node_private.getParam("/sensor/proximity_sensor/refresh_rate", refresh_rate))
+  {
+    ROS_ERROR("[proximity_sensor_node] sensor refresh rate not defined in config file: avc_sensors/config/sensors.yaml");
+    ROS_BREAK();
+  }
+
   //get trigger pin from parameters
   int trigger_pin;
-  if (!node_private.getParam("/proximity_sensor/front/trigger_pin", trigger_pin))
+  if (!node_private.getParam(parameter_path + "trigger_pin", trigger_pin))
   {
     ROS_ERROR("[proximity_sensor_node] proximity sensor trigger pin not defined in config file: avc_bringup/config/global.yaml");
     ROS_BREAK();
@@ -205,14 +227,6 @@ int main(int argc, char **argv)
 
   //create publisher to publish proximity sensor message with buffer size 10, and latch set to false
   ros::Publisher proximity_pub = node_public.advertise<sensor_msgs::Range>("proximity", 10, false);
-
-  //get refresh rate of sensor in hertz
-  float refresh_rate;
-  if (!node_private.getParam("/sensor/proximity_sensor/refresh_rate", refresh_rate))
-  {
-    ROS_ERROR("[proximity_sensor_node] sensor refresh rate not defined in config file: avc_sensors/config/sensors.yaml");
-    ROS_BREAK();
-  }
 
   //create buffer for storing five most recent readings to be used by median filter
   //int numReadings = 0;
