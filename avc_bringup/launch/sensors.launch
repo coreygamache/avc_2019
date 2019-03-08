@@ -43,7 +43,15 @@
 
   <!-- if proximity sensor is enabled, launch proximity sensor publisher node and broadcast transform -->
   <group if="$(arg sensors_proximity_enable)">
-    <node name="proximity_sensor_node" pkg="avc_sensors" type="proximity_sensor_node" ns="sensor" output="screen" />
+    <node name="proximity_sensor_front_node" pkg="avc_sensors" type="proximity_sensor_node" ns="sensor" output="screen">
+      <remap from="/sensor/proximity" to="/sensor/proximity/front" />
+    </node>
+    <node name="proximity_sensor_left_node" pkg="avc_sensors" type="proximity_sensor_node" ns="sensor" output="screen">
+      <remap from="/sensor/proximity" to="/sensor/proximity/left" />
+    </node>
+    <node name="proximity_sensor_right_node" pkg="avc_sensors" type="proximity_sensor_node" ns="sensor" output="screen">
+      <remap from="/sensor/proximity" to="/sensor/proximity/right" />
+    </node>
     <!-- <node name="proximity_sensor_link_broadcaster" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 base_link proximity_sensor_link" /> -->
   </group>
 
