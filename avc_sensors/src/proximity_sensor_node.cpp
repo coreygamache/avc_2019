@@ -27,7 +27,7 @@ void sigintHandler(int sig)
 int medianFilter(int datum)
 {
 
-  /*struct pair
+  struct pair
   {
     struct pair *point;                                //Pointers forming list linked in sorted order
     uint16_t value;                                    //Values to sort
@@ -102,8 +102,8 @@ int medianFilter(int datum)
     scan = scan->point;
   }
 
- return median->value;*/
- return 0;
+ return median->value;
+
 }
 
 //median filter using simple sorting logic
