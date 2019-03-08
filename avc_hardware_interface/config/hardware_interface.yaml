@@ -9,6 +9,7 @@ esc_node:
 
 servoblaster:
   esc_servo_number: 0 # GPIO pin #4 (BCM)
+  force_output_time: 0.5 # time allowed before a servo output is forced [s]
   sb_driver_path: "/dev/servoblaster"
   ss_servo_number: 1 # GPIO pin #17 (BCM)
 
