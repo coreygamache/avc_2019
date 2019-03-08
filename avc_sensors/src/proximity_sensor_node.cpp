@@ -27,64 +27,64 @@ void sigintHandler(int sig)
 int medianFilter(int datum)
 {
 
-  struct pair
+  /*struct pair
   {
-    struct pair *point;                                /* Pointers forming list linked in sorted order */
-    uint16_t value;                                    /* Values to sort */
+    struct pair *point;                                //Pointers forming list linked in sorted order
+    uint16_t value;                                    //Values to sort
   };
 
-  static struct pair buffer[MEDIAN_FILTER_SIZE] = {0}; /* Buffer of nwidth pairs */
-  static struct pair *datpoint = buffer;               /* Pointer into circular buffer of data */
-  static struct pair small = {NULL, STOPPER};          /* Chain stopper */
-  static struct pair big = {&small, 0};                /* Pointer to head (largest) of linked list.*/
+  static struct pair buffer[MEDIAN_FILTER_SIZE] = {0}; //Buffer of nwidth pairs
+  static struct pair *datpoint = buffer;               //Pointer into circular buffer of data
+  static struct pair small = {NULL, STOPPER};          //Chain stopper
+  static struct pair big = {&small, 0};                //Pointer to head (largest) of linked list
 
-  struct pair *successor;                              /* Pointer to successor of replaced data item */
-  struct pair *scan;                                   /* Pointer used to scan down the sorted list */
-  struct pair *scanold;                                /* Previous value of scan */
-  struct pair *median;                                 /* Pointer to median */
+  struct pair *successor;                              //Pointer to successor of replaced data item
+  struct pair *scan;                                   //Pointer used to scan down the sorted list
+  struct pair *scanold;                                //Previous value of scan
+  struct pair *median;                                 //Pointer to median
 
   if (datum == STOPPER)
-    datum = STOPPER + 1;                               /* No stoppers allowed. */
+    datum = STOPPER + 1;                               //No stoppers allowed
 
   if ((datpoint++ - buffer) >= MEDIAN_FILTER_SIZE)
-    datpoint = buffer;                                 /* Increment and wrap data in pointer.*/
+    datpoint = buffer;                                 //Increment and wrap data in pointer
 
-  datpoint->value = datum;                             /* Copy in new datum */
-  successor = datpoint->point;                         /* Save pointer to old value's successor */
-  median = &big;                                       /* Median initially to first in chain */
-  scanold = NULL;                                      /* Scanold initially null. */
-  scan = &big;                                         /* Points to pointer to first (largest) datum in chain */
+  datpoint->value = datum;                             //Copy in new datum
+  successor = datpoint->point;                         //Save pointer to old value's successor
+  median = &big;                                       //Median initially to first in chain
+  scanold = NULL;                                      //Scanold initially null
+  scan = &big;                                         //Points to pointer to first (largest) datum in chain
 
-  /* Handle chain-out of first item in chain as special case */
+  //Handle chain-out of first item in chain as special case
   if (scan->point == datpoint)
     scan->point = successor;
 
-  scanold = scan;                                      /* Save this pointer and   */
-  scan = scan->point ;                                 /* step down chain */
+  scanold = scan;                                      //Save this pointer and
+  scan = scan->point ;                                 //step down chain
 
-  /* Loop through the chain, normal loop exit via break. */
+  //Loop through the chain, normal loop exit via break
   for (int i = 0 ; i < MEDIAN_FILTER_SIZE; i++)
   {
 
-    /* Handle odd-numbered item in chain  */
+    //Handle odd-numbered item in chain
     if (scan->point == datpoint)
-      scan->point = successor;                         /* Chain out the old datum.*/
+      scan->point = successor;                         //Chain out the old datum
 
-    if (scan->value < datum)                           /* If datum is larger than scanned value,*/
+    if (scan->value < datum)                           //If datum is larger than scanned value,
     {
-      datpoint->point = scanold->point;                /* Chain it in here.  */
-      scanold->point = datpoint;                       /* Mark it chained in. */
+      datpoint->point = scanold->point;                //Chain it in here
+      scanold->point = datpoint;                       //Mark it chained in
       datum = STOPPER;
     }
 
-    /* Step median pointer down chain after doing odd-numbered element */
-    median = median->point;                            /* Step median pointer.  */
+    //Step median pointer down chain after doing odd-numbered element
+    median = median->point;                            //Step median pointer
     if (scan == &small)
-      break;                                           /* Break at end of chain  */
-    scanold = scan;                                    /* Save this pointer and   */
-    scan = scan->point;                                /* step down chain */
+      break;                                           //Break at end of chain
+    scanold = scan;                                    //Save this pointer and
+    scan = scan->point;                                //step down chain
 
-    /* Handle even-numbered item in chain.  */
+    //Handle even-numbered item in chain.
     if (scan->point == datpoint)
       scan->point = successor;
 
@@ -102,7 +102,8 @@ int medianFilter(int datum)
     scan = scan->point;
   }
 
- return median->value;
+ return median->value;*/
+ return 0;
 }
 
 //median filter using simple sorting logic
@@ -243,7 +244,7 @@ int main(int argc, char **argv)
 
     //get distance to nearest object from proximity sensor with 25ms timeout [m]
     //lastReadings[numReadings++ % 5] = sensor.getDistance(25) * 1000;
-    proximity_msg.range = medianFilter(sensor.getDistance(25));
+    proximity_msg.range = medianFilter(int(sensor.getDistance(25) * 1000)) / 1000;
 
     //set message range value to median filtered sensor reading [m]
     //proximity_msg.range = float(medianFilter(lastReadings)) / 1000;
