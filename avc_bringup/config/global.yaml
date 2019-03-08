@@ -24,11 +24,11 @@ proximity_sensor:
     echo_pin: 4
     trigger_pin: 5
   left:
-    echo_pin: 26
-    trigger_pin: 31
-  right:
     echo_pin: 21
     trigger_pin: 22
+  right:
+    echo_pin: 31
+    trigger_pin: 26
 
 # steering servo parameters
 steering_servo:
