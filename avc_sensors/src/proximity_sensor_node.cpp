@@ -5,10 +5,6 @@
 #include <signal.h>
 #include <string.h>
 
-//macro definitions for median filter (sorting method)
-#define swap(a,b) a^=b; b^=a; a^=b;
-#define sort(a,b) if(a>b) { swap(a,b); }
-
 //macro definitions for median filter (algorithm method)
 #define STOPPER 0 // smaller than any datum
 #define MEDIAN_FILTER_SIZE 7
@@ -103,25 +99,6 @@ int medianFilter(int datum)
   }
 
  return median->value;
-
-}
-
-//median filter using simple sorting logic
-int medianFilterSorted(int lastReadings[])
-{
-
-    //perform optimal combination of sorts to produce sorted array
-    sort(lastReadings[0], lastReadings[1]);
-    sort(lastReadings[3], lastReadings[4]);
-    sort(lastReadings[0], lastReadings[2]);
-    sort(lastReadings[1], lastReadings[2]);
-    sort(lastReadings[0], lastReadings[3]);
-    sort(lastReadings[2], lastReadings[3]);
-    sort(lastReadings[1], lastReadings[4]);
-    sort(lastReadings[1], lastReadings[2]);
-
-    //return middle value of sorted array (the median value)
-    return lastReadings[2];
 
 }
 
@@ -238,10 +215,6 @@ int main(int argc, char **argv)
   //create publisher to publish proximity sensor message with buffer size 10, and latch set to false
   ros::Publisher proximity_pub = node_public.advertise<sensor_msgs::Range>("proximity", 10, false);
 
-  //create buffer for storing five most recent readings to be used by median filter
-  //int numReadings = 0;
-  //int lastReadings[5] = { -1, -1, -1, -1, -1 };
-
   //set refresh rate of ROS loop to defined refresh rate of sensor parameter
   ros::Rate loop_rate(refresh_rate);
 
@@ -263,12 +236,6 @@ int main(int argc, char **argv)
 
     //set message range value to median filtered sensor reading [m]
     proximity_msg.range = float(medianFilter(int(distance * 1000))) / 1000;
-
-    ROS_INFO("[proximity_sensor_node] raw sensor distance: %f, filtered distance: %f", distance, proximity_msg.range);
-
-    //sorting method
-    //lastReadings[numReadings++ % 5] = sensor.getDistance(timeout) * 1000;
-    //proximity_msg.range = float(medianFilter(lastReadings)) / 1000;
 
     //publish proximity sensor range message
     proximity_pub.publish(proximity_msg);
