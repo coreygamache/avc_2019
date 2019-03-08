@@ -139,18 +139,18 @@ int main(int argc, char **argv)
   //override the default SIGINT handler
   signal(SIGINT, sigintHandler);
 
-  //define encoder_number via passed argument
-  /*char *sensor_position;
+  //define sensor position via passed argument
+  char *sensor_position;
   if (argc == 2)
     sensor_position = argv[1];
   else
   {
     ROS_ERROR("[proximity_sensor_node] received incorrect number of arguments");
     ROS_BREAK();
-  }*/
+  }
 
   //set node parameter path for retrieving parameters from parameter server for this node
-  std::string parameter_path = "/proximity_sensor/front/";//"/proximity_sensor/" + boost::lexical_cast<std::string>(sensor_position) + "/";
+  std::string parameter_path = "/proximity_sensor/" + boost::lexical_cast<std::string>(sensor_position) + "/";
 
   //get echo pin from parameters
   int echo_pin;
@@ -224,6 +224,15 @@ int main(int argc, char **argv)
   }
   proximity_msg.max_range = max_range;
 
+  //get timeout value of proximity sensor from parameter server [ms]
+  float timeout;
+  if (!node_private.getParam("/sensor/proximity_sensor/timeout", timeout))
+  {
+    ROS_ERROR("[proximity_sensor_node] proximity sensor timeout not defined in config file: avc_sensors/config/sensors.yaml");
+    ROS_BREAK();
+  }
+  proximity_msg.max_range = max_range;
+
   //----------------------------------------------------------
 
   //create publisher to publish proximity sensor message with buffer size 10, and latch set to false
@@ -242,19 +251,22 @@ int main(int argc, char **argv)
     //set time of current distance reading
     proximity_msg.header.stamp = ros::Time::now();
 
-    //get distance to nearest object from proximity sensor with 25ms timeout [m]
-    //lastReadings[numReadings++ % 5] = sensor.getDistance(25) * 1000;
-    proximity_msg.range = medianFilter(int(sensor.getDistance(25) * 1000)) / 1000;
-
-    //set message range value to median filtered sensor reading [m]
-    //proximity_msg.range = float(medianFilter(lastReadings)) / 1000;
+    //get distance to nearest object from proximity sensor with defined timeout [m]
+    float distance = sensor.getDistance(timeout);
 
     //verify distance from proximity sensor is valid
     //if distance check timed out then report max range
-    if ((proximity_msg.range == -1) || (proximity_msg.range > max_range))
-      proximity_msg.range = max_range;
-    else if (proximity_msg.range < min_range)
-      proximity_msg.range = min_range;
+    if ((distance == -1) || (distance > max_range))
+      distance = max_range;
+    else if (distance < min_range)
+      distance = min_range;
+
+    //set message range value to median filtered sensor reading [m]
+    proximity_msg.range = medianFilter(int(distance * 1000)) / 1000;
+
+    //sorting method
+    //lastReadings[numReadings++ % 5] = sensor.getDistance(timeout) * 1000;
+    //proximity_msg.range = float(medianFilter(lastReadings)) / 1000;
 
     //publish proximity sensor range message
     proximity_pub.publish(proximity_msg);
