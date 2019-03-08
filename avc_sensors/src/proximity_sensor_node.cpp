@@ -262,7 +262,9 @@ int main(int argc, char **argv)
       distance = min_range;
 
     //set message range value to median filtered sensor reading [m]
-    proximity_msg.range = medianFilter(int(distance * 1000)) / 1000;
+    proximity_msg.range = float(medianFilter(int(distance * 1000))) / 1000;
+
+    ROS_INFO("[proximity_sensor_node] raw sensor distance: %f, filtered distance: %f", distance, proximity_msg.range);
 
     //sorting method
     //lastReadings[numReadings++ % 5] = sensor.getDistance(timeout) * 1000;
