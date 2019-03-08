@@ -30,7 +30,7 @@ int medianFilter(int datum)
   struct pair
   {
     struct pair *point;                                //Pointers forming list linked in sorted order
-    uint16_t value;                                    //Values to sort
+    int value;                                         //Values to sort
   };
 
   static struct pair buffer[MEDIAN_FILTER_SIZE] = {0}; //Buffer of nwidth pairs
@@ -46,7 +46,7 @@ int medianFilter(int datum)
   if (datum == STOPPER)
     datum = STOPPER + 1;                               //No stoppers allowed
 
-  if ((datpoint++ - buffer) >= MEDIAN_FILTER_SIZE)
+  if ((++datpoint - buffer) >= MEDIAN_FILTER_SIZE)
     datpoint = buffer;                                 //Increment and wrap data in pointer
 
   datpoint->value = datum;                             //Copy in new datum
@@ -63,7 +63,7 @@ int medianFilter(int datum)
   scan = scan->point ;                                 //step down chain
 
   //Loop through the chain, normal loop exit via break
-  for (int i = 0 ; i < MEDIAN_FILTER_SIZE; i++)
+  for (int i = 0 ; i < MEDIAN_FILTER_SIZE; ++i)
   {
 
     //Handle odd-numbered item in chain
