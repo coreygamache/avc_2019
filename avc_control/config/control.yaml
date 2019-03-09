@@ -1,7 +1,6 @@
 collision_avoidance_node:
-  danger_threshold: 0.1 # [m]
   refresh_rate: 50
-  warning_threshold: 1.0 # [m]
+  threshold_distance: 1.0 # [m]
 
 control_node:
   refresh_rate: 10
