@@ -5,6 +5,11 @@
 arduino:
   i2c_address: 0x04 # i2c protocol address
 
+driving:
+  k_throttle_decay: -1.6 # throttle decay constant (throttle % = e^(steering_angle / max_rotation_angle * k_throttle_decay))
+  maximum_throttle: 25
+  minimum_throttle: 12
+
 # controller parameters
 joy_node:
   dev: "/dev/input/js0"
