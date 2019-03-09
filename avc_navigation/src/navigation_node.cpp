@@ -169,14 +169,29 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
-  //retrieve minimum throttle value from parameter server [%]
-  float minimum_throttle;
-  if (!node_private.getParam("/navigation/navigation_node/minimum_throttle", minimum_throttle))
+  //retrieve throttle decay constant value from parameter server
+  float k_throttle_decay;
+  if (!node_private.getParam("/driving/k_throttle_decay", k_throttle_decay))
   {
-    ROS_ERROR("[navigation_node] minimum throttle not defined in config file: avc_navigation/config/navigation.yaml");
+    ROS_ERROR("[navigation_node] minimum throttle not defined in config file: avc_bringup/config/global.yaml");
     ROS_BREAK();
   }
 
+  //retrieve maximum throttle value from parameter server [%]
+  float maximum_throttle;
+  if (!node_private.getParam("/driving/maximum_throttle", maximum_throttle))
+  {
+    ROS_ERROR("[navigation_node] minimum throttle not defined in config file: avc_bringup/config/global.yaml");
+    ROS_BREAK();
+  }
+
+  //retrieve minimum throttle value from parameter server [%]
+  float minimum_throttle;
+  if (!node_private.getParam("/driving/minimum_throttle", minimum_throttle))
+  {
+    ROS_ERROR("[navigation_node] minimum throttle not defined in config file: avc_bringup/config/global.yaml");
+    ROS_BREAK();
+  }
 
   //retrieve map waypoint delay from parameter server [ms]
   std::string output_file_path;
@@ -356,20 +371,20 @@ int main(int argc, char **argv)
         else
           steering_servo_msg.steering_angle = error;
 
+        //set time of steering servo message and publish
+        steering_servo_msg.header.stamp = ros::Time::now();
+        steering_servo_pub.publish(steering_servo_msg);
+
         //calculate throttle percent from resulting steering angle
-        esc_msg.throttle_percent = (1 - (fabs(error) / servo_max_angle)) * 100;
+        esc_msg.throttle_percent = maximum_throttle * exp(steering_servo_msg.steering_angle / servo_max_angle * k_throttle_decay);
 
         //if throttle percent is requested below minimum value, set to minimum value
-        //if (esc_msg.throttle_percent < minimum_throttle)
+        if (esc_msg.throttle_percent < minimum_throttle)
           esc_msg.throttle_percent = minimum_throttle;
 
         //set time of ESC message and publish
         esc_msg.header.stamp = ros::Time::now();
         esc_pub.publish(esc_msg);
-
-        //set time of steering servo message and publish
-        steering_servo_msg.header.stamp = ros::Time::now();
-        steering_servo_pub.publish(steering_servo_msg);
 
         //------------------------DISTANCE TO NEXT WAYPOINT CALCULATION-------------------------
 
