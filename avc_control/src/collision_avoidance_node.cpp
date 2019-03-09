@@ -93,7 +93,7 @@ int main(int argc, char **argv)
   //override the default SIGINT handler
   signal(SIGINT, sigintHandler);
 
-  //retrieve collision avoidance braking constant value from parameter server [%]
+  //retrieve collision avoidance braking constant value from parameter server
   float k_collision_brake;
   if (!node_private.getParam("/driving/k_collision_brake", k_collision_brake))
   {
@@ -101,7 +101,7 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
-  //retrieve collision avoidance steering constant value from parameter server [%]
+  //retrieve collision avoidance steering constant value from parameter server
   float k_collision_steer;
   if (!node_private.getParam("/driving/k_collision_steer", k_collision_steer))
   {
@@ -124,6 +124,15 @@ int main(int argc, char **argv)
     ROS_ERROR("[collision_avoidance_node] collision avoidance node refresh rate not defined in config file: avc_control/config/control.yaml");
     ROS_BREAK();
   }
+
+  //retrieve maximum steering angle value from parameter server [deg]
+  loat max_steering_angle;
+  if (!node_private.getParam("/steering_servo/max_rotation_angle", max_steering_angle))
+  {
+    ROS_ERROR("[collision_avoidance_node] maximum steering angle not defined in config file: avc_bringup/config/global.yaml");
+    ROS_BREAK();
+  }
+  f
 
   //retrieve algorithm engagement threshold distance from parameter server
   float threshold_distance;
@@ -175,10 +184,49 @@ int main(int argc, char **argv)
     if (autonomous_control)
     {
 
-      //if robot is within warning distance threshold then reduce throttle proportionally to distance from nearest object
-      //robot will stop at danger distance threshold at which point it must be manually moved away from the object
-//      if ((range_to_nearest > 0) && (range_to_nearest < warning_threshold))
-//        throttle_percent = throttle_percent * ((range_to_nearest - danger_threshold) / (warning_threshold - danger_threshold));
+      //engage collision avoidance algorithm if there's an obstacle within the threshold distance
+      if (range_front < threshold_distance)
+      {
+
+        //calculate steering correction value
+        float steering_correction = k_collision_steer * (1 - (range_front / threshold_distance));
+
+        //handle case: steering left is safer
+        if (range_left < range_right)
+          steering_angle += steering_correction;
+        //handle case: steering right is safer
+        else if (range_left > range_right)
+          steering_angle -= steering_correction;
+        //handle case: left and right are equally safe
+        else
+        {
+
+          //continue steering in current steering direction (default left if current steering angle is zero)
+          if (steering_angle >= 0)
+            steering_angle += steering_correction;
+          else
+            steering_angle -= steering_correction;
+
+        }
+
+      }
+
+      //validate steering angle
+      if (steering_angle < -max_steering_angle)
+        steering_angle = -max_steering_angle;
+      else if (steering_angle > max_steering_angle)
+        steering_angle = max_steering_angle;
+
+      //set time of steering servo message
+      steering_servo_msg.header.stamp = ros::Time::now();
+
+      //set steering servo message steering angle value to latest value
+      steering_servo_msg.steering_angle = steering_angle;
+
+      //publish steering servo
+      steering_servo_pub.publish(steering_servo_msg);
+
+      throttle_percent = throttle_percent * k_collision_brake * (1 - (range_front / threshold_distance));
 
       //if throttle percent is below set threshold then set to zero
       if (throttle_percent < minimum_throttle)
@@ -193,14 +241,7 @@ int main(int argc, char **argv)
       //publish esc message
       esc_pub.publish(esc_msg);
 
-      //set time of steering servo message
-      steering_servo_msg.header.stamp = ros::Time::now();
 
-      //set steering servo message steering angle value to latest value
-      steering_servo_msg.steering_angle = steering_angle;
-
-      //publish steering servo
-      steering_servo_pub.publish(steering_servo_msg);
 
     }
 
