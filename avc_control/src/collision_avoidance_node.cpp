@@ -49,7 +49,7 @@ void rangeFrontCallback(const sensor_msgs::Range::ConstPtr& msg)
 {
 
   //change local control mode to match message
-  range_to_nearest = msg->range;
+  range_front = msg->range;
 
 }
 
@@ -58,7 +58,7 @@ void rangeLeftCallback(const sensor_msgs::Range::ConstPtr& msg)
 {
 
   //change local control mode to match message
-  range_to_nearest = msg->range;
+  range_left = msg->range;
 
 }
 
@@ -67,7 +67,7 @@ void rangeRightCallback(const sensor_msgs::Range::ConstPtr& msg)
 {
 
   //change local control mode to match message
-  range_to_nearest = msg->range;
+  range_right = msg->range;
 
 }
 
@@ -126,13 +126,12 @@ int main(int argc, char **argv)
   }
 
   //retrieve maximum steering angle value from parameter server [deg]
-  loat max_steering_angle;
+  float max_steering_angle;
   if (!node_private.getParam("/steering_servo/max_rotation_angle", max_steering_angle))
   {
     ROS_ERROR("[collision_avoidance_node] maximum steering angle not defined in config file: avc_bringup/config/global.yaml");
     ROS_BREAK();
   }
-  f
 
   //retrieve algorithm engagement threshold distance from parameter server
   float threshold_distance;
@@ -163,13 +162,13 @@ int main(int argc, char **argv)
   ros::Subscriber esc_sub = node_public.subscribe("/navigation/esc_raw", 1000, escCallback);
 
   //create subscriber to subscribe to front proximity message topic with queue size set to 1000
-  ros::Subscriber range_sub = node_public.subscribe("/sensor/proximity/front", 1000, rangeFrontCallback);
+  ros::Subscriber range_front_sub = node_public.subscribe("/sensor/proximity/front", 1000, rangeFrontCallback);
 
   //create subscriber to subscribe to left proximity message topic with queue size set to 1000
-  ros::Subscriber range_sub = node_public.subscribe("/sensor/proximity/left", 1000, rangeLeftCallback);
+  ros::Subscriber range_left_sub = node_public.subscribe("/sensor/proximity/left", 1000, rangeLeftCallback);
 
   //create subscriber to subscribe to right proximity message topic with queue size set to 1000
-  ros::Subscriber range_sub = node_public.subscribe("/sensor/proximity/right", 1000, rangeRightCallback);
+  ros::Subscriber range_right_sub = node_public.subscribe("/sensor/proximity/right", 1000, rangeRightCallback);
 
   //create subscriber to subscribe to steering servo message topic with queue size set to 1000
   ros::Subscriber steering_servo_sub = node_public.subscribe("/navigation/steering_servo_raw", 1000, steeringServoCallback);
@@ -240,8 +239,6 @@ int main(int argc, char **argv)
 
       //publish esc message
       esc_pub.publish(esc_msg);
-
-
 
     }
 
