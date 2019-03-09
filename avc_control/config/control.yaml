@@ -1,6 +1,5 @@
 collision_avoidance_node:
   danger_threshold: 0.1 # [m]
-  minimum_throttle: 10 # [%]
   refresh_rate: 50
   warning_threshold: 1.0 # [m]
 
