@@ -10,7 +10,9 @@
 
 //global variables
 bool autonomous_control = false;
-float range_to_nearest = -1; //range to nearest object [m]
+float range_front = 9999; //front sensor range to nearest object [m]
+float range_left = 9999; //left sensor range to nearest object [m]
+float range_right = 9999; //right sensor range to nearest object [m]
 float throttle_percent = 0; //requested throttle position [%]
 float steering_angle = 0; //requested steering angle [deg]
 
@@ -42,8 +44,26 @@ void escCallback(const avc_msgs::ESC::ConstPtr& msg)
 
 }
 
-//callback function called to process messages on control topic
-void rangeCallback(const sensor_msgs::Range::ConstPtr& msg)
+//callback function called to process messages on front range topic
+void rangeFrontCallback(const sensor_msgs::Range::ConstPtr& msg)
+{
+
+  //change local control mode to match message
+  range_to_nearest = msg->range;
+
+}
+
+//callback function called to process messages on left range topic
+void rangeLeftCallback(const sensor_msgs::Range::ConstPtr& msg)
+{
+
+  //change local control mode to match message
+  range_to_nearest = msg->range;
+
+}
+
+//callback function called to process messages on right range topic
+void rangeRightCallback(const sensor_msgs::Range::ConstPtr& msg)
 {
 
   //change local control mode to match message
@@ -73,19 +93,27 @@ int main(int argc, char **argv)
   //override the default SIGINT handler
   signal(SIGINT, sigintHandler);
 
-  //retrieve danger distance threshold from parameter server
-  float danger_threshold;
-  if (!node_private.getParam("/control/collision_avoidance_node/danger_threshold", danger_threshold))
+  //retrieve collision avoidance braking constant value from parameter server [%]
+  float k_collision_brake;
+  if (!node_private.getParam("/driving/k_collision_brake", k_collision_brake))
   {
-    ROS_ERROR("[collision_avoidance_node] danger distance threshold not defined in config file: avc_control/config/control.yaml");
+    ROS_ERROR("[collision_avoidance_node] collision avoidance braking constant not defined in config file: avc_bringup/config/global.yaml");
     ROS_BREAK();
   }
 
-  //retrieve warning distance threshold from parameter server
-  float minimum_throttle;
-  if (!node_private.getParam("/control/collision_avoidance_node/minimum_throttle", minimum_throttle))
+  //retrieve collision avoidance steering constant value from parameter server [%]
+  float k_collision_steer;
+  if (!node_private.getParam("/driving/k_collision_steer", k_collision_steer))
   {
-    ROS_ERROR("[collision_avoidance_node] minimum throttle threshold not defined in config file: avc_control/config/control.yaml");
+    ROS_ERROR("[collision_avoidance_node] collision avoidance steering constant not defined in config file: avc_bringup/config/global.yaml");
+    ROS_BREAK();
+  }
+
+  //retrieve minimum throttle value from parameter server [%]
+  float minimum_throttle;
+  if (!node_private.getParam("/driving/minimum_throttle", minimum_throttle))
+  {
+    ROS_ERROR("[collision_avoidance_node] minimum throttle not defined in config file: avc_bringup/config/global.yaml");
     ROS_BREAK();
   }
 
@@ -97,11 +125,11 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
-  //retrieve warning distance threshold from parameter server
-  float warning_threshold;
-  if (!node_private.getParam("/control/collision_avoidance_node/warning_threshold", warning_threshold))
+  //retrieve algorithm engagement threshold distance from parameter server
+  float threshold_distance;
+  if (!node_private.getParam("/control/collision_avoidance_node/threshold_distance", threshold_distance))
   {
-    ROS_ERROR("[collision_avoidance_node] warning distance threshold not defined in config file: avc_control/config/control.yaml");
+    ROS_ERROR("[collision_avoidance_node] threshold distance not defined in config file: avc_control/config/control.yaml");
     ROS_BREAK();
   }
 
@@ -125,8 +153,14 @@ int main(int argc, char **argv)
   //create subscriber to subscribe to ESC message topic with queue size set to 1000
   ros::Subscriber esc_sub = node_public.subscribe("/navigation/esc_raw", 1000, escCallback);
 
-  //create subscriber to subscribe to proximity message topic with queue size set to 1000
-  ros::Subscriber range_sub = node_public.subscribe("/sensor/proximity", 1000, rangeCallback);
+  //create subscriber to subscribe to front proximity message topic with queue size set to 1000
+  ros::Subscriber range_sub = node_public.subscribe("/sensor/proximity/front", 1000, rangeFrontCallback);
+
+  //create subscriber to subscribe to left proximity message topic with queue size set to 1000
+  ros::Subscriber range_sub = node_public.subscribe("/sensor/proximity/left", 1000, rangeLeftCallback);
+
+  //create subscriber to subscribe to right proximity message topic with queue size set to 1000
+  ros::Subscriber range_sub = node_public.subscribe("/sensor/proximity/right", 1000, rangeRightCallback);
 
   //create subscriber to subscribe to steering servo message topic with queue size set to 1000
   ros::Subscriber steering_servo_sub = node_public.subscribe("/navigation/steering_servo_raw", 1000, steeringServoCallback);
@@ -143,8 +177,8 @@ int main(int argc, char **argv)
 
       //if robot is within warning distance threshold then reduce throttle proportionally to distance from nearest object
       //robot will stop at danger distance threshold at which point it must be manually moved away from the object
-      if ((range_to_nearest > 0) && (range_to_nearest < warning_threshold))
-        throttle_percent = throttle_percent * ((range_to_nearest - danger_threshold) / (warning_threshold - danger_threshold));
+//      if ((range_to_nearest > 0) && (range_to_nearest < warning_threshold))
+//        throttle_percent = throttle_percent * ((range_to_nearest - danger_threshold) / (warning_threshold - danger_threshold));
 
       //if throttle percent is below set threshold then set to zero
       if (throttle_percent < minimum_throttle)
