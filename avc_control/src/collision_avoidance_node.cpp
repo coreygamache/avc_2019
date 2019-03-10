@@ -232,11 +232,11 @@ int main(int argc, char **argv)
           steering_angle = max_steering_angle;
 
         //calculate corrected throttle value
-        throttle_percent = throttle_percent * k_collision_brake * (1 - (range_front / threshold_distance));
+        throttle_percent -= throttle_percent * k_collision_brake * (1 - (range_front / threshold_distance));
 
-        //if throttle percent is below set threshold then set to zero
-        if (throttle_percent < minimum_throttle)
-          throttle_percent = 0;
+        //if going forward and throttle percent is below set threshold then set to zero
+        if ((throttle_percent > 0) && (throttle_percent < minimum_throttle))
+          throttle_percent = minimum_throttle;
 
       }
 
