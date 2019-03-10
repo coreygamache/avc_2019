@@ -20,7 +20,7 @@ __nmea_navsat_driver__: http://wiki.ros.org/nmea_navsat_driver<br>
 __RTIMULib2__: https://github.com/Nick-Currawong/RTIMULib2<br><br>
 __*Note*__: All software is compiled run on Ubuntu MATE 16.04 with ROS Kinetic on Raspberry Pi. Requires C++ 11 to compile. Special thanks to Stack Exchange for holding the answer to every programming question imaginable.<br>
 ## Setup ##
-1. Build the robot.<br>
+1. Build the robot. Bear in mind that the IMU must be oriented with the compass's x-axis pointing toward the front of the robot, and its y-axis pointing to the right (its z-axis will thus be pointing into the ground, following the right hand rule). Do not confuse the coordinate frames of the accelerometers and the compass; they are different. Refer to your particular breakout's documentation if necessary.<br>
 2. Install Ubuntu MATE 16.04, ROS Kinetic, WiringPi, catkin-tools, RTIMUImuLib2 on your Raspberry Pi.<br>
 3. Enable serial, i2c, and SPI in raspi-config (DO NOT enable console via serial).<br>
 4. Install nmea_navsat_driver and Joy ROS packages.<br>
