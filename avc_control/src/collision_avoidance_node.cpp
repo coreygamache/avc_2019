@@ -1,6 +1,7 @@
 //control node
 //this node controls control mode changing via controller button press
 #include <errno.h>
+#include <math.h>
 #include <ros/ros.h>
 #include <avc_msgs/Control.h>
 #include <avc_msgs/ESC.h>
@@ -224,20 +225,20 @@ int main(int argc, char **argv)
 
         }
 
+        //validate steering angle
+        if (steering_angle < -max_steering_angle)
+          steering_angle = -max_steering_angle;
+        else if (steering_angle > max_steering_angle)
+          steering_angle = max_steering_angle;
+
+        //calculate corrected throttle value
+        throttle_percent = throttle_percent * k_collision_brake * (1 - (range_front / threshold_distance));
+
+        //if throttle percent is below set threshold then set to zero
+        if (throttle_percent < minimum_throttle)
+          throttle_percent = 0;
+
       }
-
-      //validate steering angle
-      if (steering_angle < -max_steering_angle)
-        steering_angle = -max_steering_angle;
-      else if (steering_angle > max_steering_angle)
-        steering_angle = max_steering_angle;
-
-      //calculate corrected throttle value
-      throttle_percent = throttle_percent * k_collision_brake * (1 - (range_front / threshold_distance));
-
-      //if throttle percent is below set threshold then set to zero
-      if (throttle_percent < minimum_throttle)
-        throttle_percent = 0;
 
     }
 
