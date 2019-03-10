@@ -377,7 +377,7 @@ int main(int argc, char **argv)
 
         //calculate throttle percent from resulting steering angle
         //esc_msg.throttle_percent = maximum_throttle * exp(steering_servo_msg.steering_angle / servo_max_angle * k_throttle_decay);
-        esc_msg.throttle_percent = minimum_throttle;
+        esc_msg.throttle_percent = maximum_throttle;
 
         //if throttle percent is requested below minimum value, set to minimum value
         if (esc_msg.throttle_percent < minimum_throttle)
