@@ -93,6 +93,22 @@ int main(int argc, char **argv)
   //override the default SIGINT handler
   signal(SIGINT, sigintHandler);
 
+  //retrieve collision avoidance in autonomous mode enable status value from parameter server
+  bool collision_avoidance_autonomous;
+  if (!node_private.getParam("/driving/collision_avoidance_autonomous", collision_avoidance_autonomous))
+  {
+    ROS_ERROR("[collision_avoidance_node] collision avoidance enable (autonomous mode) not defined in config file: avc_bringup/config/global.yaml");
+    ROS_BREAK();
+  }
+
+  //retrieve collision avoidance in manual mode enable status value from parameter server
+  bool collision_avoidance_manual;
+  if (!node_private.getParam("/driving/collision_avoidance_manual", collision_avoidance_manual))
+  {
+    ROS_ERROR("[collision_avoidance_node] collision avoidance enable (manual mode) not defined in config file: avc_bringup/config/global.yaml");
+    ROS_BREAK();
+  }
+
   //retrieve collision avoidance braking constant value from parameter server
   float k_collision_brake;
   if (!node_private.getParam("/driving/k_collision_brake", k_collision_brake))
@@ -159,7 +175,7 @@ int main(int argc, char **argv)
   ros::Subscriber control_sub = node_public.subscribe("control", 1000, controlCallback);
 
   //create subscriber to subscribe to ESC message topic with queue size set to 1000
-  ros::Subscriber esc_sub = node_public.subscribe("/navigation/esc_raw", 1000, escCallback);
+  ros::Subscriber esc_sub = node_public.subscribe("/control/esc_raw", 1000, escCallback);
 
   //create subscriber to subscribe to front proximity message topic with queue size set to 1000
   ros::Subscriber range_front_sub = node_public.subscribe("/sensor/proximity/front", 1000, rangeFrontCallback);
@@ -171,7 +187,7 @@ int main(int argc, char **argv)
   ros::Subscriber range_right_sub = node_public.subscribe("/sensor/proximity/right", 1000, rangeRightCallback);
 
   //create subscriber to subscribe to steering servo message topic with queue size set to 1000
-  ros::Subscriber steering_servo_sub = node_public.subscribe("/navigation/steering_servo_raw", 1000, steeringServoCallback);
+  ros::Subscriber steering_servo_sub = node_public.subscribe("/control/steering_servo_raw", 1000, steeringServoCallback);
 
   //set loop rate in Hz
   ros::Rate loop_rate(refresh_rate);
@@ -179,8 +195,8 @@ int main(int argc, char **argv)
   while (ros::ok())
   {
 
-    //only enable collisioon avoidance logic in autonomous control mode
-    if (autonomous_control)
+    //engage collision avoidance algorithm if enabled in current driving mode
+    if ((autonomous_control && collision_avoidance_autonomous) || (!autonomous_control && collision_avoidance_manual))
     {
 
       //engage collision avoidance algorithm if there's an obstacle within the threshold distance
@@ -216,31 +232,24 @@ int main(int argc, char **argv)
       else if (steering_angle > max_steering_angle)
         steering_angle = max_steering_angle;
 
-      //set time of steering servo message
-      steering_servo_msg.header.stamp = ros::Time::now();
-
-      //set steering servo message steering angle value to latest value
-      steering_servo_msg.steering_angle = steering_angle;
-
-      //publish steering servo
-      steering_servo_pub.publish(steering_servo_msg);
-
+      //calculate corrected throttle value
       throttle_percent = throttle_percent * k_collision_brake * (1 - (range_front / threshold_distance));
 
       //if throttle percent is below set threshold then set to zero
       if (throttle_percent < minimum_throttle)
         throttle_percent = 0;
 
-      //set time of ESC message
-      esc_msg.header.stamp = ros::Time::now();
-
-      //set esc message throttle value to latest value
-      esc_msg.throttle_percent = throttle_percent;
-
-      //publish esc message
-      esc_pub.publish(esc_msg);
-
     }
+
+    //set steering servo message parameters and publish
+    steering_servo_msg.header.stamp = ros::Time::now();
+    steering_servo_msg.steering_angle = steering_angle;
+    steering_servo_pub.publish(steering_servo_msg);
+
+    //set ESC message parameters and publish
+    esc_msg.header.stamp = ros::Time::now();
+    esc_msg.throttle_percent = throttle_percent;
+    esc_pub.publish(esc_msg);
 
     //process callback functions
     ros::spinOnce();
