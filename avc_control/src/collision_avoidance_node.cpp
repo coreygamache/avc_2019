@@ -196,8 +196,8 @@ int main(int argc, char **argv)
   while (ros::ok())
   {
 
-    //engage collision avoidance algorithm if enabled in current driving mode
-    if ((autonomous_control && collision_avoidance_autonomous) || (!autonomous_control && collision_avoidance_manual))
+    //engage collision avoidance algorithm if enabled in current driving mode and moving forward
+    if ((autonomous_control && collision_avoidance_autonomous) || (!autonomous_control && collision_avoidance_manual) && (throttle_percent > 0))
     {
 
       //engage collision avoidance algorithm if there's an obstacle within the threshold distance
