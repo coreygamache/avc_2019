@@ -95,7 +95,7 @@ int main(int argc, char **argv)
 
   //retrieve collision avoidance in autonomous mode enable status value from parameter server
   bool collision_avoidance_autonomous;
-  if (!node_private.getParam("/driving/collision_avoidance_autonomous", collision_avoidance_autonomous))
+  if (!node_private.getParam("/driving_aids/collision_avoidance_autonomous", collision_avoidance_autonomous))
   {
     ROS_ERROR("[collision_avoidance_node] collision avoidance enable (autonomous mode) not defined in config file: avc_bringup/config/global.yaml");
     ROS_BREAK();
@@ -103,7 +103,7 @@ int main(int argc, char **argv)
 
   //retrieve collision avoidance in manual mode enable status value from parameter server
   bool collision_avoidance_manual;
-  if (!node_private.getParam("/driving/collision_avoidance_manual", collision_avoidance_manual))
+  if (!node_private.getParam("/driving_aids/collision_avoidance_manual", collision_avoidance_manual))
   {
     ROS_ERROR("[collision_avoidance_node] collision avoidance enable (manual mode) not defined in config file: avc_bringup/config/global.yaml");
     ROS_BREAK();
