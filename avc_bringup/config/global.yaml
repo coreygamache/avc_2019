@@ -16,7 +16,7 @@ driving:
 # driving aid control parameters
 driving_aids:
   collision_avoidance_autonomous: false
-  collision_avoidance_manual: false
+  collision_avoidance_manual: true
 
 # controller parameters
 joy_node:
