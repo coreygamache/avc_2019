@@ -3,9 +3,9 @@
 This is the public repository for the MTSU SME AVC team's robot for competition in the 2019 National Robotics Championship (NRC) Autonomous Vehicle Challenge (AVC). The goal of the Autonomous Vehicle Challenge is to autonomously navigate a provided course as quickly as possible, while avoiding certain obstacles and traversing others for bonus points. Competition rules constrain robot size and prohibit any outside communication with the robot with the exception of GPS signals.
 ## The Project ##
 This robot was built on very limited budget, utilizing off-the-shelf RC car parts and hobby-level electronics and sensors. It relies primarily on GPS for navigation, but features a number of additional sensors to improve localization, allow for obstacle avoidance, etc.<br><br>
-The robot has two control modes: manual and autonomous control. In manual control mode, the robot is controlled via BlueTooth with a controller. It can be driven like a typical RC car, and also has the ability to mark and save GPS waypoints. In autonomous mode the robot autonomously drives to the previously saved waypoints in the order they were entered. The hardware used is listed below, with the exception of typical electrical components (voltage regulators, resistors, etc.).
+The robot has two control modes: manual and autonomous control. In manual control mode, the robot is controlled via BlueTooth with a controller. It can be driven like a typical RC car, and also has the ability to mark and save GPS waypoints. In autonomous mode the robot autonomously drives to the previously saved waypoints in the order they were entered. The hardware used is listed below, with the exception of typical electrical components (voltage regulators, resistors, etc.).<br><br>
 __Chassis__: Tamiya "The Hornet" RC Car<br>
-__ESC__: HobbyWing QuicRun WP 1060 Brushed
+__ESC__: HobbyWing QuicRun WP 1060 Brushed<br>
 __Steering Servo__: Futaba S0003<br>
 __Microprocessors__: Raspberry Pi 3 Model B, Arduino Nano<br>
 __GPS__: Adafruit Ultimate GPS with Active Antenna<br>
