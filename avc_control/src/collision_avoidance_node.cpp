@@ -209,10 +209,10 @@ int main(int argc, char **argv)
 
         //handle case: steering left is safer
         if (range_left < range_right)
-          steering_angle += steering_correction;
+          steering_angle -= steering_correction;
         //handle case: steering right is safer
         else if (range_left > range_right)
-          steering_angle -= steering_correction;
+          steering_angle += steering_correction;
         //handle case: left and right are equally safe
         else
         {
