@@ -212,8 +212,11 @@ int main(int argc, char **argv)
         //set heading angle of heading msg to yaw value from IMU [rad]
         heading_msg.heading_angle = imu_data.fusionPose.z();
 
-        //normalize yaw value to compass heading in degrees (0 - 360 deg, magnetic heading = yaw - 90)
-        heading_msg.heading_angle = fmod((heading_msg.heading_angle / PI * 180) + 360, 360) - 90;
+        //convert from yaw [rad] to magnetic heading [deg] (magnetic heading = yaw - 90 deg)
+        heading_msg.heading_angle = (heading_msg.heading_angle / PI * 180) - 90;
+
+        //normalize yaw value to compass heading in degrees (0 - 360 deg)
+        heading_msg.heading_angle = fmod(heading_msg.heading_angle + 360, 360);
 
         //publish heading message
         heading_pub.publish(heading_msg);
