@@ -104,7 +104,7 @@ int main(int argc, char **argv)
     ROS_INFO("[gps_setup_node] opened serial device %s with baud rate %d", serial_port.c_str(), baud_rate);
 
   //sleep briefly before running command
-  ros::Duration(3.0).sleep();
+  ros::Duration(1.0).sleep();
 
   //----------------------------------------------------------------------------
   //-----------------------SEND COMMANDS TO GPS CHIP----------------------------
@@ -117,7 +117,7 @@ int main(int argc, char **argv)
     ROS_BREAK();
 
   //sleep briefly before running command
-  ros::Duration(3.0).sleep();
+  ros::Duration(1.0).sleep();
 
   //-----------------------SET CHIP DATA OUTPUT RATE----------------------------
 
@@ -126,7 +126,7 @@ int main(int argc, char **argv)
     ROS_BREAK();
 
   //sleep briefly before running command
-  ros::Duration(3.0).sleep();
+  ros::Duration(1.0).sleep();
 
   //-----------------------SET CHIP FIX UPDATE RATE-----------------------------
 
@@ -135,7 +135,7 @@ int main(int argc, char **argv)
     ROS_BREAK();
 
   //sleep briefly before running command
-  ros::Duration(3.0).sleep();
+  ros::Duration(1.0).sleep();
 
   //--------------------------SET CHIP BAUD RATE--------------------------------
 
@@ -144,7 +144,7 @@ int main(int argc, char **argv)
     ROS_BREAK();
 
   //sleep briefly before closing serial device
-  ros::Duration(3.0).sleep();
+  ros::Duration(1.0).sleep();
 
   //----------------------------------------------------------------------------
   //-----------------------END COMMANDS TO GPS CHIP-----------------------------
