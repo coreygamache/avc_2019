@@ -241,9 +241,12 @@ int main(int argc, char **argv)
         //calculate new throttle value
         throttle_percent -= throttle_correction;
 
-        //if going forward and throttle percent is below set threshold then set to zero
+        //if going forward and throttle percent is below set threshold then set both throttle and steering to zero
         if (throttle_percent < minimum_throttle)
+        {
+          steering_angle = 0;
           throttle_percent = 0;
+        }
 
       }
 
