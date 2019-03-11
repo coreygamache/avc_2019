@@ -30,10 +30,10 @@ int main(int argc, char **argv)
 {
 
   //send notification that node is launching
-  ROS_INFO("[NODE LAUNCH]: starting imu_pub_node");
+  ROS_INFO("[NODE LAUNCH]: starting imu_node");
 
   //initialize node and create node handler
-  ros::init(argc, argv, "imu_pub_node");
+  ros::init(argc, argv, "imu_node");
   ros::NodeHandle node_private("~");
   ros::NodeHandle node_public;
 
@@ -44,23 +44,31 @@ int main(int argc, char **argv)
   std::string calibration_file_path;
   if (!node_private.getParam("/sensor/imu/calibration_file_path", calibration_file_path))
   {
-    ROS_ERROR("calibration file not found");
+    ROS_ERROR("[imu_node] calibration file not found");
     ROS_BREAK();
   }
-  ROS_INFO("calibration file path: %s", calibration_file_path.c_str()); //output calibration file path (for testing)
+  //ROS_INFO("[imu_node] calibration file path: %s", calibration_file_path.c_str()); //output calibration file path (for testing)
 
   //retrieve calibration file name from parameter server [RTIMULib parameter]
   std::string calibration_file_name = "RTIMULib";
   if (!node_private.getParam("/sensor/imu/calibration_file_name", calibration_file_name))
   {
-    ROS_WARN_STREAM("no calibration file name provided, using default: " << calibration_file_name);
+    ROS_WARN_STREAM("[imu_node] no calibration file name provided, using default: " << calibration_file_name);
   }
 
   //get frame id parameter [RTIMULib parameter]
   std::string frame_id = "imu_link";
   if (!node_private.getParam("/sensor/imu/frame_id", frame_id))
   {
-    ROS_WARN_STREAM("no frame_id provided, using default: " << frame_id);
+    ROS_WARN_STREAM("[imu_node] no frame_id provided, using default: " << frame_id);
+  }
+
+  //get refresh rate of sensor in hertz from parameter server
+  float refresh_rate;
+  if (!node_private.getParam("/sensor/imu/refresh_rate", refresh_rate))
+  {
+    ROS_ERROR("[imu_node] sensor refresh rate not defined in config file: avc_sensors/config/sensors.yaml");
+    ROS_BREAK();
   }
 
   //create RTIMUSettings type object called imu_settings to set initial IMU settings that will later be used to create IMU object
@@ -72,14 +80,14 @@ int main(int argc, char **argv)
   //make sure IMU was detected
   if ((imu == NULL) || (imu->IMUType() == RTIMU_TYPE_NULL))
   {
-    ROS_ERROR("IMU not found");
+    ROS_ERROR("[imu_node] IMU not found");
     ROS_BREAK();
   }
 
   //initialize IMU
   if (!imu->IMUInit())
   {
-    ROS_ERROR("failed to initialize IMU");
+    ROS_ERROR("[imu_node] failed to initialize IMU");
     ROS_BREAK();
   }
 
@@ -87,7 +95,7 @@ int main(int argc, char **argv)
   float slerp_power;
   if (!node_private.getParam("/sensor/imu/slerp_power", slerp_power))
   {
-    ROS_ERROR("IMU slerp power not defined in config file: avc_sensors/config/sensors.yaml");
+    ROS_ERROR("[imu_node] IMU slerp power not defined in config file: avc_sensors/config/sensors.yaml");
     ROS_BREAK();
   }
 
@@ -138,11 +146,14 @@ int main(int argc, char **argv)
   //create publisher to publish compass messages with buffer size 10, and latch set to false
   ros::Publisher compass_pub = node_public.advertise<sensor_msgs::MagneticField>("compass", 10, false);
 
-  //create publisher to publish compass heading messages with buffer size 10, and latch set to false
-  ros::Publisher heading_pub = node_public.advertise<avc_msgs::Heading>("heading", 10, false);
+  //create publisher to publish compass heading messages with buffer size 1, and latch set to false
+  ros::Publisher heading_pub = node_public.advertise<avc_msgs::Heading>("heading", 1, false);
 
   //create publisher to publish IMU messages with buffer size 10, and latch set to false
   ros::Publisher imu_pub = node_public.advertise<sensor_msgs::Imu>("imu", 10, false);
+
+  //set refresh rate of ROS loop to defined refresh rate of sensor parameter
+  ros::Rate loop_rate(refresh_rate);
 
   while (ros::ok())
   {
@@ -219,6 +230,9 @@ int main(int argc, char **argv)
 
     //sleep until next IMU reading
     ros::Duration(imu->IMUGetPollInterval() / 1000.0).sleep();
+
+    //sleep until next sensor reading
+    //loop_rate.sleep();
 
   }
   return 0;
