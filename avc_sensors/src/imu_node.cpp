@@ -63,14 +63,6 @@ int main(int argc, char **argv)
     ROS_WARN_STREAM("no frame_id provided, using default: " << frame_id);
   }
 
-  //retrieve refresh rate of sensor from parameter server [Hz]
-  float refresh_rate;
-  if (!node_private.getParam("/sensor/imu/refresh_rate", refresh_rate))
-  {
-    ROS_ERROR("IMU refresh rate not defined in config file: avc_sensors/config/sensors.yaml");
-    ROS_BREAK();
-  }
-
   //create RTIMUSettings type object called imu_settings to set initial IMU settings that will later be used to create IMU object
   RTIMUSettings *imu_settings = new RTIMUSettings(calibration_file_path.c_str(), calibration_file_name.c_str());
 
@@ -152,9 +144,6 @@ int main(int argc, char **argv)
   //create publisher to publish IMU messages with buffer size 10, and latch set to false
   ros::Publisher imu_pub = node_public.advertise<sensor_msgs::Imu>("imu", 10, false);
 
-  //set refresh rate of ROS loop to defined refresh rate of sensor parameter
-  ros::Rate loop_rate(refresh_rate);
-
   while (ros::ok())
   {
 
@@ -213,10 +202,10 @@ int main(int argc, char **argv)
         heading_msg.heading_angle = imu_data.fusionPose.z();
 
         //convert from yaw [rad] to magnetic heading [deg] (magnetic heading = yaw - 90 deg)
-        heading_msg.heading_angle = (heading_msg.heading_angle / PI * 180) - 90;
+        //heading_msg.heading_angle = (heading_msg.heading_angle / PI * 180) - 90;
 
         //normalize yaw value to compass heading in degrees (0 - 360 deg)
-        heading_msg.heading_angle = fmod(heading_msg.heading_angle + 360, 360);
+        //heading_msg.heading_angle = fmod(heading_msg.heading_angle + 360, 360);
 
         //publish heading message
         heading_pub.publish(heading_msg);
