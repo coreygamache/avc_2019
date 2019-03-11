@@ -29,7 +29,7 @@ imu:
   calibration_file_path: /home/corey/avc_ws/src/avc_sensors/config
   calibration_file_name: RTIMULib
   frame_id: imu_link
-  slerp_power: 0.02
+  slerp_power: 0.8 # was 0.02 (taken from internet)
 
 # proximity sensor parameters
 proximity_sensor:
