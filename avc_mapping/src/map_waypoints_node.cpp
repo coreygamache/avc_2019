@@ -30,6 +30,7 @@ std::vector< std::vector<double> > lastFixes(LAST_FIXES, std::vector<double>(2, 
 //must be global so that they can be accessed by callback function
 int indicator_LED;
 
+
 //callback function called to process SIGINT command
 void sigintHandler(int sig)
 {
@@ -118,7 +119,6 @@ void gpsFixCallback(const sensor_msgs::NavSatFix::ConstPtr& msg)
   fixCounter++;
 
 }
-
 
 int main(int argc, char **argv)
 {
