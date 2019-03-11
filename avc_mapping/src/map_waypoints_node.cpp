@@ -109,8 +109,8 @@ void gpsFixCallback(const sensor_msgs::NavSatFix::ConstPtr& msg)
   {
 
     //put most recent GPS fix data into appropriate position in vector
-    lastFixes[fixCounter % fixCounter][0] = msg->latitude;
-    lastFixes[fixCounter % fixCounter][1] = msg->longitude;
+    lastFixes[fixCounter % LAST_FIXES][0] = msg->latitude;
+    lastFixes[fixCounter % LAST_FIXES][1] = msg->longitude;
 
   }
 
