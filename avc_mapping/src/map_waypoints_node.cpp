@@ -24,7 +24,7 @@ std::vector<int> controller_buttons(13, 0);
 
 //global GPS position variables
 std::vector< std::vector<double> > gpsWaypoints;
-std::vector< std::vector<double> > lastFixes(LAST_FIXES);
+std::vector< std::vector<double> > lastFixes(LAST_FIXES, std::vector<double>(2, 0));
 
 //pin variables
 //must be global so that they can be accessed by callback function
