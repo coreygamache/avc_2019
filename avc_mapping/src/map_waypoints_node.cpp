@@ -12,6 +12,9 @@
 #include <signal.h>
 #include <wiringPi.h>
 
+//macro definition for averaging filter
+#define LAST_FIXES 10 //number of GPS fixes to average
+
 //global variables
 bool mapping = false;
 bool mapping_mode = true;
@@ -20,8 +23,8 @@ bool mapping_mode = true;
 std::vector<int> controller_buttons(13, 0);
 
 //global GPS position variables
-std::vector<double> gpsFix(2, 0); //[latitude, longitude]
 std::vector< std::vector<double> > gpsWaypoints;
+std::vector< std::vector<double> > lastFixes(LAST_FIXES);
 
 //pin variables
 //must be global so that they can be accessed by callback function
@@ -87,9 +90,32 @@ bool disableMappingCallback(avc_msgs::ChangeControlMode::Request& req, avc_msgs:
 void gpsFixCallback(const sensor_msgs::NavSatFix::ConstPtr& msg)
 {
 
-  //set local variables to match value received in message [deg]
-  gpsFix[0] = msg->latitude;
-  gpsFix[1] = msg->longitude;
+  //create counter for placing most recent fix in vector
+  static int fixCounter = 0;
+
+  //on first iteration populate entire vector with current GPS fix
+  if (fixCounter == 0)
+  {
+
+    //iterate through each element of vector, inserting current GPS fix data
+    for (int i = 0; i < LAST_FIXES; i++)
+    {
+      lastFixes[i][0] = msg->latitude;
+      lastFixes[i][1] = msg->longitude;
+    }
+
+  }
+  else
+  {
+
+    //put most recent GPS fix data into appropriate position in vector
+    lastFixes[fixCounter % fixCounter][0] = msg->latitude;
+    lastFixes[fixCounter % fixCounter][1] = msg->longitude;
+
+  }
+
+  //increment counter
+  fixCounter++;
 
 }
 
@@ -162,7 +188,7 @@ int main(int argc, char **argv)
 
    //if save waypoint button on controller is pressed, mapping mode is enabled, and not currently saving a waypoint then save waypoint
    if (mapping_mode && (controller_buttons[1] == 1))
-    {
+   {
 
       //set mapping variable to true to indicate waypoint is being saved
       mapping = true;
@@ -177,8 +203,19 @@ int main(int argc, char **argv)
       //wait momentarily for new GPS position signal
       delay(map_waypoint_delay);
 
-      //process callback function calls
-      ros::spinOnce();
+      //create vector to hold current GPS location
+      std::vector<double> gpsFix(2, 0);
+
+      //set gpsFix values to sum of specified number of last GPS fixes
+      for (int i = 0; i < LAST_FIXES; i++)
+      {
+        gpsFix[0] += lastFixes[i][0];
+        gpsFix[1] += lastFixes[i][1];
+      }
+
+      //divide values by number of last GPS fixes to calculate average values
+      gpsFix[0] = gpsFix[0] / LAST_FIXES;
+      gpsFix[1] = gpsFix[1] / LAST_FIXES;
 
       //add most recent GPS position to list of waypoints
       gpsWaypoints.push_back(gpsFix);
