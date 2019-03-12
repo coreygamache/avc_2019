@@ -88,10 +88,10 @@ int main(int argc, char **argv)
   ros::Subscriber control_sub = node_public.subscribe("/control/control", 1000, controlCallback);
 
   //create subscriber to subscribe to ESC message topic with queue size set to 1
-  ros::Subscriber esc_sub = node_public.subscribe("esc_fixed", 1, escCallback);
+  ros::Subscriber esc_sub = node_public.subscribe("esc", 1, escCallback);
 
   //create subscriber to subscribe to steering servo message topic with queue size set to 1
-  ros::Subscriber steering_servo_sub = node_public.subscribe("steering_servo_fixed", 1, steeringServoCallback);
+  ros::Subscriber steering_servo_sub = node_public.subscribe("steering_servo", 1, steeringServoCallback);
 
   //initialize i2c protocol and verify connection
   int fd = wiringPiI2CSetup(i2c_address);
