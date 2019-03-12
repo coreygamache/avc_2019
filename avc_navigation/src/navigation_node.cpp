@@ -247,10 +247,10 @@ int main(int argc, char **argv)
   //create subscriber to subscribe to joy messages topic with queue size set to 1000
   ros::Subscriber controller_sub = node_public.subscribe("/control/joy", 1000, controllerCallback);
 
-  //create subscriber to subscribe to heading messages topic with queue size set to 1000
+  //create subscriber to subscribe to heading messages topic with queue size set to 1
   ros::Subscriber heading_sub = node_public.subscribe("/sensor/heading", 1, headingCallback);
 
-  //create subscriber to subscribe to GPS location messages topic with queue size set to 1000
+  //create subscriber to subscribe to GPS location messages topic with queue size set to 1
   ros::Subscriber nav_sat_fix_sub = node_public.subscribe("/sensor/fix", 1, navSatFixCallback);
 
   //create subscriber to subscribe to odometry messages topic with queue size set to 1000
