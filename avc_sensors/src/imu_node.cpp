@@ -108,6 +108,7 @@ int main(int argc, char **argv)
 
   //create geometry_msgs/Imu type message to publish IMU data
   sensor_msgs::Imu imu_msg;
+  imu_msg.header.frame_id = frame_id;
 
   //retrieve IMU orientation covariance values from parameter server
   std::vector<double> orientation_covariance;
@@ -139,6 +140,7 @@ int main(int argc, char **argv)
 
   //create sensor_msgs/MagneticField type message to publish compass data
   sensor_msgs::MagneticField compass_msg;
+  compass_msg.header.frame_id = "0";
 
   //set compass message magnetic_field_covariance values to zero to indicate unknown
   std::vector<double> magnetic_field_covariance(9, 0);
@@ -166,7 +168,6 @@ int main(int argc, char **argv)
       RTIMU_DATA imu_data = imu->getIMUData();
 
       //set IMU message headers
-      imu_msg.header.frame_id = frame_id;
       imu_msg.header.stamp = ros::Time::now();
 
       //set IMU message angles
@@ -194,7 +195,6 @@ int main(int argc, char **argv)
       {
 
         //set compass message headers
-        compass_msg.header.frame_id = frame_id;
         compass_msg.header.stamp = ros::Time::now();
 
         //set compass message magnetic field values
@@ -207,7 +207,6 @@ int main(int argc, char **argv)
         compass_pub.publish(compass_msg);
 
         //set heading message headers
-        heading_msg.header.frame_id = frame_id;
         heading_msg.header.stamp = ros::Time::now();
 
         //convert from yaw to heading
