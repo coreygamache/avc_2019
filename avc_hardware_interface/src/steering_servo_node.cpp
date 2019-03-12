@@ -127,8 +127,8 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
-  //create subscriber to subscribe to steering servo message topic with queue size set to 1000
-  ros::Subscriber steering_servo_sub = node_public.subscribe("steering_servo", 1000, steeringServoCallback);
+  //create subscriber to subscribe to steering servo message topic with queue size set to 1
+  ros::Subscriber steering_servo_sub = node_public.subscribe("steering_servo", 1, steeringServoCallback);
 
   //calculate throttle forward and reverse ranges
   int ss_left_range = ss_neutral_value - ss_max_left;
