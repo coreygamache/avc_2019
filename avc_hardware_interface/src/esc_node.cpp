@@ -118,8 +118,8 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
-  //create subscriber to subscribe to ESC message topic with queue size set to 1000
-  ros::Subscriber esc_sub = node_public.subscribe("esc", 1000, escCallback);
+  //create subscriber to subscribe to ESC message topic with queue size set to 1
+  ros::Subscriber esc_sub = node_public.subscribe("esc", 1, escCallback);
 
   //calculate throttle forward and reverse ranges
   int esc_fwd_range = esc_max_value - esc_neutral_value;
