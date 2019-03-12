@@ -166,29 +166,29 @@ int main(int argc, char **argv)
   avc_msgs::SteeringServo steering_servo_msg;
   steering_servo_msg.header.frame_id = "0";
 
-  //create publisher to publish ESC message status with buffer size 10, and latch set to false
-  ros::Publisher esc_pub = node_public.advertise<avc_msgs::ESC>("esc_fixed", 10, false);
+  //create publisher to publish ESC message status with buffer size 1, and latch set to false
+  ros::Publisher esc_pub = node_public.advertise<avc_msgs::ESC>("esc_fixed", 1, false);
 
-  //create publisher to publish steering servo message status with buffer size 10, and latch set to false
-  ros::Publisher steering_servo_pub = node_public.advertise<avc_msgs::SteeringServo>("steering_servo_fixed", 10, false);
+  //create publisher to publish steering servo message status with buffer size 1, and latch set to false
+  ros::Publisher steering_servo_pub = node_public.advertise<avc_msgs::SteeringServo>("steering_servo_fixed", 1, false);
 
   //create subscriber to subscribe to control messages topic with queue size set to 1000
   ros::Subscriber control_sub = node_public.subscribe("control", 1000, controlCallback);
 
-  //create subscriber to subscribe to ESC message topic with queue size set to 1000
-  ros::Subscriber esc_sub = node_public.subscribe("/control/esc_raw", 1000, escCallback);
+  //create subscriber to subscribe to ESC message topic with queue size set to 1
+  ros::Subscriber esc_sub = node_public.subscribe("/control/esc_raw", 1, escCallback);
 
-  //create subscriber to subscribe to front proximity message topic with queue size set to 1000
-  ros::Subscriber range_front_sub = node_public.subscribe("/sensor/proximity/front", 1000, rangeFrontCallback);
+  //create subscriber to subscribe to front proximity message topic with queue size set to 1
+  ros::Subscriber range_front_sub = node_public.subscribe("/sensor/proximity/front", 1, rangeFrontCallback);
 
-  //create subscriber to subscribe to left proximity message topic with queue size set to 1000
-  ros::Subscriber range_left_sub = node_public.subscribe("/sensor/proximity/left", 1000, rangeLeftCallback);
+  //create subscriber to subscribe to left proximity message topic with queue size set to 1
+  ros::Subscriber range_left_sub = node_public.subscribe("/sensor/proximity/left", 1, rangeLeftCallback);
 
-  //create subscriber to subscribe to right proximity message topic with queue size set to 1000
-  ros::Subscriber range_right_sub = node_public.subscribe("/sensor/proximity/right", 1000, rangeRightCallback);
+  //create subscriber to subscribe to right proximity message topic with queue size set to 1
+  ros::Subscriber range_right_sub = node_public.subscribe("/sensor/proximity/right", 1, rangeRightCallback);
 
-  //create subscriber to subscribe to steering servo message topic with queue size set to 1000
-  ros::Subscriber steering_servo_sub = node_public.subscribe("/control/steering_servo_raw", 1000, steeringServoCallback);
+  //create subscriber to subscribe to steering servo message topic with queue size set to 1
+  ros::Subscriber steering_servo_sub = node_public.subscribe("/control/steering_servo_raw", 1, steeringServoCallback);
 
   //set loop rate in Hz
   ros::Rate loop_rate(refresh_rate);
