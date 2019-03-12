@@ -212,8 +212,8 @@ int main(int argc, char **argv)
 
   //----------------------------------------------------------
 
-  //create publisher to publish proximity sensor message with buffer size 10, and latch set to false
-  ros::Publisher proximity_pub = node_public.advertise<sensor_msgs::Range>("proximity", 10, false);
+  //create publisher to publish proximity sensor message with buffer size 1, and latch set to false
+  ros::Publisher proximity_pub = node_public.advertise<sensor_msgs::Range>("proximity", 1, false);
 
   //set refresh rate of ROS loop to defined refresh rate of sensor parameter
   ros::Rate loop_rate(refresh_rate);
