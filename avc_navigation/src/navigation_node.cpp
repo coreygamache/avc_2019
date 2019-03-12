@@ -232,11 +232,11 @@ int main(int argc, char **argv)
   avc_msgs::SteeringServo steering_servo_msg;
   steering_servo_msg.header.frame_id = "0";
 
-  //create publisher to publish ESC message status with buffer size 10, and latch set to false
-  ros::Publisher esc_pub = node_public.advertise<avc_msgs::ESC>("esc_raw", 10, false);
+  //create publisher to publish ESC message status with buffer size 1, and latch set to false
+  ros::Publisher esc_pub = node_public.advertise<avc_msgs::ESC>("esc_raw", 1, false);
 
-  //create publisher to publish steering servo message status with buffer size 10, and latch set to false
-  ros::Publisher steering_servo_pub = node_public.advertise<avc_msgs::SteeringServo>("steering_servo_raw", 10, false);
+  //create publisher to publish steering servo message status with buffer size 1, and latch set to false
+  ros::Publisher steering_servo_pub = node_public.advertise<avc_msgs::SteeringServo>("steering_servo_raw", 1, false);
 
   //create service to process service requests on the disable manual control topic
   ros::ServiceServer disable_navigation_srv = node_public.advertiseService("/control/disable_navigation", disableNavigationCallback);
@@ -248,10 +248,10 @@ int main(int argc, char **argv)
   ros::Subscriber controller_sub = node_public.subscribe("/control/joy", 1000, controllerCallback);
 
   //create subscriber to subscribe to heading messages topic with queue size set to 1000
-  ros::Subscriber heading_sub = node_public.subscribe("/sensor/heading", 1000, headingCallback);
+  ros::Subscriber heading_sub = node_public.subscribe("/sensor/heading", 1, headingCallback);
 
   //create subscriber to subscribe to GPS location messages topic with queue size set to 1000
-  ros::Subscriber nav_sat_fix_sub = node_public.subscribe("/sensor/fix", 1000, navSatFixCallback);
+  ros::Subscriber nav_sat_fix_sub = node_public.subscribe("/sensor/fix", 1, navSatFixCallback);
 
   //create subscriber to subscribe to odometry messages topic with queue size set to 1000
   ros::Subscriber odometry_sub = node_public.subscribe("odometry", 1000, odometryCallback);
