@@ -6,6 +6,7 @@
 #include <string>
 #include <errno.h>
 #include <math.h>
+#include <ros/console.h>
 #include <ros/ros.h>
 #include <avc_msgs/ChangeControlMode.h>
 #include <avc_msgs/Control.h>
@@ -326,6 +327,7 @@ int main(int argc, char **argv)
           ROS_INFO("[navigation_node] GPS waypoint list read from file, %d total waypoints", int(gpsWaypoints.size()));
         else
           ROS_INFO("[navigation_node] GPS waypoint list read from file but no waypoints found; switch to mapping mode to record waypoints");
+
       }
 
     }
@@ -361,7 +363,10 @@ int main(int argc, char **argv)
           error += 360;
 
         //output target heading, current heading, and error for debugging purposes
-        ROS_INFO("[navigation_node] target heading: target heading: %lf, current heading: %lf , error: %f", target_heading, heading, error);
+        ROS_INFO("[navigation_node] target heading: %lf, current heading: %lf , error: %f", target_heading, heading, error);
+
+        //output debug data to log
+        ROS_DEBUG_NAMED("nav_data", "target heading: %lf, current heading: %lf , error: %f", target_heading, heading, error);
 
         //set desired servo angle to error value if valid
         if (error > servo_max_angle)
