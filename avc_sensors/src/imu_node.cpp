@@ -1,6 +1,7 @@
 //IMU node
 //outputs IMU data
 #include <math.h>
+#include <ros/console.h>
 #include <ros/ros.h>
 #include <avc_msgs/Heading.h>
 #include <sensor_msgs/Imu.h>
@@ -220,6 +221,9 @@ int main(int argc, char **argv)
 
         //publish heading message
         heading_pub.publish(heading_msg);
+
+        //output debug data to log
+        ROS_DEBUG_NAMED("heading_data", "current heading: %f", heading_msg.heading_angle);
 
       }
 
