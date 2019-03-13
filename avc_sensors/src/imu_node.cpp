@@ -64,14 +64,6 @@ int main(int argc, char **argv)
     ROS_WARN_STREAM("[imu_node] no frame_id provided, using default: " << frame_id);
   }
 
-  //get refresh rate of sensor in hertz from parameter server
-  float refresh_rate;
-  if (!node_private.getParam("/sensor/imu/refresh_rate", refresh_rate))
-  {
-    ROS_ERROR("[imu_node] sensor refresh rate not defined in config file: avc_sensors/config/sensors.yaml");
-    ROS_BREAK();
-  }
-
   //create RTIMUSettings type object called imu_settings to set initial IMU settings that will later be used to create IMU object
   RTIMUSettings *imu_settings = new RTIMUSettings(calibration_file_path.c_str(), calibration_file_name.c_str());
 
@@ -155,9 +147,6 @@ int main(int argc, char **argv)
   //create publisher to publish IMU messages with buffer size 1, and latch set to false
   ros::Publisher imu_pub = node_public.advertise<sensor_msgs::Imu>("imu", 1, false);
 
-  //set refresh rate of ROS loop to defined refresh rate of sensor parameter
-  ros::Rate loop_rate(refresh_rate);
-
   while (ros::ok())
   {
 
@@ -234,9 +223,6 @@ int main(int argc, char **argv)
 
     //sleep until next IMU reading
     ros::Duration(imu->IMUGetPollInterval() / 1000.0).sleep();
-
-    //sleep until next sensor reading
-    //loop_rate.sleep();
 
   }
   return 0;
