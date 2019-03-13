@@ -30,7 +30,7 @@ imu:
   calibration_file_name: RTIMULib
   frame_id: imu_link
   refresh_rate: 15.0
-  slerp_power: 0.02 # was 0.02 (taken from internet)
+  slerp_power: 0.1 # weight of gyros vs. accelerometer/compass data (0 to 1, default 0.02)
 
 # proximity sensor parameters
 proximity_sensor:
