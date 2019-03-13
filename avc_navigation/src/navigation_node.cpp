@@ -354,7 +354,7 @@ int main(int argc, char **argv)
         target_heading = fmod((target_heading / PI * 180) + 360, 360);
 
         //calculate error between current heading and target heading; positive error values indicate CCW rotation needed
-        float error = target_heading - heading;
+        float error = heading- target_heading;
 
         //correct error so robot turns the smallest angle possible to reach target heading
         if (error > 180)
