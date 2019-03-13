@@ -7,7 +7,7 @@
   <arg name="sensors_enabled" value="true" />
 
   <!-- load project rosconsole configuration file -->
-  <env name="ROSCONSOLE_CONFIG_FILE" value="$(find avc_bringup)/config/rosconsole.config"/>
+  <env name="ROSCONSOLE_CONFIG_FILE" value="$(find avc_bringup)/config/avcconsole.conf"/>
 
   <!-- load global parameters to parameter server -->
   <rosparam command="load" file="$(find avc_bringup)/config/global.yaml" ns="/" />
