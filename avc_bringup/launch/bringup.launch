@@ -1,46 +1,49 @@
 <launch>
 
-<!-- set arguments -->
-<arg name="control_enabled" value="true" />
-<arg name="hardware_enabled" value="true" />
-<arg name="nav_mapping_enabled" value="true" />
-<arg name="sensors_enabled" value="true" />
+  <!-- set arguments -->
+  <arg name="control_enabled" value="true" />
+  <arg name="hardware_enabled" value="true" />
+  <arg name="nav_mapping_enabled" value="true" />
+  <arg name="sensors_enabled" value="true" />
 
-<!-- load global parameters to parameter server -->
-<rosparam command="load" file="$(find avc_bringup)/config/global.yaml" ns="/" />
+  <!-- load project rosconsole configuration file -->
+  <env name="ROSCONSOLE_CONFIG_FILE" value="$(find avc_bringup)/config/rosconsole.conf"/>
 
-<!-- if sensors are enabled then include sensor launch file  -->
-<group if="$(arg hardware_enabled)">
-  <include file="$(find avc_bringup)/launch/hardware_interface.launch" />
-</group>
+  <!-- load global parameters to parameter server -->
+  <rosparam command="load" file="$(find avc_bringup)/config/global.yaml" ns="/" />
 
-<!-- if sensors are enabled then include sensor launch file  -->
-<group if="$(arg sensors_enabled)">
-  <include file="$(find avc_bringup)/launch/sensors.launch" />
-</group>
+  <!-- if sensors are enabled then include sensor launch file  -->
+  <group if="$(arg hardware_enabled)">
+    <include file="$(find avc_bringup)/launch/hardware_interface.launch" />
+  </group>
 
-<!-- if control is enabled then load control parameters to parameter server and launch control nodes -->
-<group if="$(arg control_enabled)">
-  <rosparam command="load" file="$(find avc_control)/config/control.yaml" ns="control" />
-  <node name="collision_avoidance_node" pkg="avc_control" type="collision_avoidance_node" ns="control" output="screen">
-    <remap from="/control/esc_fixed" to="/hardware/esc" />
-    <remap from="/control/steering_servo_fixed" to="/hardware/steering_servo" />
-  </node>
-  <node name="control_node" pkg="avc_control" type="control_node" ns="control" output="screen" />
-  <node name="controller_node" pkg="joy" type="joy_node" ns="control" output="screen" />
-  <node name="manual_control_node" pkg="avc_control" type="manual_control_node" ns="control" output="screen" />
-</group>
+  <!-- if sensors are enabled then include sensor launch file  -->
+  <group if="$(arg sensors_enabled)">
+    <include file="$(find avc_bringup)/launch/sensors.launch" />
+  </group>
 
-<!-- if navigation and mapping are enabled then load control parameters to parameter server and launch control nodes -->
-<group if="$(arg nav_mapping_enabled)">
-  <rosparam command="load" file="$(find avc_mapping)/config/mapping.yaml" ns="mapping" />
-  <rosparam command="load" file="$(find avc_navigation)/config/navigation.yaml" ns="navigation" />
-  <node name="map_waypoints_node" pkg="avc_mapping" type="map_waypoints_node" ns="mapping" output="screen" />
-  <node name="navigation_node" pkg="avc_navigation" type="navigation_node" ns="navigation" output="screen">
-    <remap from="/navigation/esc_raw" to="/control/esc_raw" />
-    <remap from="/navigation/steering_servo_raw" to="/control/steering_servo_raw" />
-  </node>
-  <!-- <node name="odometry_node" pkg="avc_navigation" type="odometry_node" ns="navigation" output="screen" /> -->
-</group>
+  <!-- if control is enabled then load control parameters to parameter server and launch control nodes -->
+  <group if="$(arg control_enabled)">
+    <rosparam command="load" file="$(find avc_control)/config/control.yaml" ns="control" />
+    <node name="collision_avoidance_node" pkg="avc_control" type="collision_avoidance_node" ns="control" output="screen">
+      <remap from="/control/esc_fixed" to="/hardware/esc" />
+      <remap from="/control/steering_servo_fixed" to="/hardware/steering_servo" />
+    </node>
+    <node name="control_node" pkg="avc_control" type="control_node" ns="control" output="screen" />
+    <node name="controller_node" pkg="joy" type="joy_node" ns="control" output="screen" />
+    <node name="manual_control_node" pkg="avc_control" type="manual_control_node" ns="control" output="screen" />
+  </group>
+
+  <!-- if navigation and mapping are enabled then load control parameters to parameter server and launch control nodes -->
+  <group if="$(arg nav_mapping_enabled)">
+    <rosparam command="load" file="$(find avc_mapping)/config/mapping.yaml" ns="mapping" />
+    <rosparam command="load" file="$(find avc_navigation)/config/navigation.yaml" ns="navigation" />
+    <node name="map_waypoints_node" pkg="avc_mapping" type="map_waypoints_node" ns="mapping" output="screen" />
+    <node name="navigation_node" pkg="avc_navigation" type="navigation_node" ns="navigation" output="log">
+      <remap from="/navigation/esc_raw" to="/control/esc_raw" />
+      <remap from="/navigation/steering_servo_raw" to="/control/steering_servo_raw" />
+    </node>
+    <!-- <node name="odometry_node" pkg="avc_navigation" type="odometry_node" ns="navigation" output="screen" /> -->
+  </group>
 
 </launch>
