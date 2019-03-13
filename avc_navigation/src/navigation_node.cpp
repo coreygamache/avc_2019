@@ -362,11 +362,8 @@ int main(int argc, char **argv)
         else if (error < -180)
           error += 360;
 
-        //output target heading, current heading, and error for debugging purposes
-        ROS_INFO("[navigation_node] target heading: %lf, current heading: %lf , error: %f", target_heading, heading, error);
-
         //output debug data to log
-        ROS_DEBUG_NAMED("nav_data", "target heading: %lf, current heading: %lf , error: %f", target_heading, heading, error);
+        ROS_DEBUG("[navigation_node] target heading: %lf, current heading: %lf , error: %f", target_heading, heading, error);
 
         //set desired servo angle to error value if valid
         if (error > servo_max_angle)
