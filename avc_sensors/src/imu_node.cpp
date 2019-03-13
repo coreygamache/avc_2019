@@ -211,8 +211,7 @@ int main(int argc, char **argv)
         heading_pub.publish(heading_msg);
 
         //output debug data to log
-        ROS_DEBUG_NAMED("heading_data", "current yaw: %f", imu_data.fusionPose.z());
-        ROS_DEBUG_NAMED("heading_data", "current heading: %f", heading_msg.heading_angle);
+        ROS_DEBUG_NAMED("heading_data", "current yaw: %f, current heading: %f", imu_data.fusionPose.z(), heading_msg.heading_angle);
 
       }
 
