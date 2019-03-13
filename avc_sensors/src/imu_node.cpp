@@ -209,19 +209,14 @@ int main(int argc, char **argv)
         //set heading message headers
         heading_msg.header.stamp = ros::Time::now();
 
-        //convert from yaw to heading
-        //yaw ranges from 0 to +/- 180 degrees as measured counter-clockwise from compass east
-        //heading ranges from 0 to 360 degrees as measured clockwise from compass north
-        //heading = ()(-yaw + 90) + 360) % 360
-
-        //set heading angle of heading msg to negative yaw value from IMU to change positive rotation direction to match bearing coordinate frame [rad]
-        heading_msg.heading_angle = -1 * imu_data.fusionPose.z();
-
-        //convert from yaw [rad] to magnetic heading [deg]
-        heading_msg.heading_angle = (heading_msg.heading_angle / PI * 180) + 90;
+        //get yaw value and convert to degrees [deg]
+        heading_msg.heading_angle = imu_data.fusionPose.z() / PI * 180;
 
         //normalize yaw value to compass heading in degrees (0 - 360 deg)
-        heading_msg.heading_angle = fmod(heading_msg.heading_angle + 360, 360);
+        if (heading_msg.heading_angle < 90)
+          heading_msg.heading_angle += 270;
+        else
+          heading_msg.heading_angle -= 90;
 
         //publish heading message
         heading_pub.publish(heading_msg);
