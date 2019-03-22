@@ -11,11 +11,13 @@
 
 //global variables
 bool autonomous_control = false;
+bool hold_requested = false;
 float range_front = 9999; //front sensor range to nearest object [m]
 float range_left = 9999; //left sensor range to nearest object [m]
 float range_right = 9999; //right sensor range to nearest object [m]
-float throttle_percent = 0; //requested throttle position [%]
 float steering_angle = 0; //requested steering angle [deg]
+float steering_reset_timer = 0; //duration steering angle is held after obstacle is cleared from front sensor
+float throttle_percent = 0; //requested throttle position [%]
 
 
 //callback function called to process SIGINT command
@@ -42,6 +44,15 @@ void escCallback(const avc_msgs::ESC::ConstPtr& msg)
 
   //set local value to received value
   throttle_percent = msg->throttle_percent;
+
+}
+
+//callback function to process hold timer firing event
+void holdTimerCallback(const ros::TimerEvent& event)
+{
+
+  //clear hold request flag
+  hold_requested = false;
 
 }
 
@@ -190,6 +201,12 @@ int main(int argc, char **argv)
   //create subscriber to subscribe to steering servo message topic with queue size set to 1
   ros::Subscriber steering_servo_sub = node_public.subscribe("/control/steering_servo_raw", 1, steeringServoCallback);
 
+  //create variable to record last steering correction angle
+  float last_range = 999;
+
+  //create timer object for clearing hold request flags
+  ros::Timer hold_timer;
+
   //set loop rate in Hz
   ros::Rate loop_rate(refresh_rate);
 
@@ -203,6 +220,10 @@ int main(int argc, char **argv)
       //engage collision avoidance algorithm if there's an obstacle within the threshold distance
       if (range_front < threshold_distance)
       {
+
+        //----------------------------------------------------------------------
+        //------------------------STEERING CORRECTION---------------------------
+        //----------------------------------------------------------------------
 
         //calculate steering correction value
         float steering_correction = k_collision_steer * (1 - (range_front / threshold_distance));
@@ -231,6 +252,10 @@ int main(int argc, char **argv)
         else if (steering_angle > max_steering_angle)
           steering_angle = max_steering_angle;
 
+        //----------------------------------------------------------------------
+        //------------------------THROTTLE CORRECTION---------------------------
+        //----------------------------------------------------------------------
+
         //calculate corrected throttle value
         float throttle_correction = throttle_percent * k_collision_brake * (1 - (range_front / threshold_distance));
 
@@ -249,17 +274,36 @@ int main(int argc, char **argv)
         }
 
       }
+      //if obstacle was seen but isn't anymore then trigger timer to hold steering angle until time elapses
+      else if ((range_front > threshold_distance) && (last_range < threshold_distance))
+      {
+
+        //set hold requested flag to true
+        hold_requested = true;
+
+        //start timer
+        hold_timer = node_private.createTimer(ros::Duration(steering_reset_timer), holdTimerCallback, true);
+
+      }
+
+    }
+
+    //update steering and throttle message values unless hold is active
+    if (!hold_requested)
+    {
+
+      //update steering and throttle message values
+      steering_servo_msg.steering_angle = steering_angle;
+      esc_msg.throttle_percent = throttle_percent;
 
     }
 
     //set steering servo message parameters and publish
     steering_servo_msg.header.stamp = ros::Time::now();
-    steering_servo_msg.steering_angle = steering_angle;
     steering_servo_pub.publish(steering_servo_msg);
 
     //set ESC message parameters and publish
     esc_msg.header.stamp = ros::Time::now();
-    esc_msg.throttle_percent = throttle_percent;
     esc_pub.publish(esc_msg);
 
     //process callback functions
