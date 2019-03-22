@@ -194,6 +194,22 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
+  //retrieve minimum distance value from parameter server [m]
+  float min_distance_value;
+  if (!node_private.getParam("/driving/min_distance_value", min_distance_value))
+  {
+    ROS_ERROR("[navigation_node] minimum distance value not defined in config file: avc_bringup/config/global.yaml");
+    ROS_BREAK();
+  }
+
+  //retrieve minimum distance throttle value from parameter server [%]
+  float min_distance_throttle;
+  if (!node_private.getParam("/driving/min_distance_throttle", min_distance_throttle))
+  {
+    ROS_ERROR("[navigation_node] minimum distance throttle value not defined in config file: avc_bringup/config/global.yaml");
+    ROS_BREAK();
+  }
+
   //retrieve map waypoint delay from parameter server [ms]
   std::string output_file_path;
   if (!node_private.getParam("/mapping/output_file_path", output_file_path))
@@ -222,6 +238,14 @@ int main(int argc, char **argv)
   if (!node_private.getParam("/navigation/navigation_node/waypoint_radius", waypoint_radius))
   {
     ROS_ERROR("[navigation_node] waypoint radius not defined in config file: avc_navigation/config/navigation.yaml");
+    ROS_BREAK();
+  }
+
+  //retrieve threshold distance value from parameter server [m]
+  float threshold_distance_value;
+  if (!node_private.getParam("/driving/threshold_distance_value", threshold_distance_value))
+  {
+    ROS_ERROR("[navigation_node] threshold distance value not defined in config file: avc_bringup/config/global.yaml");
     ROS_BREAK();
   }
 
@@ -373,13 +397,35 @@ int main(int argc, char **argv)
         else
           steering_servo_msg.steering_angle = error;
 
+        //------------------------
+        //--add PID control here--
+        //------------------------
+
         //set time of steering servo message and publish
         steering_servo_msg.header.stamp = ros::Time::now();
         steering_servo_pub.publish(steering_servo_msg);
 
         //calculate throttle percent from resulting steering angle
         //esc_msg.throttle_percent = maximum_throttle * exp(steering_servo_msg.steering_angle / servo_max_angle * k_throttle_decay);
-        esc_msg.throttle_percent = maximum_throttle;
+
+        //------------------------DISTANCE TO NEXT WAYPOINT CALCULATION-------------------------
+
+        //calculate x and y values of vector from current position to next target waypoint in meters (s = r * theta)
+        double target_delta_x = (gpsWaypoints[0][1] - gpsFix[1]) * EARTH_RADIUS; //longitude
+        double target_delta_y = (gpsWaypoints[0][0] - gpsFix[0]) * EARTH_RADIUS; //latitude
+
+        //calculate distance to next waypoint
+        float distance_to_next = sqrt(pow(target_delta_x, 2) + pow(target_delta_y, 2));
+
+        //if distance is above threshold value, set throttle to maximum value
+        if (distance_to_next > threshold_distance_value)
+          esc_msg.throttle_percent = maximum_throttle;
+        //if within threshold distance, reduce throttle from maximum inverse-proportionally to distance to minimum distance value
+        else if ((distance_to_next < threshold_distance_value) && (distance_to_next > min_distance_value))
+          esc_msg.throttle_percent = min_distance_throttle + (maximum_throttle - min_distance_throttle) * ((distance_to_next - min_distance_value) / (threshold_distance_value - min_distance_value));
+        //if below minimum distance value, set throttle to minimum value
+        else
+          esc_msg.throttle_percent = minimum_throttle;
 
         //if throttle percent is requested below minimum value, set to minimum value
         if (esc_msg.throttle_percent < minimum_throttle)
@@ -389,18 +435,8 @@ int main(int argc, char **argv)
         esc_msg.header.stamp = ros::Time::now();
         esc_pub.publish(esc_msg);
 
-        //------------------------DISTANCE TO NEXT WAYPOINT CALCULATION-------------------------
-
-        //calculate x and y values of vector from current position to next target waypoint
-        double target_delta_x = gpsWaypoints[0][1] - gpsFix[1]; //longitude
-        double target_delta_y = gpsWaypoints[0][0] - gpsFix[0]; //latitude
-
-        //convert target delta_x and y values to values in meters (s = r * theta)
-        target_delta_x = target_delta_x  * EARTH_RADIUS;
-        target_delta_y = target_delta_y  * EARTH_RADIUS;
-
         //check if robot is within defined distance of waypoint, notify and set target to next waypoint if true
-        if (sqrt(pow(target_delta_x, 2) + pow(target_delta_y, 2)) < waypoint_radius)
+        if (distance_to_next < waypoint_radius)
         {
 
           //notify that waypoint has been reached
