@@ -24,6 +24,7 @@ const double EARTH_RADIUS = 6371008.7714;
 const double PI = 3.1415926535897;
 
 //global variables
+bool accel_delay_flag = false;
 bool autonomous_control = false;
 bool autonomous_running = false;
 bool mode_change_requested = false;
@@ -50,6 +51,15 @@ void sigintHandler(int sig)
 
   //call the default shutdown function
   ros::shutdown();
+
+}
+
+//callback function to process accel delay timer
+void accelDelayTimerCallback(const ros::TimerEvent& event)
+{
+
+  //clear acceleration delay flag
+  accel_delay_flag = false;
 
 }
 
@@ -163,6 +173,14 @@ int main(int argc, char **argv)
   //override the default SIGINT handler
   signal(SIGINT, sigintHandler);
 
+  //retrieve acceleration delay time value from parameter server [s]
+  float accel_delay_time;
+  if (!node_private.getParam("/navigation/navigation_node/accel_delay_time", accel_delay_time))
+  {
+    ROS_ERROR("[navigation_node] acceleration delay time value not defined in config file: avc_navigation/config/navigation.yaml");
+    ROS_BREAK();
+  }
+
   //retrieve indicator LED pin from parameter server
   if (!node_private.getParam("/led/indicator_pin", indicator_LED))
   {
@@ -218,6 +236,30 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
+  //retrieve PID derivative constant value from parameter server
+  float pidKd;
+  if (!node_private.getParam("/navigation/navigation_node/pidKd", pidKd))
+  {
+    ROS_ERROR("[navigation_node] PID derivative constant value not defined in config file: avc_navigation/config/navigation.yaml");
+    ROS_BREAK();
+  }
+
+  //retrieve PID integral constant value from parameter server
+  float pidKi;
+  if (!node_private.getParam("/navigation/navigation_node/pidKi", pidKi))
+  {
+    ROS_ERROR("[navigation_node] PID integral constant value not defined in config file: avc_navigation/config/navigation.yaml");
+    ROS_BREAK();
+  }
+
+  //retrieve PID proportional constant value from parameter server
+  float pidKp;
+  if (!node_private.getParam("/navigation/navigation_node/pidKp", pidKp))
+  {
+    ROS_ERROR("[navigation_node] PID proportional constant value value not defined in config file: avc_navigation/config/navigation.yaml");
+    ROS_BREAK();
+  }
+
   //retrieve refresh rate of node in hertz from parameter server
   float refresh_rate;
   if (!node_private.getParam("/navigation/navigation_node/refresh_rate", refresh_rate))
@@ -234,6 +276,7 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
+  //retrieve waypoint radius value from parameter server
   float waypoint_radius;
   if (!node_private.getParam("/navigation/navigation_node/waypoint_radius", waypoint_radius))
   {
@@ -284,6 +327,9 @@ int main(int argc, char **argv)
   //run wiringPi GPIO setup function and set pin modes
   wiringPiSetup();
   pinMode(indicator_LED, OUTPUT);
+
+  //create timer object for clearing acceleration delay flag
+  ros::Timer accel_delay_timer;
 
   //set loop rate in Hz
   ros::Rate loop_rate(refresh_rate);
@@ -389,6 +435,11 @@ int main(int argc, char **argv)
         //output debug data to log
         ROS_DEBUG("[navigation_node] target heading: %lf, current heading: %lf , error: %f", target_heading, heading, error);
 
+        //------------------------
+        //--add PID control here--
+        //------------------------
+        error = pidKp * error;
+
         //set desired servo angle to error value if valid
         if (error > servo_max_angle)
           steering_servo_msg.steering_angle = servo_max_angle;
@@ -396,10 +447,6 @@ int main(int argc, char **argv)
           steering_servo_msg.steering_angle = -servo_max_angle;
         else
           steering_servo_msg.steering_angle = error;
-
-        //------------------------
-        //--add PID control here--
-        //------------------------
 
         //set time of steering servo message and publish
         steering_servo_msg.header.stamp = ros::Time::now();
@@ -418,14 +465,14 @@ int main(int argc, char **argv)
         float distance_to_next = sqrt(pow(target_delta_x, 2) + pow(target_delta_y, 2));
 
         //if distance is above threshold value, set throttle to maximum value
-        if (distance_to_next > threshold_distance_value)
+        if (!accel_delay_flag && (distance_to_next > threshold_distance_value))
           esc_msg.throttle_percent = maximum_throttle;
         //if within threshold distance, reduce throttle from maximum inverse-proportionally to distance to minimum distance value
-        else if ((distance_to_next < threshold_distance_value) && (distance_to_next > min_distance_value))
+        else if (!accel_delay_flag && ((distance_to_next < threshold_distance_value) && (distance_to_next > min_distance_value)))
           esc_msg.throttle_percent = min_distance_throttle + (maximum_throttle - min_distance_throttle) * ((distance_to_next - min_distance_value) / (threshold_distance_value - min_distance_value));
         //if below minimum distance value, set throttle to minimum value
         else
-          esc_msg.throttle_percent = minimum_throttle;
+          esc_msg.throttle_percent = min_distance_throttle;
 
         //if throttle percent is requested below minimum value, set to minimum value
         if (esc_msg.throttle_percent < minimum_throttle)
@@ -444,6 +491,12 @@ int main(int argc, char **argv)
 
           //remove current waypoint from list
           gpsWaypoints.erase(gpsWaypoints.begin());
+
+          //set acceleration delay flag
+          accel_delay_flag = true;
+
+          //start timer
+          accel_delay_timer = node_private.createTimer(ros::Duration(accel_delay_time), accelDelayTimerCallback, true);
 
         }
 
