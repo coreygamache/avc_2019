@@ -92,31 +92,40 @@ void gpsFixCallback(const sensor_msgs::NavSatFix::ConstPtr& msg)
 {
 
   //create counter for placing most recent fix in vector
-  static int fixCounter = 0;
+  static unsigned int fixCounter = 0;
 
   //on first iteration populate entire vector with current GPS fix
   if (fixCounter == 0)
   {
 
     //iterate through each element of vector, inserting current GPS fix data
-    for (int i = 0; i < LAST_FIXES; i++)
+    for (int i = 1; i < LAST_FIXES; i++)
     {
       lastFixes[i][0] = msg->latitude;
       lastFixes[i][1] = msg->longitude;
     }
 
+    //increment counter
+    fixCounter++;
+
   }
-  else
+
+  //store GPS fix if it's unique and increment counter
+  if ((msg->latitude != lastFixes[(fixCounter - 1) % LAST_FIXES][0]) && (msg->longitude != lastFixes[(fixCounter - 1) % LAST_FIXES][1]))
   {
 
     //put most recent GPS fix data into appropriate position in vector
     lastFixes[fixCounter % LAST_FIXES][0] = msg->latitude;
     lastFixes[fixCounter % LAST_FIXES][1] = msg->longitude;
 
-  }
+    //increment counter
+    fixCounter++;
 
-  //increment counter
-  fixCounter++;
+    //prevent counter overflow
+    if (fixCounter == 65535)
+      fixCounter = 5;
+
+  }
 
 }
 
