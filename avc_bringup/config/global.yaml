@@ -10,8 +10,11 @@ driving:
   k_collision_brake: 0.5 # collision avoidance braking constant (larger values = harsher braking  w.r.t. distance to object (linear)) [0 to 1]
   k_collision_steer: 70.0 # collision avoidance steering constant (larger values = harsher steering w.r.t. distance to object (linear)) [0 to infinity]
   k_throttle_decay: -1.6 # throttle decay constant (smaller values = harsher throttle cut w.r.t. steering angle (exponential)) [0 to -infinity]
-  maximum_throttle: 18.0
+  maximum_throttle: 25.0
   minimum_throttle: 10.0
+  min_distance_value: 2.0
+  min_distance_throttle: 18.0
+  threshold_distance_value: 4.0
 
 # driving aid control parameters
 driving_aids:
