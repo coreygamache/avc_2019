@@ -113,7 +113,7 @@ int main(int argc, char **argv)
   //-----------------------SET CHIP DATA OUTPUT TYPE----------------------------
 
   //notify of current command to be sent
-  ROS_INFO("[gps_setup_node] setting data output type";
+  ROS_INFO("[gps_setup_node] setting data output type");
 
   //set GPS chip data output type to RMC only
   if (!sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA))
@@ -125,7 +125,7 @@ int main(int argc, char **argv)
   //-----------------------SET CHIP DATA OUTPUT RATE----------------------------
 
   //notify of current command to be sent
-  ROS_INFO("[gps_setup_node] setting data output rate";
+  ROS_INFO("[gps_setup_node] setting data output rate");
 
   //set GPS chip data output rate to 5 Hz
   if (!sendCommand(PMTK_SET_NMEA_UPDATE_10HZ))
@@ -137,7 +137,7 @@ int main(int argc, char **argv)
   //-----------------------SET CHIP FIX UPDATE RATE-----------------------------
 
   //notify of current command to be sent
-  ROS_INFO("[gps_setup_node] setting fix update rate";
+  ROS_INFO("[gps_setup_node] setting fix update rate");
 
   //set GPS chip fix update rate to 5 Hz
   if (!sendCommand(PMTK_API_SET_FIX_CTL_5HZ))
@@ -149,7 +149,7 @@ int main(int argc, char **argv)
   //--------------------------SET CHIP BAUD RATE--------------------------------
 
   //notify of current command to be sent
-  ROS_INFO("[gps_setup_node] setting chip baud rate";
+  ROS_INFO("[gps_setup_node] setting chip baud rate");
 
   //set GPS chip baud rate to 57600
   if (!sendCommand(PMTK_SET_BAUD_57600))
