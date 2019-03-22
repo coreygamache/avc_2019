@@ -104,7 +104,7 @@ int main(int argc, char **argv)
     ROS_INFO("[gps_setup_node] opened serial device %s with baud rate %d", serial_port.c_str(), baud_rate);
 
   //sleep briefly before running command
-  ros::Duration(1.0).sleep();
+  ros::Duration(2.0).sleep();
 
   //----------------------------------------------------------------------------
   //-----------------------SEND COMMANDS TO GPS CHIP----------------------------
@@ -112,39 +112,51 @@ int main(int argc, char **argv)
 
   //-----------------------SET CHIP DATA OUTPUT TYPE----------------------------
 
+  //notify of current command to be sent
+  ROS_INFO("[gps_setup_node] setting data output type";
+
   //set GPS chip data output type to RMC only
   if (!sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA))
     ROS_BREAK();
 
   //sleep briefly before running command
-  ros::Duration(1.0).sleep();
+  ros::Duration(2.0).sleep();
 
   //-----------------------SET CHIP DATA OUTPUT RATE----------------------------
+
+  //notify of current command to be sent
+  ROS_INFO("[gps_setup_node] setting data output rate";
 
   //set GPS chip data output rate to 5 Hz
   if (!sendCommand(PMTK_SET_NMEA_UPDATE_10HZ))
     ROS_BREAK();
 
   //sleep briefly before running command
-  ros::Duration(1.0).sleep();
+  ros::Duration(2.0).sleep();
 
   //-----------------------SET CHIP FIX UPDATE RATE-----------------------------
+
+  //notify of current command to be sent
+  ROS_INFO("[gps_setup_node] setting fix update rate";
 
   //set GPS chip fix update rate to 5 Hz
   if (!sendCommand(PMTK_API_SET_FIX_CTL_5HZ))
     ROS_BREAK();
 
   //sleep briefly before running command
-  ros::Duration(1.0).sleep();
+  ros::Duration(2.0).sleep();
 
   //--------------------------SET CHIP BAUD RATE--------------------------------
+
+  //notify of current command to be sent
+  ROS_INFO("[gps_setup_node] setting chip baud rate";
 
   //set GPS chip baud rate to 57600
   if (!sendCommand(PMTK_SET_BAUD_57600))
     ROS_BREAK();
 
   //sleep briefly before closing serial device
-  ros::Duration(1.0).sleep();
+  ros::Duration(2.0).sleep();
 
   //----------------------------------------------------------------------------
   //-----------------------END COMMANDS TO GPS CHIP-----------------------------
@@ -157,7 +169,7 @@ int main(int argc, char **argv)
   ROS_INFO("[gps_setup_node] closed serial device %s", serial_port.c_str());
 
   //sleep briefly before reopening serial device
-  ros::Duration(1.0).sleep();
+  ros::Duration(2.0).sleep();
 
   //if program is still running at this point then everything has completed successfully
   //indicate that program has completed setup successfully
