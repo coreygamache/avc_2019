@@ -29,7 +29,8 @@ PIDController::~PIDController() {}
 //set functions
 
 //set class set_point value
-void PIDController::setSetPoint(double set_point){
+void PIDController::setSetPoint(double set_point)
+{
   this->_set_point = set_point;
 }
 
@@ -43,7 +44,7 @@ double PIDController::calculate(double input)
   double output = 0;
 
   //calculate current error
-  double error = this->_set_point - input;
+  double error = input - this->_set_point;
 
   //add proportional term to output
   output += this->_kp * error;
