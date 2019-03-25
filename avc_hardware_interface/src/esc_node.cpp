@@ -200,10 +200,18 @@ int main(int argc, char **argv)
 
       }
 
-      if ((throttle_percent - last_throttle_value) > (maximum_acceleration / refresh_rate))
-        throttle_percent = last_throttle_value + (maximum_acceleration / refresh_rate);
-      else if ((last_throttle_value - throttle_percent)  > (maximum_deceleration / refresh_rate))
-        throttle_percent = throttle_percent - (maximum_deceleration / refresh_rate);
+      if (throttle_percent > 0)
+      {
+        if ((throttle_percent - last_throttle_value) > (maximum_acceleration / refresh_rate))
+          throttle_percent = last_throttle_value + (maximum_acceleration / refresh_rate);
+        else if ((last_throttle_value - throttle_percent)  > (maximum_deceleration / refresh_rate))
+          throttle_percent = last_throttle_value - (maximum_deceleration / refresh_rate);
+      }
+      else if (throttle_percent < 0)
+      {
+
+      }
+
 
       //create pulsewidth variable to output calculated pulsewidth to esc
       int pulsewidth;
