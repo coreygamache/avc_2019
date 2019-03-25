@@ -4,16 +4,20 @@
 #include <errno.h>
 #include <math.h>
 #include <ros/ros.h>
+#include <avc_msgs/Control.h>
 #include <avc_msgs/ESC.h>
 #include <signal.h>
 
 //global variables
+bool autonomous_control = false;
 bool force_output = false;
 float throttle_percent = 0;
 int esc_neutral_value;
 int esc_servo_number;
 std::string sb_driver_path;
 
+
+//----------------------------SIGINT HANDLER------------------------------------
 
 //callback function called to process SIGINT command
 void sigintHandler(int sig)
@@ -30,6 +34,17 @@ void sigintHandler(int sig)
 
   //call the default shutdown function
   ros::shutdown();
+
+}
+
+//--------------------------CALLBACK FUNCTIONS----------------------------------
+
+//callback function called to process messages on control topic
+void controlCallback(const avc_msgs::Control::ConstPtr& msg)
+{
+
+  //change local control mode to match message
+  autonomous_control = msg->autonomous_control;
 
 }
 
@@ -134,6 +149,9 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
+  //create subscriber to subscribe to control messages topic with queue size set to 1000
+  ros::Subscriber control_sub = node_public.subscribe("/control/control", 1000, controlCallback);
+
   //create subscriber to subscribe to ESC message topic with queue size set to 1
   ros::Subscriber esc_sub = node_public.subscribe("esc", 1, escCallback);
 
@@ -200,10 +218,18 @@ int main(int argc, char **argv)
 
       }
 
-      if ((throttle_percent - last_throttle_value) > (maximum_acceleration / refresh_rate))
-        throttle_percent = last_throttle_value + (maximum_acceleration / refresh_rate);
-      else if ((last_throttle_value - throttle_percent)  > (maximum_deceleration / refresh_rate))
-        throttle_percent = last_throttle_value - (maximum_deceleration / refresh_rate);
+      //use acceleration and deceleration limiting if in autonomous mode
+      if (autonomous_control)
+      {
+
+        //limit acceleration to defined maximum
+        if ((throttle_percent - last_throttle_value) > (maximum_acceleration / refresh_rate))
+          throttle_percent = last_throttle_value + (maximum_acceleration / refresh_rate);
+        //limit deceleration to defined maximum
+        else if ((last_throttle_value - throttle_percent)  > (maximum_deceleration / refresh_rate))
+          throttle_percent = last_throttle_value - (maximum_deceleration / refresh_rate);
+
+      }
 
 
       //create pulsewidth variable to output calculated pulsewidth to esc
