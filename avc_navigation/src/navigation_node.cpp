@@ -6,6 +6,7 @@
 #include <string>
 #include <errno.h>
 #include <math.h>
+#include <pid_controller.hpp>
 #include <ros/console.h>
 #include <ros/ros.h>
 #include <avc_msgs/ChangeControlMode.h>
@@ -332,6 +333,9 @@ int main(int argc, char **argv)
   wiringPiSetup();
   pinMode(indicator_LED, OUTPUT);
 
+  //create PID controller object for steering output control
+  PIDController steering_controller(pidKp, pidKi, pidKd, -servo_max_angle, servo_max_angle, 1 / refresh_rate);
+
   //create timer object for clearing acceleration delay flag
   ros::Timer accel_delay_timer;
 
@@ -427,36 +431,27 @@ int main(int argc, char **argv)
         //normalize target heading to compass bearing in degrees (0 - 360 deg)
         target_heading = fmod((target_heading / PI * 180) + 360, 360);
 
-        //calculate error between current heading and target heading; positive error values indicate CCW rotation needed
-        float error = heading- target_heading;
+        //calculate output to steering servo using PID controller; positive output values indicate CCW rotation needed
+        double output = steering_controller.calculate(target_heading, heading);
 
-        //correct error so robot turns the smallest angle possible to reach target heading
-        if (error > 180)
-          error -= 360;
-        else if (error < -180)
-          error += 360;
+        //correct output so robot turns the smallest angle possible to reach target heading
+        if (output > 180)
+          output -= 360;
+        else if (output < -180)
+          output += 360;
 
-        //output debug data to log
-        ROS_DEBUG("[navigation_node] target heading: %lf, current heading: %lf , error: %f", target_heading, heading, error);
-
-        //------------------------
-        //--add PID control here--
-        //------------------------
-        error = pidKp * error;
-
-        //set desired servo angle to error value if valid
-        if (error > servo_max_angle)
-          steering_servo_msg.steering_angle = servo_max_angle;
-        else if (error < -servo_max_angle)
-          steering_servo_msg.steering_angle = -servo_max_angle;
-        else
-          steering_servo_msg.steering_angle = error;
+        //set steering servo message steering angle value to current output value
+        steering_servo_msg.steering_angle = output;
 
         //set time of steering servo message and publish
         steering_servo_msg.header.stamp = ros::Time::now();
         steering_servo_pub.publish(steering_servo_msg);
 
+        //output debug data to log
+        ROS_DEBUG("[navigation_node] target heading: %lf, current heading: %lf , output: %f", target_heading, heading, output);
+
         //calculate throttle percent from resulting steering angle
+        //DEPRECATED: replaced with distance-based throttle control below
         //esc_msg.throttle_percent = maximum_throttle * exp(steering_servo_msg.steering_angle / servo_max_angle * k_throttle_decay);
 
         //------------------------DISTANCE TO NEXT WAYPOINT CALCULATION-------------------------
