@@ -74,8 +74,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES avc_navigation
+  INCLUDE_DIRS include
+  LIBRARIES pid_controller
   CATKIN_DEPENDS roscpp avc_msgs nav_msgs sensor_msgs
 #  DEPENDS system_lib
 )
@@ -87,7 +87,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+  include/avc_navigation
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -95,6 +95,7 @@ include_directories(
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/avc_navigation.cpp
 # )
+add_library(pid_controller src/pid_controller.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -122,4 +123,5 @@ add_dependencies(navigation_node ${catkin_EXPORTED_TARGETS})
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
+target_link_libraries(pid_controller ${catkin_LIBRARIES})
 target_link_libraries(navigation_node ${catkin_LIBRARIES} wiringPi)
