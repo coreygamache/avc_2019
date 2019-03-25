@@ -4,7 +4,6 @@
 #include <errno.h>
 #include <math.h>
 #include <ros/ros.h>
-#include <avc_msgs/Control.h>
 #include <avc_msgs/ESC.h>
 #include <signal.h>
 
@@ -38,15 +37,6 @@ void sigintHandler(int sig)
 }
 
 //--------------------------CALLBACK FUNCTIONS----------------------------------
-
-//callback function called to process messages on control topic
-void controlCallback(const avc_msgs::Control::ConstPtr& msg)
-{
-
-  //change local control mode to match message
-  autonomous_control = msg->autonomous_control;
-
-}
 
 //callback function called to process messages on drive_motors topic
 void escCallback(const avc_msgs::ESC::ConstPtr& msg)
@@ -111,22 +101,6 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
-  //retrieve max acceleration value from parameter server
-  float maximum_acceleration;
-  if (!node_private.getParam("/driving/maximum_acceleration", maximum_acceleration))
-  {
-    ROS_ERROR("[navigation_node] ESC maximum acceleration not defined in config file: avc_bringup/config/global.yaml");
-    ROS_BREAK();
-  }
-
-  //retrieve max acceleration value from parameter server
-  float maximum_deceleration;
-  if (!node_private.getParam("/driving/maximum_deceleration", maximum_deceleration))
-  {
-    ROS_ERROR("[navigation_node] ESC maximum deceleration not defined in config file: avc_bringup/config/global.yaml");
-    ROS_BREAK();
-  }
-
   //retrieve refresh rate of sensor in hertz from parameter server
   float refresh_rate;
   if (!node_private.getParam("/hardware/esc_node/refresh_rate", refresh_rate))
@@ -148,9 +122,6 @@ int main(int argc, char **argv)
     ROS_ERROR("[esc_node] ESC servo number not defined in config file: avc_hardware_interface/config/hardware_interface.yaml");
     ROS_BREAK();
   }
-
-  //create subscriber to subscribe to control messages topic with queue size set to 1000
-  ros::Subscriber control_sub = node_public.subscribe("/control/control", 1000, controlCallback);
 
   //create subscriber to subscribe to ESC message topic with queue size set to 1
   ros::Subscriber esc_sub = node_public.subscribe("esc", 1, escCallback);
@@ -217,20 +188,6 @@ int main(int argc, char **argv)
         timer = node_private.createTimer(ros::Duration(force_output_time), timerCallback, true);
 
       }
-
-      //use acceleration and deceleration limiting if in autonomous mode
-      if (autonomous_control)
-      {
-
-        //limit acceleration to defined maximum
-        if ((throttle_percent - last_throttle_value) > (maximum_acceleration / refresh_rate))
-          throttle_percent = last_throttle_value + (maximum_acceleration / refresh_rate);
-        //limit deceleration to defined maximum
-        else if ((last_throttle_value - throttle_percent)  > (maximum_deceleration / refresh_rate))
-          throttle_percent = last_throttle_value - (maximum_deceleration / refresh_rate);
-
-      }
-
 
       //create pulsewidth variable to output calculated pulsewidth to esc
       int pulsewidth;
