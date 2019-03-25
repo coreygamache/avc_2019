@@ -96,6 +96,22 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
+  //retrieve max acceleration value from parameter server
+  float maximum_acceleration;
+  if (!node_private.getParam("/driving/maximum_acceleration", maximum_acceleration))
+  {
+    ROS_ERROR("[navigation_node] ESC maximum acceleration not defined in config file: avc_bringup/config/global.yaml");
+    ROS_BREAK();
+  }
+
+  //retrieve max acceleration value from parameter server
+  float maximum_deceleration;
+  if (!node_private.getParam("/driving/maximum_deceleration", maximum_deceleration))
+  {
+    ROS_ERROR("[navigation_node] ESC maximum deceleration not defined in config file: avc_bringup/config/global.yaml");
+    ROS_BREAK();
+  }
+
   //retrieve refresh rate of sensor in hertz from parameter server
   float refresh_rate;
   if (!node_private.getParam("/hardware/esc_node/refresh_rate", refresh_rate))
@@ -183,6 +199,11 @@ int main(int argc, char **argv)
         timer = node_private.createTimer(ros::Duration(force_output_time), timerCallback, true);
 
       }
+
+      if ((throttle_percent - last_throttle_value) > (maximum_acceleration / refresh_rate))
+        throttle_percent = last_throttle_value + (maximum_acceleration / refresh_rate);
+      else if ((last_throttle_value - throttle_percent)  > (maximum_deceleration / refresh_rate))
+        throttle_percent = throttle_percent - (maximum_deceleration / refresh_rate);
 
       //create pulsewidth variable to output calculated pulsewidth to esc
       int pulsewidth;
