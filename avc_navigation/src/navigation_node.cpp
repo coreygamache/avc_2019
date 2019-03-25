@@ -201,6 +201,22 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
+  //retrieve max acceleration value from parameter server
+  float maximum_acceleration;
+  if (!node_private.getParam("/driving/maximum_acceleration", maximum_acceleration))
+  {
+    ROS_ERROR("[navigation_node] ESC maximum acceleration not defined in config file: avc_bringup/config/global.yaml");
+    ROS_BREAK();
+  }
+
+  //retrieve max acceleration value from parameter server
+  float maximum_deceleration;
+  if (!node_private.getParam("/driving/maximum_deceleration", maximum_deceleration))
+  {
+    ROS_ERROR("[navigation_node] ESC maximum deceleration not defined in config file: avc_bringup/config/global.yaml");
+    ROS_BREAK();
+  }
+
   //retrieve maximum throttle value from parameter server [%]
   float maximum_throttle;
   if (!node_private.getParam("/driving/maximum_throttle", maximum_throttle))
@@ -339,6 +355,9 @@ int main(int argc, char **argv)
   //create timer object for clearing acceleration delay flag
   ros::Timer accel_delay_timer;
 
+  //initialie variable for recording last throttle percent value
+  double last_throttle_value = 0;
+
   //set loop rate in Hz
   ros::Rate loop_rate(refresh_rate);
 
@@ -463,23 +482,37 @@ int main(int argc, char **argv)
         //calculate distance to next waypoint
         float distance_to_next = sqrt(pow(target_delta_x, 2) + pow(target_delta_y, 2));
 
+        //create throttle percent variable
+        double throttle_percent;
+
         //if distance is above threshold value, set throttle to maximum value
         if (!accel_delay_flag && (distance_to_next > threshold_distance_value))
-          esc_msg.throttle_percent = maximum_throttle;
+          throttle_percent = maximum_throttle;
         //if within threshold distance, reduce throttle from maximum inverse-proportionally to distance to minimum distance value
         else if (!accel_delay_flag && ((distance_to_next < threshold_distance_value) && (distance_to_next > min_distance_value)))
-          esc_msg.throttle_percent = min_distance_throttle + (maximum_throttle - min_distance_throttle) * ((distance_to_next - min_distance_value) / (threshold_distance_value - min_distance_value));
+          throttle_percent = min_distance_throttle + (maximum_throttle - min_distance_throttle) * ((distance_to_next - min_distance_value) / (threshold_distance_value - min_distance_value));
         //if below minimum distance value, set throttle to minimum value
         else
-          esc_msg.throttle_percent = min_distance_throttle;
+          throttle_percent = min_distance_throttle;
+
+        //limit acceleration to defined maximum
+        if ((throttle_percent - last_throttle_value) > (maximum_acceleration / refresh_rate))
+          throttle_percent = last_throttle_value + (maximum_acceleration / refresh_rate);
+        //limit deceleration to defined maximum
+        else if ((last_throttle_value - throttle_percent)  > (maximum_deceleration / refresh_rate))
+          throttle_percent = last_throttle_value - (maximum_deceleration / refresh_rate);
 
         //if throttle percent is requested below minimum value, set to minimum value
-        if (esc_msg.throttle_percent < minimum_throttle)
-          esc_msg.throttle_percent = minimum_throttle;
+        if (throttle_percent < minimum_throttle)
+          throttle_percent = minimum_throttle;
 
-        //set time of ESC message and publish
+        //set time and throttle percent value of ESC message and publish
+        esc_msg.throttle_percent = throttle_percent;
         esc_msg.header.stamp = ros::Time::now();
         esc_pub.publish(esc_msg);
+
+        //set last throttle value to current throttle value
+        last_throttle_value = throttle_percent;
 
         //check if robot is within defined distance of waypoint, notify and set target to next waypoint if true
         if (distance_to_next < waypoint_radius)
