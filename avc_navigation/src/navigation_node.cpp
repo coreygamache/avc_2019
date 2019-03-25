@@ -42,6 +42,8 @@ std::vector< std::vector<double> > gpsWaypoints;
 int indicator_LED;
 
 
+//----------------------------SIGINT HANDLER------------------------------------
+
 //callback function called to process SIGINT command
 void sigintHandler(int sig)
 {
@@ -62,6 +64,8 @@ void accelDelayTimerCallback(const ros::TimerEvent& event)
   accel_delay_flag = false;
 
 }
+
+//--------------------------CALLBACK FUNCTIONS----------------------------------
 
 //callback function called to process messages on control topic
 void controlCallback(const avc_msgs::Control::ConstPtr& msg)
