@@ -10,8 +10,8 @@ driving:
   k_collision_brake: 0.5 # collision avoidance braking constant (larger values = harsher braking  w.r.t. distance to object (linear)) [0 to 1]
   k_collision_steer: 70.0 # collision avoidance steering constant (larger values = harsher steering w.r.t. distance to object (linear)) [0 to infinity]
   k_throttle_decay: -1.6 # throttle decay constant (smaller values = harsher throttle cut w.r.t. steering angle (exponential)) [0 to -infinity]
-  maximum_acceleration: 40.0 # [%/s^2]
-  maximum_deceleration: 40.0 # [%/s^2]
+  maximum_acceleration: 35.0 # [%/s^2]
+  maximum_deceleration: 100.0 # [%/s^2]
   maximum_throttle: 32.0 # 32.0 last tested good
   minimum_throttle: 10.0
   min_distance_value: 2.0
