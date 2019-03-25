@@ -29,7 +29,7 @@ imu:
   calibration_file_path: /home/corey/avc_ws/src/avc_sensors/config
   calibration_file_name: RTIMULib
   frame_id: imu_link
-  slerp_power: 0.02 # weight of gyros vs. accelerometer/compass data (0 to 1, default 0.02)
+  slerp_power: 0.01 # weight of gyros vs. accelerometer/compass data (0 to 1, default 0.02, 0.02 works with some circling)
 
 # proximity sensor parameters
 proximity_sensor:
