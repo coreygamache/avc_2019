@@ -2,6 +2,6 @@ navigation_node:
   accel_delay_time: 2.0 # [s]
   pidKd: 0
   pidKi: 0
-  pidKp: 0.75
+  pidKp: 0.50
   refresh_rate: 20
   waypoint_radius: 1.75 # [m]
