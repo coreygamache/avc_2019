@@ -106,6 +106,7 @@ include_directories(
 # add_executable(${PROJECT_NAME}_node src/avc_control_node.cpp)
 add_executable(collision_avoidance_node src/collision_avoidance_node.cpp)
 add_executable(control_node src/control_node.cpp)
+add_executable(emergency_stop_node src/emergency_stop_node.cpp)
 add_executable(manual_control_node src/manual_control_node.cpp)
 
 ## Rename C++ executable without prefix
@@ -119,6 +120,7 @@ add_executable(manual_control_node src/manual_control_node.cpp)
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(collision_avoidance_node ${catkin_EXPORTED_TARGETS})
 add_dependencies(control_node ${catkin_EXPORTED_TARGETS})
+add_dependencies(emergency_stop_node ${catkin_EXPORTED_TARGETS})
 add_dependencies(manual_control_node ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
@@ -127,4 +129,5 @@ add_dependencies(manual_control_node ${catkin_EXPORTED_TARGETS})
 # )
 target_link_libraries(collision_avoidance_node ${catkin_LIBRARIES})
 target_link_libraries(control_node ${catkin_LIBRARIES} wiringPi)
+target_link_libraries(emergency_stop_node ${catkin_LIBRARIES})
 target_link_libraries(manual_control_node ${catkin_LIBRARIES})
