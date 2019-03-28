@@ -1,5 +1,4 @@
-//control node
-//this node controls control mode changing via controller button press
+//emergency stop node
 #include <errno.h>
 #include <ros/ros.h>
 #include <sensor_msgs/Joy.h>
