@@ -122,8 +122,8 @@ void gpsFixCallback(const sensor_msgs::NavSatFix::ConstPtr& msg)
     fixCounter++;
 
     //prevent counter overflow
-    if (fixCounter == 65535)
-      fixCounter = 5;
+    if (fixCounter >= 10001)
+      fixCounter = 1;
 
   }
 
