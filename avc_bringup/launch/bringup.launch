@@ -31,7 +31,7 @@
     </node>
     <node name="control_node" pkg="avc_control" type="control_node" ns="control" output="screen" />
     <node name="controller_node" pkg="joy" type="joy_node" ns="control" output="screen" />
-    <node name="emergency_stop_node" pkg="avc_control" type="emergency_stop_node" ns="control" output="screen" required="true" />
+    <node name="emergency_stop_node" pkg="avc_control" type="emergency_stop_node" ns="control" output="log" required="true" />
     <node name="manual_control_node" pkg="avc_control" type="manual_control_node" ns="control" output="screen" />
   </group>
 
