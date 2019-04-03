@@ -3,5 +3,5 @@ navigation_node:
   pidKd: 0
   pidKi: 0
   pidKp: 0.50
-  refresh_rate: 20
+  refresh_rate: 50
   waypoint_radius: 2.5 # [m]
