@@ -20,7 +20,15 @@ void controllerCallback(const sensor_msgs::Joy::ConstPtr& msg)
 
   //kill the node if the emergency stop button is pressed
   if (msg->buttons[2] == 1)
+  {
+
+    //notify emergency shutdown requested
+    ROS_INFO("[emergency_stop_node] emergency stop requested");
+
+    //shutdown node
     ros::shutdown();
+
+  }
 
 }
 
