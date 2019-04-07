@@ -4,6 +4,6 @@
   <rosparam command="load" file="$(find avc_sensors)/config/gps.yaml" ns="setup" />
 
   <!-- launch GPS setup node -->
-  <node name="gps_setup_node" pkg="avc_sensors" type="gps_setup_node" ns="setup" output="screen" />
+  <node name="gps_setup_node" pkg="avc_sensors" type="gps_setup_node" ns="setup" output="screen" required="yes" />
 
 </launch>
