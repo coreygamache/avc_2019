@@ -7,7 +7,7 @@ arduino:
 
 # button parameters
 button:
-  input_pin: 0
+  input_pin: 1
 
 # driving control parameters
 driving:
