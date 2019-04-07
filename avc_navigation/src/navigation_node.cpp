@@ -186,6 +186,14 @@ int main(int argc, char **argv)
     ROS_BREAK();
   }
 
+  //retrieve button input pin from parameter server
+  int button_pin;
+  if (!node_private.getParam("/button/input_pin", button_pin))
+  {
+    ROS_ERROR("[navigation_node] button input pin not defined in config file: avc_bringup/config/global.yaml");
+    ROS_BREAK();
+  }
+
   //retrieve indicator LED pin from parameter server
   if (!node_private.getParam("/led/indicator_pin", indicator_LED))
   {
@@ -348,6 +356,7 @@ int main(int argc, char **argv)
   //run wiringPi GPIO setup function and set pin modes
   wiringPiSetup();
   pinMode(indicator_LED, OUTPUT);
+  pinMode(button_pin, INPUT);
 
   //create PID controller object for steering output control
   PIDController steering_controller(pidKp, pidKi, pidKd, -servo_max_angle, servo_max_angle, 1 / refresh_rate);
@@ -364,6 +373,7 @@ int main(int argc, char **argv)
   while (ros::ok())
   {
 
+    //handle mode change request
     if (mode_change_requested)
     {
 
@@ -426,6 +436,20 @@ int main(int argc, char **argv)
           ROS_INFO("[navigation_node] GPS waypoint list read from file but no waypoints found; switch to mapping mode to record waypoints");
 
       }
+
+    }
+    //if mode change wasn't requested and in autonomous mode, check if button is pressed
+    else if (autonomous_control && !autonomous_running && digitalRead(button_pin))
+    {
+
+      //enable autonomous running
+      autonomous_running = true;
+
+      //turn on indicator LED during autonomous running
+      digitalWrite(indicator_LED, HIGH);
+
+      //notify that autonomous running is being enabled
+      ROS_INFO("[navigation_node] enabling autonomous running");
 
     }
 
