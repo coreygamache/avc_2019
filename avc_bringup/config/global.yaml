@@ -5,6 +5,10 @@
 arduino:
   i2c_address: 0x04 # i2c protocol address
 
+# button parameters
+button:
+  input_pin: 0
+
 # driving control parameters
 driving:
   k_collision_brake: 0.5 # collision avoidance braking constant (larger values = harsher braking  w.r.t. distance to object (linear)) [0 to 1]
