@@ -175,6 +175,9 @@ int main(int argc, char **argv)
   //indicate that program has completed setup successfully
   ROS_INFO("[gps_setup_node] GPS chip setup completed successfully");
 
+  //kill node when finished
+  ros::shutdown();
+
   return 0;
 }
 
